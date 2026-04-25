@@ -73,17 +73,11 @@ def main():
     transformed = transform_predefined_processes(df, space_on_x=False)
     print(f"Loaded {len(transformed)} processes")
 
-    p = create_space_time_figure(width=1000, height=700, space_on_x=False)
+    p = create_space_time_figure(width=1200, height=700, space_on_x=False)
     p = add_magnitude_labels(p, font_size="10pt", space_on_x=False)
     p = add_diffusion_lines(p, space_on_x=False)
     p = add_predefined_processes(p, transformed, interactive=False, font_size="9pt", space_on_x=False)
-
-    # Legend inside the plot area, top-left
-    p.legend.location = "top_left"
-    p.legend.click_policy = "hide"
-    p.legend.label_text_font_size = "8pt"
-    p.legend.background_fill_alpha = 0.7
-    p.legend.border_line_alpha = 0.3
+    p = add_legend(p, position="above", font_size="9pt")
     print("Built Stommel diagram OK")
 
     # ── Save embeddable HTML ─────────────────────────────────────────
