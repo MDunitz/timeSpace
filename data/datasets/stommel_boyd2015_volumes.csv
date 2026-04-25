@@ -14,7 +14,7 @@ eddies"
 7,Population & food web dynamics,1.00E+05: ~1 day,1.00E+08: ~3 years,1.00E+06: 10⁶ m³,1.00E+12: 10¹² m³,#6B9D9D,"Boyd et al. (2015); cf. Dickey (2003),  Haury et al. (1978)",Biological processes,Biological,L_v ~ 100 m (euphotic zone); V = L_h² × L_v.,right,5,0,"Population &
 food web dynamics"
 8,Biological pump,1.00E+05: ~1 day,1.00E+07: ~4 months,1.00E+11: 10¹¹ m³,4.00E+15: 4×10¹⁵ m³,#8CB3A3,"Boyd et al. (2015); cf. Dickey (2003),  Haury et al. (1978)",Bio-chemical & biological processes,Chemical,L_v = 1000–4000 m (full water column); V = L_h² × L_v.,right,5,-30,
-9,Biogeochemical cycles,1.00E+05: ~1 day,1.00E+10: ~300 years,4.00E+13: 4×10¹³ m³,1.50E+18: ~global ocean,#8CB3A3,"Boyd et al. (2015); cf. Dickey (2003),  Haury et al. (1978)",Bio-chemical & biological processes,Chemical,L_v ~ 4000 m. Space_max = 1.5×10¹⁸ m³. Number 9 in diagram.,left,-5,-50,
+9,Biogeochemical cycles,1.00E+05: ~1 day,1.00E+10: ~300 years,4.00E+13: 4×10¹³ m³,1.50E+18: ~global ocean,#8CB3A3,"Boyd et al. (2015); cf. Dickey (2003),  Haury et al. (1978)",Bio-chemical & biological processes,Chemical,L_v ~ 4000 m. Space_max = 1.5×10¹⁸ m³. Number 9 in diagram.,left,-5,-10,
 10,Upwelling,1.00E+06: ~12 days,1.00E+08: ~3 years,2.00E+10: 2×10¹⁰ m³,1.00E+15: 10¹⁵ m³,#7BA3B3,"Boyd et al. (2015); cf. Dickey (2003),  Haury et al. (1978)",Physical processes,Physical,L_v = 200–1000 m; V = L_h² × L_v.,right,5,0,
 11,Ocean warming and acidification,1.00E+09: ~30 years,1.00E+10: ~300 years,4.00E+13: 4×10¹³ m³,1.50E+18: ~global ocean,#8CB3A3,"Boyd et al. (2015); cf. Dickey (2003),  Haury et al. (1978)",Bio-chemical & biological processes,Chemical,L_v ~ 4000 m. Space_max = 1.5×10¹⁸ m³.,right,5,0,"Ocean warming &
 acidification"
