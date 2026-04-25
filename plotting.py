@@ -59,22 +59,29 @@ def set_diffusion_line_colors(diffusion_coefficients):
 
 
 # SETUP
-def add_legend(p):
-    """Move the figure legend to the right side and enable click-to-hide.
+def add_legend(p, position="right", font_size="12pt"):
+    """Move the figure legend and enable click-to-hide.
 
     Parameters
     ----------
     p : figure
         Bokeh figure with at least one legend.
+    position : str
+        Where to place the legend: "right", "above", "below", "left".
+    font_size : str
+        Legend label font size.
 
     Returns
     -------
     figure
     """
     leg = p.legend[0]
-    p.add_layout(leg, "right")  # outside
+    p.add_layout(leg, position)
     p.legend.click_policy = "hide"
-    p.legend.label_text_font_size = "12pt"
+    p.legend.label_text_font_size = font_size
+    if position in ("above", "below"):
+        p.legend.orientation = "horizontal"
+        p.legend.nrows = 2
     return p
 
 
@@ -408,14 +415,20 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
 
         lx, ly, align = _label_anchor(row, space_on_x=space_on_x)
         if lx is None:
+            has_side = "label_side" in process_df.columns
+            side = str(row.label_side).strip() if has_side and str(row.get("label_side", "")).strip() else "right"
             if space_on_x:
-                lx = row.Space_max.value
+                lx = row.Space_min.value if side == "left" else row.Space_max.value
                 ly = np.sqrt(row.Time_min.value * row.Time_max.value)
             else:
-                lx = row.Time_max.value
+                lx = row.Time_min.value if side == "left" else row.Time_max.value
                 ly = np.sqrt(row.Space_min.value * row.Space_max.value)
-            align = "left"
+            align = "right" if side == "left" else "left"
 
+        has_xo = "x_offset" in process_df.columns
+        has_yo = "y_offset" in process_df.columns
+        xo_val = str(row.get("x_offset", "")).strip() if has_xo else ""
+        yo_val = str(row.get("y_offset", "")).strip() if has_yo else ""
         p.text(
             x=lx,
             y=ly,
@@ -424,6 +437,8 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
             text_color=row.Color,
             text_alpha=row.TextAlpha,
             text_align=align,
+            x_offset=int(float(xo_val)) if xo_val else 0,
+            y_offset=int(float(yo_val)) if yo_val else 0,
             legend_label=row.Name,
             visible=visible,
         )
