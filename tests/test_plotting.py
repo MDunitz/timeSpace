@@ -112,5 +112,5 @@ class TestStartVisibleColumn:
         csv_dir = timeSpace.PROJECT_ROOT / "data" / "datasets"
         df = pd.read_csv(csv_dir / "stommel_boyd2015_volumes.csv")
         hidden = set(df.loc[~df["start_visible"].astype(bool), "Name"])
-        expected = {"Habitat-scale hydrodynamics", "Biological pump", "Benthic boundary layers"}
+        expected = {"Habitat-scale hydrodynamics", "Biological pump"}
         assert hidden == expected, f"unexpected hidden set: {hidden}"
