@@ -53,3 +53,88 @@ class TestAddMagnitudeLabels:
         p = create_space_time_figure()
         result = add_magnitude_labels(p)
         assert type(result).__name__ == "figure"
+
+
+class TestAddProcessLabelLeaders:
+    def _transformed_df(self):
+        import pandas as pd
+        import timeSpace
+        from timeSpace import transform_predefined_processes
+
+        csv_dir = timeSpace.PROJECT_ROOT / "data" / "datasets"
+        df = pd.read_csv(csv_dir / "stommel_boyd2015_volumes.csv")
+        return transform_predefined_processes(df, space_on_x=False)
+
+    def test_returns_figure(self):
+        from timeSpace.plotting import (
+            add_predefined_processes,
+            add_process_label_leaders,
+            create_space_time_figure,
+        )
+
+        transformed = self._transformed_df()
+        p = create_space_time_figure(space_on_x=False)
+        p = add_predefined_processes(p, transformed, space_on_x=False)
+        result = add_process_label_leaders(p, transformed, space_on_x=False)
+        assert type(result).__name__ == "figure"
+
+    def test_adds_segments(self):
+        """Leader lines should add at least one Segment glyph to the figure
+        when labels have nonzero offsets above the threshold."""
+        from bokeh.models import Segment
+        from timeSpace.plotting import (
+            add_predefined_processes,
+            add_process_label_leaders,
+            create_space_time_figure,
+        )
+
+        transformed = self._transformed_df()
+        p = create_space_time_figure(space_on_x=False)
+        add_predefined_processes(p, transformed, space_on_x=False)
+        before = sum(1 for r in p.renderers if isinstance(r.glyph, Segment))
+        add_process_label_leaders(p, transformed, space_on_x=False, min_offset_px=1)
+        after = sum(1 for r in p.renderers if isinstance(r.glyph, Segment))
+        assert after > before
+
+    def test_threshold_skips_small_offsets(self):
+        """When `min_offset_px` exceeds all label offsets in the data, no
+        Segment glyph should be added."""
+        from bokeh.models import Segment
+        from timeSpace.plotting import (
+            add_predefined_processes,
+            add_process_label_leaders,
+            create_space_time_figure,
+        )
+
+        transformed = self._transformed_df()
+        p = create_space_time_figure(space_on_x=False)
+        add_predefined_processes(p, transformed, space_on_x=False)
+        before = sum(1 for r in p.renderers if isinstance(r.glyph, Segment))
+        # 10_000 px threshold — larger than any realistic offset
+        add_process_label_leaders(p, transformed, space_on_x=False, min_offset_px=10_000)
+        after = sum(1 for r in p.renderers if isinstance(r.glyph, Segment))
+        assert after == before
+
+    def test_empty_dataframe_no_op(self):
+        import pandas as pd
+        from timeSpace.plotting import (
+            add_process_label_leaders,
+            create_space_time_figure,
+        )
+
+        empty = pd.DataFrame(
+            columns=[
+                "Name",
+                "Time_min",
+                "Time_max",
+                "Space_min",
+                "Space_max",
+                "x_offset",
+                "y_offset",
+                "label_side",
+                "Color",
+            ]
+        )
+        p = create_space_time_figure(space_on_x=False)
+        result = add_process_label_leaders(p, empty, space_on_x=False)
+        assert type(result).__name__ == "figure"

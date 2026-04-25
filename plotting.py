@@ -2,7 +2,7 @@ import numpy as np
 import colorcet as cc
 import pandas as pd
 from bokeh.plotting import figure
-from bokeh.models import Label, Span, CustomJS
+from bokeh.models import Label, Span, CustomJS, Segment, ColumnDataSource
 from timeSpace.constants import DIFFUSION_COEFFICIENTS, TIME_MARKERS, SPACE_MARKERS, base_time
 from timeSpace.calculations import calculate_diffusion_length, calculate_sphere_volume
 
@@ -442,6 +442,133 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
             legend_label=row.Name,
             visible=visible,
         )
+    return p
+
+
+def add_process_label_leaders(
+    p,
+    process_df,
+    space_on_x=True,
+    min_offset_px=25,
+    line_color="#888888",
+    line_dash="dotted",
+    line_width=1,
+    line_alpha=0.6,
+    legend_margin_px=220,
+    axis_margin_px=80,
+):
+    """Draw thin leader lines from each label's offset anchor back to its
+    process centroid. Call this AFTER `add_predefined_processes` on the same
+    figure and same dataframe.
+
+    Only draws a line when the label's pixel offset magnitude exceeds
+    `min_offset_px` (so tiny offsets don't clutter with micro-segments).
+
+    Parameters
+    ----------
+    p : bokeh.plotting.figure
+        The figure already populated by `add_predefined_processes`.
+    process_df : pandas.DataFrame
+        Output of `transform_predefined_processes`. Must contain
+        Time_min, Time_max, Space_min, Space_max, x_offset, y_offset,
+        label_side.
+    space_on_x : bool
+        Must match the value passed to `add_predefined_processes`.
+    min_offset_px : int
+        Skip the leader if |x_offset| < this and |y_offset| < this.
+    legend_margin_px, axis_margin_px : int
+        Approximate pixel overhead used to estimate the plot inner area.
+        These are approximations — the exact figure frame is not
+        known until render. Defaults fit the current 1200 px × 700 px
+        layout with right-side legend.
+
+    Notes
+    -----
+    Pixel offsets are converted to data-space on a log-log axis via
+        new_val = old_val * 10 ** (dpx / pixels_per_decade)
+    where `pixels_per_decade = inner_width_px / log10(range_end / range_start)`.
+
+    Sign convention for pixel offsets (matches Bokeh Text glyph):
+        x_offset > 0 → label to the right of anchor (larger x)
+        y_offset > 0 → label DOWN on screen; for a non-reversed y axis
+                       this is smaller y, for a reversed y axis it is larger y.
+    """
+    if len(process_df) == 0:
+        return p
+
+    inner_w = max(100, p.width - legend_margin_px - axis_margin_px)
+    inner_h = max(100, p.height - axis_margin_px)
+
+    x_start, x_end = float(p.x_range.start), float(p.x_range.end)
+    y_start, y_end = float(p.y_range.start), float(p.y_range.end)
+    # Reversed axis: log span can be negative, take absolute for the
+    # pixels-per-decade magnitude; direction is handled via sign.
+    x_log_span = np.log10(x_end) - np.log10(x_start)
+    y_log_span = np.log10(y_end) - np.log10(y_start)
+    px_per_dec_x = inner_w / abs(x_log_span)
+    px_per_dec_y = inner_h / abs(y_log_span)
+    x_dir = np.sign(x_log_span)  # +1 if x increases rightward (normal)
+    y_dir_screen = -np.sign(y_log_span)  # Bokeh: +y_offset moves DOWN on screen;
+    #   down on screen maps to smaller y_data when axis is not reversed
+    #   (y_log_span > 0), and to larger y_data when reversed (y_log_span < 0).
+
+    xs_start, ys_start, xs_end, ys_end, colors = [], [], [], [], []
+    for _, row in process_df.iterrows():
+        try:
+            xo = int(float(str(row.get("x_offset", "")).strip() or 0))
+            yo = int(float(str(row.get("y_offset", "")).strip() or 0))
+        except (TypeError, ValueError):
+            xo, yo = 0, 0
+
+        if abs(xo) < min_offset_px and abs(yo) < min_offset_px:
+            continue
+
+        # Ellipse centroid in data space (geometric mean on log axes)
+        cx_time = np.sqrt(row.Time_min.value * row.Time_max.value)
+        cy_space = np.sqrt(row.Space_min.value * row.Space_max.value)
+        if space_on_x:
+            cx_data, cy_data = cy_space, cx_time
+        else:
+            cx_data, cy_data = cx_time, cy_space
+
+        # Label anchor is at the ellipse edge determined by label_side,
+        # matching the logic in add_predefined_processes.
+        side = str(row.get("label_side", "")).strip() or "right"
+        if space_on_x:
+            lx_anchor = row.Space_min.value if side == "left" else row.Space_max.value
+            ly_anchor = np.sqrt(row.Time_min.value * row.Time_max.value)
+        else:
+            lx_anchor = row.Time_min.value if side == "left" else row.Time_max.value
+            ly_anchor = np.sqrt(row.Space_min.value * row.Space_max.value)
+
+        # Convert pixel offset to data-space offset on log axes.
+        # dx_data = lx_anchor * 10 ** (xo * x_dir / px_per_dec_x)
+        dx_log = xo * x_dir / px_per_dec_x
+        dy_log = yo * y_dir_screen / px_per_dec_y
+        lx_effective = lx_anchor * (10**dx_log)
+        ly_effective = ly_anchor * (10**dy_log)
+
+        xs_start.append(cx_data)
+        ys_start.append(cy_data)
+        xs_end.append(lx_effective)
+        ys_end.append(ly_effective)
+        colors.append(row.Color if "Color" in process_df.columns else line_color)
+
+    if not xs_start:
+        return p
+
+    source = ColumnDataSource(data=dict(x0=xs_start, y0=ys_start, x1=xs_end, y1=ys_end, color=colors))
+    seg = Segment(
+        x0="x0",
+        y0="y0",
+        x1="x1",
+        y1="y1",
+        line_color=line_color,
+        line_dash=line_dash,
+        line_width=line_width,
+        line_alpha=line_alpha,
+    )
+    p.add_glyph(source, seg)
     return p
 
 
