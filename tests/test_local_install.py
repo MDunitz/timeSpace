@@ -77,7 +77,7 @@ def main():
     p = add_magnitude_labels(p, font_size="10pt", space_on_x=False)
     p = add_diffusion_lines(p, space_on_x=False)
     p = add_predefined_processes(p, transformed, interactive=False, font_size="9pt", space_on_x=False)
-    p = add_legend(p, position="above", font_size="9pt")
+    p = add_legend(p, position="right", font_size="9pt")
     print("Built Stommel diagram OK")
 
     # ── Save embeddable HTML ─────────────────────────────────────────
