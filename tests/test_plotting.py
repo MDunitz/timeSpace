@@ -6,6 +6,7 @@ from bokeh.models.glyphs import Text
 import timeSpace
 from timeSpace import transform_predefined_processes
 from timeSpace.plotting import (
+    _resolve_start_visible,
     add_magnitude_labels,
     add_predefined_processes,
     create_space_time_figure,
@@ -129,3 +130,30 @@ class TestAddPredefinedProcessesLabelText:
         add_predefined_processes(p, transformed, space_on_x=False)
         texts = self._text_glyph_values(p)
         assert "Diffusion boundary layers" in texts
+
+
+class TestStartVisibleColumn:
+    """Verify the per-row start_visible column overrides the global
+    `interactive`-derived default in add_predefined_processes.
+    The CSV format is pandas' default bool serialization: 'True' / 'False'.
+    """
+
+    def test_resolves_true_and_false(self):
+        assert _resolve_start_visible(pd.Series({"start_visible": "True"}), default=False) is True
+        assert _resolve_start_visible(pd.Series({"start_visible": "False"}), default=True) is False
+
+    def test_blank_cell_falls_back_to_default(self):
+        assert _resolve_start_visible(pd.Series({"start_visible": ""}), default=True) is True
+        assert _resolve_start_visible(pd.Series({"start_visible": ""}), default=False) is False
+
+    def test_missing_column_falls_back_to_default(self):
+        assert _resolve_start_visible(pd.Series({"other": "x"}), default=True) is True
+        assert _resolve_start_visible(pd.Series({"other": "x"}), default=False) is False
+
+    def test_csv_has_expected_off_by_default(self):
+        """Regression on the shipped CSV: exactly these processes start hidden."""
+        csv_dir = timeSpace.PROJECT_ROOT / "data" / "datasets"
+        df = pd.read_csv(csv_dir / "stommel_boyd2015_volumes.csv")
+        hidden = set(df.loc[~df["start_visible"].astype(bool), "Name"])
+        expected = {"Habitat-scale hydrodynamics", "Biological pump"}
+        assert hidden == expected, f"unexpected hidden set: {hidden}"
