@@ -1,6 +1,15 @@
+import numpy as np
+import pandas as pd
 from bokeh.models import LogAxis
+from bokeh.models.glyphs import Text
 
-from timeSpace.plotting import add_magnitude_labels, create_space_time_figure
+import timeSpace
+from timeSpace import transform_predefined_processes
+from timeSpace.plotting import (
+    add_magnitude_labels,
+    add_predefined_processes,
+    create_space_time_figure,
+)
 
 
 class TestCreateSpaceTimeFigure:
@@ -78,3 +87,45 @@ class TestRangeBoundsJSSafe:
         p = create_space_time_figure(space_on_x=False)
         for v in (p.x_range.start, p.x_range.end, p.y_range.start, p.y_range.end):
             self._assert_safe(v)
+
+
+class TestAddPredefinedProcessesLabelText:
+    """Per-row `label_text` overrides the Name displayed on the plot.
+    Legend continues to use Name unchanged."""
+
+    def _row_factory(self, label_text_value):
+        csv_dir = timeSpace.PROJECT_ROOT / "data" / "datasets"
+        df = pd.read_csv(csv_dir / "stommel_boyd2015_volumes.csv")
+        df = df.iloc[:1].copy()
+        df["label_text"] = [label_text_value]
+        return transform_predefined_processes(df, space_on_x=False)
+
+    def _text_glyph_values(self, p):
+        out = []
+        for r in p.renderers:
+            if isinstance(r.glyph, Text):
+                src = r.data_source
+                if "text" in src.data:
+                    out.extend(src.data["text"])
+        return out
+
+    def test_label_text_renders_when_set(self):
+        transformed = self._row_factory("custom\nlabel")
+        p = create_space_time_figure(space_on_x=False)
+        add_predefined_processes(p, transformed, space_on_x=False)
+        texts = self._text_glyph_values(p)
+        assert "custom\nlabel" in texts
+
+    def test_empty_string_falls_back_to_name(self):
+        transformed = self._row_factory("")
+        p = create_space_time_figure(space_on_x=False)
+        add_predefined_processes(p, transformed, space_on_x=False)
+        texts = self._text_glyph_values(p)
+        assert "Diffusion boundary layers" in texts
+
+    def test_nan_falls_back_to_name(self):
+        transformed = self._row_factory(np.nan)
+        p = create_space_time_figure(space_on_x=False)
+        add_predefined_processes(p, transformed, space_on_x=False)
+        texts = self._text_glyph_values(p)
+        assert "Diffusion boundary layers" in texts
