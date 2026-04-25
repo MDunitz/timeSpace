@@ -20,6 +20,6 @@ food web dynamics",True
 acidification",True
 12,Marine snow / particle aggregation,1.00E+00: one second,1.00E+05: ~1 day,1.00E-09: 1 mm³ (single particle),1.00E+03: 10³ m³ (aggregation patch),#8CB3A3,Boyd et al. (2015); Alldredge & Silver (1988),Bio-chemical & biological processes,Chemical,Particle formation through sinking transit. V = L³.,right,5,15,,True
 13,Benthic boundary layers,1.00E+02: ~2 minutes,1.00E+05: ~1 day,5.00E+01: ~50 m³ (10m patch × 0.5m BBL),1.00E+08: 10⁸ m³ (10km patch × 1m BBL),#7BA3B3,Boyd et al. (2015); Trowbridge & Lentz (1998),Physical processes,Physical,BBL thickness L_v ~ 0.5–1m; L_h from patch to coastal scale. V = L_h² × L_v.,right,5,40,"Benthic
-boundary layers",True
+boundary layers",False
 14,Physical/ecological interaction among benthic species,1.00E+07: ~4 months,1.00E+09: ~30 years,1.00E+02: 10² m³ (10m habitat × 1m depth),1.00E+11: 10¹¹ m³ (100km range × 10m depth),#6B9D9D,"Boyd et al. (2015); cf. Dickey (2003),  Haury et al. (1978)",Biological processes,Biological,Active benthic layer L_v ~ 1–10m; L_h ~ 10m–100km. V = L_h² × L_v.,right,5,30,"Physical/ecological interaction
 among benthic species",True
