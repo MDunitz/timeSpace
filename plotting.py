@@ -95,10 +95,10 @@ def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True)
     """
     if space_on_x:
         xl, yl = "Space (m\u00b3)", "Time (s)"
-        xr, yr = (10**-27, 10**21), (10**12, 10**-3)
+        xr, yr = (1e-27, 1e21), (1e12, 1e-3)
     else:
         xl, yl = "Time (s)", "Space (m\u00b3)"
-        xr, yr = (10**-3, 10**12), (10**-21, 10**21)
+        xr, yr = (1e-3, 1e12), (1e-21, 1e21)
     p = figure(
         width=width,
         height=height,
@@ -230,7 +230,7 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
         else:
             lbl_kwargs = dict(
                 x=time_val,
-                y=p.y_range.end if hasattr(p.y_range, "end") else 10**21,
+                y=p.y_range.end if hasattr(p.y_range, "end") else 1e21,
                 text_align="center",
                 text_baseline="top",
             )
