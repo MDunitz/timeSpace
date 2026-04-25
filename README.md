@@ -113,6 +113,13 @@ processed = transform_process_response_sheet(df)
 5. In `constants.py`, set `PROCESSES_URI` to the identifying string between `/d/` and `/edit` in the sheet URL.
    For example: `https://docs.google.com/spreadsheets/d/USE_THIS_PART/edit?gid=0#gid=0`
 
+> **Editing the Time / Space scale answer options**
+>
+> The scale answer options in the form follow the format `<value>: <example>`, for instance `1.00E+07: ~3 months`.
+>
+> - The **numeric value before the `:`** (e.g. `1.00E+07`) is what the ETL parses and plots. Do **not** change these — the code (`etl.py`) splits on `:` and casts the prefix to `float`, so anything non-numeric or out of the expected decade will break downstream processing or silently shift your data.
+> - The **example text after the `:`** (e.g. `~3 months`) is purely a human-readable anchor. You can edit it freely to make the scale more intuitive for your respondents.
+
 ### Setting up a measurement form
 
 Follow the same steps as above, using your measurement form template, and set `MEASUREMENTS_URI` in `constants.py`.
