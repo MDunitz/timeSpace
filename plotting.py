@@ -394,6 +394,31 @@ def _label_anchor(row, space_on_x=True):
         return None, None, None  # caller uses existing logic
 
 
+def _resolve_start_visible(row, has_col, default):
+    """Parse per-row start_visible override into a bool.
+
+    Accepts: bool, 0/1, or case-insensitive 'true'/'false'/'yes'/'no'/'1'/'0'.
+    Missing cell (NaN or empty string) → fall back to `default`.
+    """
+    if not has_col:
+        return default
+    val = row.get("start_visible")
+    if val is None or pd.isna(val):
+        return default
+    if isinstance(val, bool):
+        return val
+    if isinstance(val, (int, float)):
+        return bool(val)
+    s = str(val).strip().lower()
+    if s == "":
+        return default
+    if s in ("true", "1", "yes", "y", "t"):
+        return True
+    if s in ("false", "0", "no", "n", "f"):
+        return False
+    return default
+
+
 def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
     """Render predefined process glyphs with labels.
 
@@ -410,8 +435,10 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
             f"Did you forget to call transform_predefined_processes() first?"
         )
     visible = not interactive
+    has_start_visible = "start_visible" in process_df.columns
     for i, row in process_df.iterrows():
-        _render_glyph(p, row, row.Color, row.FillAlpha, visible, row.Name, space_on_x=space_on_x)
+        row_visible = _resolve_start_visible(row, has_start_visible, visible)
+        _render_glyph(p, row, row.Color, row.FillAlpha, row_visible, row.Name, space_on_x=space_on_x)
 
         lx, ly, align = _label_anchor(row, space_on_x=space_on_x)
         if lx is None:
@@ -440,7 +467,7 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
             x_offset=int(float(xo_val)) if xo_val else 0,
             y_offset=int(float(yo_val)) if yo_val else 0,
             legend_label=row.Name,
-            visible=visible,
+            visible=row_visible,
         )
     return p
 

@@ -53,3 +53,63 @@ class TestAddMagnitudeLabels:
         p = create_space_time_figure()
         result = add_magnitude_labels(p)
         assert type(result).__name__ == "figure"
+
+
+class TestStartVisibleColumn:
+    """Verify the per-row start_visible column overrides the global
+    `interactive`-derived default in add_predefined_processes.
+    """
+
+    def _df(self, start_visible_values):
+        import pandas as pd
+        import timeSpace
+        from timeSpace import transform_predefined_processes
+
+        csv_dir = timeSpace.PROJECT_ROOT / "data" / "datasets"
+        df = pd.read_csv(csv_dir / "stommel_boyd2015_volumes.csv")
+        # Override start_visible per-row by name-index order
+        df["start_visible"] = start_visible_values
+        return transform_predefined_processes(df, space_on_x=False)
+
+    def test_parser_accepts_bool(self):
+        from timeSpace.plotting import _resolve_start_visible
+        import pandas as pd
+
+        row_true = pd.Series({"start_visible": True})
+        row_false = pd.Series({"start_visible": False})
+        assert _resolve_start_visible(row_true, True, default=True) is True
+        assert _resolve_start_visible(row_false, True, default=True) is False
+
+    def test_parser_accepts_strings(self):
+        from timeSpace.plotting import _resolve_start_visible
+        import pandas as pd
+
+        for s in ("true", "True", "TRUE", "1", "yes", "y"):
+            row = pd.Series({"start_visible": s})
+            assert _resolve_start_visible(row, True, default=False) is True
+        for s in ("false", "False", "0", "no", "n"):
+            row = pd.Series({"start_visible": s})
+            assert _resolve_start_visible(row, True, default=True) is False
+
+    def test_parser_falls_back_on_missing(self):
+        from timeSpace.plotting import _resolve_start_visible
+        import pandas as pd
+
+        row_nan = pd.Series({"start_visible": float("nan")})
+        row_empty = pd.Series({"start_visible": ""})
+        assert _resolve_start_visible(row_nan, True, default=True) is True
+        assert _resolve_start_visible(row_empty, True, default=False) is False
+        # Column not present → always default
+        row_missing = pd.Series({"other": "x"})
+        assert _resolve_start_visible(row_missing, False, default=True) is True
+
+    def test_csv_has_two_off_by_default(self):
+        """Regression: the shipped CSV marks exactly
+        'Habitat-scale hydrodynamics' and 'Biological pump' as start hidden."""
+        import pandas as pd
+        import timeSpace
+
+        csv_dir = timeSpace.PROJECT_ROOT / "data" / "datasets"
+        df = pd.read_csv(csv_dir / "stommel_boyd2015_volumes.csv")
+        hidden = set(df.loc[~df["start_visible"].astype(bool), "Name"])
+        assert hidden == {"Habitat-scale hydrodynamics", "Biological pump"}, f"unexpected hidden set: {hidden}"
