@@ -1,6 +1,6 @@
 from bokeh.models import LogAxis
 
-from timeSpace.plotting import create_space_time_figure
+from timeSpace.plotting import add_magnitude_labels, create_space_time_figure
 
 
 class TestCreateSpaceTimeFigure:
@@ -38,8 +38,6 @@ class TestCreateSpaceTimeFigure:
 
 class TestAddMagnitudeLabels:
     def test_adds_layout_elements(self):
-        from timeSpace.plotting import add_magnitude_labels, create_space_time_figure
-
         p = create_space_time_figure()
         before = len(p.center)
         add_magnitude_labels(p)
@@ -48,8 +46,6 @@ class TestAddMagnitudeLabels:
         assert after > before
 
     def test_returns_figure(self):
-        from timeSpace.plotting import add_magnitude_labels, create_space_time_figure
-
         p = create_space_time_figure()
         result = add_magnitude_labels(p)
         assert type(result).__name__ == "figure"

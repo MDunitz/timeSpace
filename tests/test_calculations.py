@@ -1,14 +1,16 @@
 import numpy as np
+import pandas as pd
 import astropy.units as u
 import pytest
 
 from timeSpace.calculations import (
-    create_ellipse_data,
-    calculate_sphere_volume,
     calculate_diffusion_length,
+    calculate_log10_y_for_ellipse,
     calculate_log_center,
     calculate_log_width,
+    calculate_sphere_volume,
     classify_process_geometry,
+    create_ellipse_data,
 )
 
 
@@ -61,8 +63,6 @@ class TestLogHelpers:
 class TestCreateEllipseData:
     @pytest.fixture
     def sample_row(self):
-        import pandas as pd
-
         return pd.Series(
             {
                 "Time_min": 1e2 * u.second,
@@ -128,8 +128,6 @@ class TestCreateEllipseData:
 
     def test_degenerate_time_raises(self):
         """Degenerate time axis should raise ValueError."""
-        import pandas as pd
-
         row = pd.Series(
             {
                 "Time_min": 1e3 * u.second,
@@ -143,8 +141,6 @@ class TestCreateEllipseData:
 
     def test_degenerate_space_raises(self):
         """Degenerate space axis should raise ValueError."""
-        import pandas as pd
-
         row = pd.Series(
             {
                 "Time_min": 1e2 * u.second,
@@ -161,8 +157,6 @@ class TestCalculateLog10YForEllipse:
     """Tests for the log10-space ellipse Y solver."""
 
     def test_at_center_returns_extremes(self):
-        from timeSpace.calculations import calculate_log10_y_for_ellipse
-
         # At x = 10^c_x, inner term is zero → y = c_y ± b
         c_x, c_y, a, b = 3.0, 5.0, 2.0, 1.5
         x = 10**c_x
@@ -171,8 +165,6 @@ class TestCalculateLog10YForEllipse:
         np.testing.assert_allclose(minus, c_y - b, rtol=1e-10)
 
     def test_at_edge_returns_center(self):
-        from timeSpace.calculations import calculate_log10_y_for_ellipse
-
         # At x = 10^(c_x + a) (right edge), y should collapse to c_y
         c_x, c_y, a, b = 3.0, 5.0, 2.0, 1.5
         x = 10 ** (c_x + a)
@@ -181,8 +173,6 @@ class TestCalculateLog10YForEllipse:
         np.testing.assert_allclose(minus, c_y, atol=1e-6)
 
     def test_symmetric_about_center(self):
-        from timeSpace.calculations import calculate_log10_y_for_ellipse
-
         c_x, c_y, a, b = 3.0, 5.0, 2.0, 1.5
         # Points equidistant from center in log-x should give same y spread
         x_left = 10 ** (c_x - 1.0)
@@ -197,8 +187,6 @@ class TestClassifyProcessGeometry:
 
     @staticmethod
     def _make_row(t_min, t_max, s_min, s_max):
-        import pandas as pd
-
         return pd.Series(
             {
                 "Time_min": t_min * u.second,
