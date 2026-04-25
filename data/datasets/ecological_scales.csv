@@ -1,0 +1,43 @@
+,Name,Time_min,Time_max,Space_min,Space_max,Color,Reference(s),Sub-reference ([TODO] check use in original reference before publication),Definition,Notes,Column 1
+0,Ecosystem,1.00E+08: ~3 years ,1.00E+10: ~ 310 years ,1.00E0: one cubic meter (1000 liters),1.00E+09: cubic km,,,,,,
+1,Metacommunities and meta populations,1.00E+06: ~12 days,1.00E+08: ~3 years ,1.00E-6: 1 cubic cm (1 milliliter),1.00E0: one cubic meter (1000 liters),,,,,,
+2,Local communities and populations, 1.00E+04: ~3 hours ,1.00E+06: ~12 days,1.00E-15: 10 cubic µm (typical yeast cell volume),1.00E-12: 100 cubic µm (pollen grain),,,,,,
+3,microcolonies (100 cells or less),1.00E+0: one second,1.00E+07: ~3 months,1.00E-15: 10 cubic µm (typical yeast cell volume),1.00E-12: 100 cubic µm (pollen grain),,Going local: technologies for exploring bacterial microenvironments | Nature Reviews Microbiology,,"Small aggregates of bacteria.
+The number of cells within an
+aggregate is not officially
+defined, but in this Review this
+term refers to aggregates of
+less than 100 cells.",spatial scale of 100 cells defined in going local. time scale assumed based on single cell numbers,
+4,microenvironment,1.00E+02: ~2 minutes ,1.00E+06: ~12 days,1.00E-18: 1 cubic µm (typical bacterial cell volume),1.00E-12: 100 cubic µm (pollen grain),,Going local: technologies for exploring bacterial microenvironments | Nature Reviews Microbiology,Short-range interactions govern the dynamics and functions of microbial communities | Nature Ecology & Evolution,"Small, defined regions of the
+environment. In microbial
+communities, a
+microenvironment refers to
+the area immediately
+surrounding a single cell or
+small group of cells and is
+generally distinct from its
+environs on the basis of
+characteristics such as nutrient
+availability and mass transfer.","Alma et al show that there is a short interaction range for microenviroments (~ 20um). This work does not have 3D dimensional space. It is done in a 2D planar chip, confined to one cell thickness.",
+5,Single cells,1.00E+0: one second,1.00E+07: ~3 months,1.00E-18: 1 cubic µm (typical bacterial cell volume),1.00E-15: 10 cubic µm (typical yeast cell volume),,,,,,
+6,Nutrient Patches,1.00E+0: one second,1.00E+02: ~2 minutes ,1.00E-18: 1 cubic µm (typical bacterial cell volume),1.00E-9: 1 cubic mm,,Going local: technologies for exploring bacterial microenvironments | Nature Reviews Microbiology,,"Microscale ephemeral nutrient
+point sources that can contain
+biologically labile organic
+compounds at concentrations
+two to three orders of
+magnitude higher than in the
+surrounding bulk environment.","Patches for bacterial cells Patch size: micrometers to centimeters, often submillimeter scale for dissolved organic matter patches. Patch lifetime: seconds to minutes for ephemeral patches, hours to days for persistent ones (e.g., around particles).",  https://npg.copernicus.org/articles/24/293/2017/npg-24-293-2017.pdf [Size scale]
+7,Nutrient Plumes,1.00E+02: ~2 minutes ,1.00E+06: ~12 days,1.00E-18: 1 cubic µm (typical bacterial cell volume),1.00E-6: 1 cubic cm (1 milliliter),,Going local: technologies for exploring bacterial microenvironments | Nature Reviews Microbiology,,"Microscale regions of elevated
+nutrient levels. These plumes
+often form in the wake of a
+sinking point source of
+nutrients (for example, sinking
+detritus or faecal pellets) in an
+aqueous environment.",Plumes: micrometers to centimeters. Plume lifetime: hours to days for sinking particles ,
+8,Omics,1.00E+02: ~2 minutes , 1.00E+04: ~3 hours ,1.00E-15: 10 cubic µm (typical yeast cell volume),1.00E-6: 1 cubic cm (1 milliliter),,Highly sensitive spatial transcriptomics at near-cellular resolution with Slide-seqV2 - PMC,Scaling up spatial transcriptomics for large-sized tissues: uncovering cellular-level tissue architecture beyond conventional platforms with iSCALE | Nature Methods,,"Temporal and spatial omics technologies for 4D profiling | Nature Methods
+Note: In a single experiment, the temporal upper limit could be hours in continuous imaging/profiling. However, if sampled regularly, it could be months. Depending on the -omics approach too.",
+9,Microscopy,1.00E-06: micro (µ) ,1.00E+06: ~12 days,1.00E-24: 10 cubic nm (typcial virus volume),1.00E-6: 1 cubic cm (1 milliliter),,Optical microscopy beyond the diffraction limit - PMC,,,,
+10,Environmental Samples (mesocosms),1.00E+06: ~12 days,1.00E+08: ~3 years ,1.00E0: one cubic meter (1000 liters),1.00E+03: deka (da),,sp-2-oae2023-6-2023.pdf,Mesocosm Experiments as a Tool for Ecological Climate-Change Research - ScienceDirect,,,
+11,Bacterial aggregation,,,,,,,,,,
+12,Molecular Fingerprinting,,,,,,,,,,
+13,Culturing, 1.00E+04: ~3 hours ,1.00E+08: ~3 years ,1.00E-9: 1 cubic mm,1.00E-3: 1 cubic dm (1 liter),,,,,,

@@ -1,0 +1,10 @@
+# Development dependencies — full environment for running notebooks,
+# projects, and the CLI. For the installable package, see pyproject.toml.
+astropy
+bokeh
+cartopy
+certifi
+colorcet
+ipykernel
+numpy
+pandas

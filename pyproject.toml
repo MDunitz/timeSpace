@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timeSpace"
+version = "0.1.1"
+description = "Stommel diagrams for biogeochemical process visualization"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Madison Dunitz"}]
+readme = "README.md"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "astropy>=5.0,<8",
+    "bokeh>=3.0,<4",
+    "colorcet>=3.0,<5",
+    "numpy>=1.24,<3",
+    "pandas>=1.5,<3",
+]
+
+[project.urls]
+Homepage = "https://github.com/MDunitz/timeSpace"
+Repository = "https://github.com/MDunitz/timeSpace"
+Issues = "https://github.com/MDunitz/timeSpace/issues"
+Changelog = "https://github.com/MDunitz/timeSpace/releases"
+
+[project.optional-dependencies]
+dev = ["pytest", "ipykernel", "black", "flake8"]
+ssl-fallback = ["certifi"]
+globe = ["cartopy"]
+
+[tool.setuptools.package-dir]
+timeSpace = "."
+
+[tool.setuptools]
+packages = ["timeSpace"]
+
+[tool.setuptools.package-data]
+timeSpace = [
+    "data/datasets/desert_farm_leverage_points.csv",
+    "data/datasets/ecological_scales.csv",
+    "data/datasets/microbial_processes.csv",
+    "data/datasets/models.csv",
+    "data/datasets/scale_popout_boxes.csv",
+    "data/datasets/stommel_boyd2015.csv",
+    "data/datasets/stommel_boyd2015_volumes.csv",
+    "data/datasets/stommel_boyd2015_volumes_hbw.csv",
+    "data/datasets/time_space_reference_objects.csv",
+    "data/datasets/us_measurements.csv",
+    "data/datasets/us_processes.csv",
+    "data/datasets/workshop_measurements_feb2025.csv",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 120
+target-version = ["py310", "py311", "py312"]
+extend-exclude = "Makefile"

@@ -1,0 +1,7 @@
+.env
+__pycache__/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+test_*.html

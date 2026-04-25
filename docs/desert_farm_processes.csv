@@ -1,0 +1,25 @@
+Name,ShortName,Time_min,Time_max,Space_min,Space_max,Scale,Energy_type
+RuBisCO catalytic cycle,RuBisCO,0.1,1.0,1e-27,1e-24,Molecular,Chemical
+Photosynthetic electron transport,Photosynthesis (e⁻),1e-3,1.0,1e-21,1e-18,Molecular,Radiative
+CO2 diffusion across membrane,CO₂ diffusion,1e-3,0.1,1e-24,1e-21,Molecular,Chemical
+Nutrient ion transport,Ion transport,1e-3,0.1,1e-26,1e-22,Molecular,Chemical
+Carbonate equilibration,CO₂/HCO₃⁻ equil.,1.0,100.0,1e-21,1e-15,Molecular,Chemical
+Calvin cycle,Calvin cycle,1.0,10.0,1e-18,1e-16,Cellular,Chemical
+Photoacclimation (Chl:C adjustment),Photoacclimation,3600,86400,1e-16,1e-13,Cellular,Radiative
+Algae cell division,Cell division,21600,172800,1e-16,1e-13,Cellular,Chemical
+Lipid accumulation (N-starved),Lipid accumul.,86400,864000,1e-16,1e-13,Cellular,Chemical
+Biofilm/floc formation,Biofilm/floc,3600,86400,1e-12,1e-9,Cellular,Chemical
+Light penetration and attenuation,Light atten.,10,3600,10,200,Pond,Radiative
+Paddle wheel mixing,Mixing,300,1800,100,1000,Pond,Mechanical
+Chemical dosing (pH/CO2/nutrients),Dosing,60,86400,1,1000,Pond,Chemical
+Harvest cycle,Harvest,86400,604800,100,1000,Pond,Mechanical
+Evaporation,Evaporation,86400,2592000,100,1000,Pond,Thermal
+Culture crash/restart,Crash/restart,604800,2592000,100,1000,Pond,Chemical
+Water and energy systems,Water/energy,43200,2592000,1e6,1e10,Facility,Mechanical
+Growth campaign,Growth campaign,604800,2592000,1e7,1e8,Facility,Chemical
+Seasonal productivity,Seasonal prod.,2592000,31536000,1e7,1e9,Facility,Radiative
+Supply chain and logistics,Supply chain,3600,604800,1e8,1e12,Regional,Mechanical
+Desert land and water rights,Land/water rights,3.2e7,3.2e10,1e9,1e13,Regional,Thermal
+Carbon capture (annual budget),Carbon capture,3.2e7,3.2e8,1e15,1e18,Global,Chemical
+Atmospheric CO2 and climate,Atmos. CO₂/climate,3.2e9,3.2e12,1e18,1e21,Global,Chemical
+Ocean-atmosphere equilibration,Ocean equil.,3.2e7,3.2e10,1e15,1e18,Global,Thermal

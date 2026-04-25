@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: timeSpace
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - given-names: Madison
+    family-names: Dunitz
+    orcid: "https://orcid.org/0000-0001-7062-7528"
+repository-code: "https://github.com/MDunitz/timeSpace"
+license: MIT
+version: 0.1.0
+date-released: "2026-04-05"
+abstract: >-
+  timeSpace is a Python package for visualizing biogeochemical and physical
+  processes on log-log Stommel diagrams. Processes are rendered as ellipses
+  sized to their characteristic time and space ranges, with diffusion lines
+  and a speed-of-light causality boundary overlaid to show transport regimes.
+keywords:
+  - stommel-diagram
+  - biogeochemistry
+  - oceanography
+  - visualization
+  - time-space
+  - bokeh

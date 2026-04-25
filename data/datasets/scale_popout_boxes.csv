@@ -1,0 +1,11 @@
+index,Label,L_h_m,L_v_m,Volume_m3,log10_Volume,Aspect_ratio_Lh_Lv,Is_isotropic,BGC_model_context,Notes
+0,"10° grid cell (global BGC)",1000000,N/A,N/A,N/A,N/A,False,"HAMOCC, TOPAZ, MEDUSA","Globe footprint only — horizontal extent of one 10° cell in coarse global BGC models (e.g. HAMOCC, TOPAZ). No depth; pulled out in Box 1."
+1,"Basin column",1000000,4000,4.000e+15,15.6,250.0,False,"Global BGC model water column","Full water column under one 10° BGC cell. L_v = mean ocean depth 4km. Extreme aspect ratio L_h/L_v = 250."
+2,"1° grid cell (mesoscale BGC)",100000,1000,1.000e+13,13.0,100.0,False,"PISCES, BEC, TOPAZ2","Horizontal extent of 1° eddy-permitting BGC cell (e.g. PISCES/NEMO, BEC/MOM). L_v = thermocline base ~1km."
+3,"0.1° grid cell (eddy-resolving)",10000,100,1.000e+10,10.0,100.0,False,"MOM6 0.1°, ROMS regional","Eddy-resolving BGC cell. L_v = mixed layer depth ~100m. Still strongly stratified — vertical exchange parameterized."
+4,"Coastal/regional cell",1000,10,1.000e+07,7.0,100.0,False,"ROMS, FVCOM coastal","High-resolution coastal model cell. L_v = near-surface layer ~10m."
+5,"LES outer scale",100,10,1.000e+05,5.0,10.0,False,"LES parameterization boundary","Large-Eddy Simulation outer scale. Stratification still suppresses vertical motions. Approaching Ozmidov scale."
+6,"Ozmidov scale (isotropic onset)",10,10,1.000e+03,3.0,1.0,True,"LES resolved / DNS boundary","Ozmidov scale L_o = sqrt(ε/N³) ≈ 10m for typical ocean (ε~10⁻⁹ m²/s³, N~10⁻² rad/s). Below this, buoyancy no longer suppresses turbulence — motions become isotropic."
+7,"LES resolved / DNS",1,1,1.000e+00,0.0,1.0,True,"DNS, fine LES","Fully isotropic turbulence. Resolved in DNS; subgrid in most LES."
+8,"Kolmogorov scale",0.001,0.001,1.000e-09,-9.0,1.0,True,"Molecular / viscous sublayer","Kolmogorov microscale η = (ν³/ε)^(1/4) ≈ 1mm in ocean. Viscosity dissipates turbulent kinetic energy. No smaller turbulent motions."
+9,"Cellular / molecular",1e-06,1e-06,1.000e-18,-18.0,1.0,True,"Sub-grid for all ocean models","Cellular scale ~1µm. Molecular diffusion dominant. Gene expression, enzyme kinetics, nutrient uptake."

@@ -1,0 +1,17 @@
+*
+*/
+!.gitignore
+!datasets/
+datasets/*
+!datasets/stommel_boyd2015.csv
+!datasets/stommel_boyd2015_volumes.csv
+!datasets/time_space_reference_objects.csv
+!datasets/scale_popout_boxes.csv
+!datasets/ecological_scales.csv
+!datasets/microbial_processes.csv
+!datasets/models.csv
+!datasets/us_measurements.csv
+!datasets/us_processes.csv
+!datasets/stommel_boyd2015_volumes_hbw.csv
+!datasets/workshop_measurements_feb2025.csv
+!datasets/desert_farm_leverage_points.csv

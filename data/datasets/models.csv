@@ -1,0 +1,11 @@
+,Name,Time_min,Time_max,Space_min,Space_max,Color,Reference(s),Sub-reference ([TODO] check use in original reference before publication),Definition,Notes
+0,Default Biogeochemical Models,1.00E+07: ~3 months,1.00E+15: ~31 million years ,1.00E+06: hecto (h),1.00E+18: cubic Mm (approx oceanic volume),,,,,"Spatial labels use SI prefixes on linear dimension before cubing: hecto (h) = (100m)³ = 1e6 m³, deka (da) = (10m)³ = 1e3 m³"
+1,Models with Increased Microbial Diversity,1.00E+06: ~12 days,1.00E+10: ~ 310 years ,3.67E+11: ~367 km³ (~Volume of Mount Everest),1.00E+18: cubic Mm (approx oceanic volume),,,,,
+2,Trait-Based Models,1.00E+06: ~12 days,1.00E+09: ~31 years ,1.00E+06: hecto (h),1.00E+15: 100s of cubic km,,,,,
+3,Genome-based Emergent Ocean Microbial Ecosystem (GENOME),1.00E+0: one second,1.00E+06: ~12 days,1.00E-15: 10 cubic µm (typical yeast cell volume),1.00E-12: 100 cubic µm (pollen grain),,,,,
+4,Macromolecular Models,1.00E-03: milliseconds (m) ,1.00E+06: ~12 days,1.00E-15: 10 cubic µm (typical yeast cell volume),1.00E-12: 100 cubic µm (pollen grain),,,,,
+5,Proteome Allocation Models,1.00E-03: milliseconds (m) , 1.00E+04: ~3 hours ,1.00E-18: 1 cubic µm (typical bacterial cell volume),1.00E-12: 100 cubic µm (pollen grain),,,,,
+6,Genome-Scale Metabolic Models (GEMs),1.00E-03: milliseconds (m) , 1.00E+04: ~3 hours ,1.00E-18: 1 cubic µm (typical bacterial cell volume),1.00E-15: 10 cubic µm (typical yeast cell volume),,,,,
+7,Size-Structured and Food-Web Models,1.00E+06: ~12 days,1.00E+10: ~ 310 years ,1.00E+03: deka (da),1.00E+15: 100s of cubic km,,,,,
+8,Particle-Associated Microbial Dynamics,1.00E+02: ~2 minutes ,1.00E+06: ~12 days,1.00E-15: 10 cubic µm (typical yeast cell volume),1.00E+03: deka (da),,,,,
+9,Mixotrophy and Metabolic Strategies,1.00E+06: ~12 days,1.00E+10: ~ 310 years ,1.00E+03: deka (da),1.00E+15: 100s of cubic km,,,,,

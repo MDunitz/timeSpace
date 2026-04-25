@@ -1,0 +1,16 @@
+,Name,Time_min,Time_max,Space_min,Space_max,Color,Reference(s),Category,Notes
+0,Carbon & nutrient transport,1.00E+00: one second,1.00E+02: ~2 minutes,1.00E-03: 1 mm,1.00E+02: 100 m,#6B9D9D,Boyd et al. (2015); Dickey (2003),Biological processes,
+1,Diffusion boundary layers,1.00E+01: ~10 seconds,1.00E+03: ~15 minutes,1.00E+00: 1 m,1.00E+03: 1 km,#6B9D9D,Boyd et al. (2015); Dickey (2003),Biological processes,
+2,Gene & protein expression,1.00E+01: ~10 seconds,1.00E+04: ~3 hours,1.00E-03: 1 mm,1.00E+01: 10 m,#6B9D9D,Boyd et al. (2015); Dickey (2003),Biological processes,Number 1-2-3 in diagram
+3,Benthic boundary layers,1.00E+02: ~2 minutes,1.00E+05: ~1 day,1.00E+01: 10 m,1.00E+04: 10 km,#6B9D9D,Boyd et al. (2015); Dickey (2003),Biological processes,
+4,Microbial growth & metabolism,1.00E+02: ~2 minutes,1.00E+04: ~3 hours,1.00E-03: 1 mm,1.00E+02: 100 m,#6B9D9D,Boyd et al. (2015); Dickey (2003),Biological processes,Number 4 in diagram
+5,Habitat-scale hydrodynamics,1.00E+03: ~15 minutes,1.00E+06: ~12 days,1.00E+02: 100 m,1.00E+04: 10 km,#7BA3B3,Boyd et al. (2015); Dickey (2003),Physical processes,Number 5 in diagram
+6,Submesoscale eddies,1.00E+04: ~3 hours,1.00E+06: ~12 days,1.00E+03: 1 km,1.00E+05: 100 km,#7BA3B3,Boyd et al. (2015); Dickey (2003),Physical processes,
+7,Mesoscale eddies,1.00E+04: ~3 hours,1.00E+06: ~12 days,1.00E+04: 10 km,1.00E+06: 1000 km,#7BA3B3,Boyd et al. (2015); Dickey (2003),Physical processes,Number 7 in diagram
+8,Population & food web dynamics,1.00E+05: ~1 day,1.00E+06: ~12 days,1.00E+02: 100 m,1.00E+05: 100 km,#6B9D9D,Boyd et al. (2015); Dickey (2003),Biological processes,
+9,Biological pump,1.00E+05: ~1 day,1.00E+07: ~4 months,1.00E+04: 10 km,1.00E+06: 1000 km,#8CB3A3,Boyd et al. (2015); Dickey (2003),Bio-chemical & biological processes,
+10,Biogeochemical cycles,1.00E+05: ~1 day,1.00E+10: ~300 years,1.00E+05: 100 km,1.00E+07: 10000 km,#8CB3A3,Boyd et al. (2015); Dickey (2003),Bio-chemical & biological processes,Number 9 in diagram
+11,Upwelling,1.00E+06: ~12 days,1.00E+08: ~3 years,1.00E+04: 10 km,1.00E+06: 1000 km,#7BA3B3,Boyd et al. (2015); Dickey (2003),Physical processes,
+12,Physical/ecological interaction among benthic species,1.00E+07: ~4 months,1.00E+09: ~30 years,1.00E+01: 10 m,1.00E+05: 100 km,#6B9D9D,Boyd et al. (2015); Dickey (2003),Biological processes,
+13,Eutrophication and other pollutants,1.00E+08: ~3 years,1.00E+10: ~300 years,1.00E+04: 10 km,1.00E+06: 1000 km,#8CB3A3,Boyd et al. (2015); Dickey (2003),Bio-chemical & biological processes,
+14,Ocean warming and acidification,1.00E+09: ~30 years,1.00E+10: ~300 years,1.00E+05: 100 km,1.00E+07: 10000 km,#8CB3A3,Boyd et al. (2015); Dickey (2003),Bio-chemical & biological processes,

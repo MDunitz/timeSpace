@@ -1,0 +1,13 @@
+Prefix,ShortName,Time_min,Time_max,Space_min,Space_max,Color,Reference
+model,Molecular Dynamics Models,1.00E-15,1.00E-09,1.00E-30,1.00E-27,#013333,
+process,CO2 fixation,7.69E-03,2.38E-01,5.79E-26,1.19E-24,#006666,Bar-On et al. (2019) PNAS 116:4738 — kcat dependent on HCO3- pool via carbonic anhydrase (Igamberdiev 2015)
+process,Nutrient transport,1.00E-02,1.00E+00,1.00E-22,1.00E-20,#006666,Moore et al. (2013) Nature Geosci 6:701
+process,Biochemical synthesis,1.00E+00,1.00E+01,1.00E-21,1.00E-19,#006666,Moore et al. (2013) Nature Geosci 6:701
+process,Growth,1.00E+05,1.00E+06,1.00E-20,1.00E-10,#006666,Moore et al. (2013) Nature Geosci 6:701
+model,Community Metabolic Models,99,1.00E+07,1.00E-18,1.00E-03,#013333,
+leverage point,Community Ecology,1.00E+06,1.00E+08,1.00E-09,1.00E+00,#FF9900,Moore et al. (2013) Nature Geosci 6:701
+leverage point,Flocculation,1.00E+03,86400,1.00E-15,1.00E-09,#FF9900,Salim et al. (2011) J Appl Phycol; Vandamme et al. (2013) Biotechnol Adv 31:1680
+leverage point,Ponds,86400,3.15E+07,2000,2.00E+04,#FF9900,Design basis: 10x100x3m deep ponds (3000 m3); depth for photoinhibition protection and floc settling
+model,Biogeochemical Circulation Models,1.00E+05,1.00E+10,1.00E+09,1.00E+16,#013333,
+leverage point,Sequestration,3.15E+08,1.00E+11,3.12E+09,2.91E+10,#FF9900,40 GtCO2/yr: Space_min=C as diamond (3.5 t/m3) Space_max=biomass+salt+sand (rho~1.5 t/m3) per year
+process,Extraction,3.16E+14,6.31E+15,2.03E+12,2.05E+14,#006666,Carboniferous coal (~300 Mya) + Mesozoic petroleum (~252-66 Mya); Tissot & Welte (1984)
