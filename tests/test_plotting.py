@@ -53,3 +53,32 @@ class TestAddMagnitudeLabels:
         p = create_space_time_figure()
         result = add_magnitude_labels(p)
         assert type(result).__name__ == "figure"
+
+
+class TestRangeBoundsJSSafe:
+    """Regression for Bokeh `out of range integer may result in loss of
+    precision` warning. Range bounds get serialized to JS `Number`, which
+    loses precision beyond 2**53 - 1. All axis-range bounds must therefore
+    be floats, not Python ints.
+    """
+
+    _MAX_SAFE_INT = 2**53 - 1  # JavaScript Number.MAX_SAFE_INTEGER
+
+    def _assert_safe(self, v):
+        # Bokeh only warns for `int`, not `float`. The fix is to use 1eN
+        # literals (floats) rather than 10**N (ints) for large bounds.
+        if isinstance(v, int) and not isinstance(v, bool):
+            assert abs(v) <= self._MAX_SAFE_INT, (
+                f"range bound {v!r} is an int > 2**53; will trigger "
+                "BokehUserWarning on serialization. Use a float literal."
+            )
+
+    def test_range_bounds_are_js_safe_space_on_x(self):
+        p = create_space_time_figure(space_on_x=True)
+        for v in (p.x_range.start, p.x_range.end, p.y_range.start, p.y_range.end):
+            self._assert_safe(v)
+
+    def test_range_bounds_are_js_safe_time_on_x(self):
+        p = create_space_time_figure(space_on_x=False)
+        for v in (p.x_range.start, p.x_range.end, p.y_range.start, p.y_range.end):
+            self._assert_safe(v)
