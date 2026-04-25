@@ -429,10 +429,22 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
         has_yo = "y_offset" in process_df.columns
         xo_val = str(row.get("x_offset", "")).strip() if has_xo else ""
         yo_val = str(row.get("y_offset", "")).strip() if has_yo else ""
+
+        # Multi-line / alternate display text: if a non-empty `label_text`
+        # cell is present, render that; otherwise fall back to Name.
+        # Legend always uses Name so it stays single-line and matches
+        # what the user searches on.
+        has_label_text = "label_text" in process_df.columns
+        lt_raw = row.get("label_text") if has_label_text else None
+        if lt_raw is None or (isinstance(lt_raw, float) and pd.isna(lt_raw)):
+            display_text = row.Name
+        else:
+            lt_str = str(lt_raw).strip()
+            display_text = lt_str if lt_str else row.Name
         p.text(
             x=lx,
             y=ly,
-            text=[row.Name],
+            text=[display_text],
             text_font_size=font_size,
             text_color=row.Color,
             text_alpha=row.TextAlpha,
