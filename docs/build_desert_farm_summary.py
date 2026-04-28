@@ -31,11 +31,11 @@ def load_and_transform(csv_path):
     Uses etl.transform_process_response_sheet which applies:
     - process_magnitude_column (astropy units)
     - classify_process_geometry (ellipse/vline/hline/point)
-    - create_ellipse_data
+    - create_ellipse_data (Boyd order: x=time, y=space)
     - set_fill_alpha (area-based transparency)
     """
     df = pd.read_csv(csv_path)
-    process_df = transform_process_response_sheet(df)
+    process_df = transform_process_response_sheet(df, space_on_x=False)
     process_df["x_offset"] = 0
     process_df["y_offset"] = 0
     return process_df
@@ -43,7 +43,7 @@ def load_and_transform(csv_path):
 
 def build_summary_figure(csv_path=None, output_path=None):
     csv_path = csv_path or DEFAULT_CSV
-    output_path = output_path or Path(__file__).resolve().parent / "desert_farm_summary.html"
+    output_path = output_path or "desert_farm_summary.html"
 
     process_df = load_and_transform(csv_path)
 
