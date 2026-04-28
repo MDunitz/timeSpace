@@ -1,26 +1,26 @@
-bion_id,Properties,Organism,Value,Range,Units,URL,Cited_in_row
-100289,Generation time,Cyanobacteria Synechocystis PCC 6803,6.0,,Hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100289,Photoautotroph cell growth
-102211,Mean generation time (on acetate),Green algae chlorella,20.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=102211,Photoautotroph cell growth
-102212,mean generation time (photoautotrophic growth),Green algae chlorella,11.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=102212,Photoautotroph cell growth
-104195,Generation time,Diatom Phaeodactylum tricornutum,15.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104195,Photoautotroph cell growth
-104196,Generation time,Green algae Dunaliella tertiolecta,15.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104196,Photoautotroph cell growth
-105638,Generation time at 30°C,Green algae Dunaliella salina,20.0,,Hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105638,Photoautotroph cell growth
-111252,Doubling time,Cyanobacteria Synechocystis PCC 6803,12.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111252,Photoautotroph cell growth
-111335,Fastest generation time,Cyanobacteria Synechocystis PCC 6803,5.13,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111335,Photoautotroph cell growth
-100233,Translation rate of beta-galactosidase in E. coli,Bacteria Escherichia coli,14.5,'13-16,aa/s,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100233,Biochemical synthesis
-105067,Translation rate for short peptides,Bacteria Escherichia coli,22.0,'Table link - http://bionumbers.hms.harvard.edu/files/Maximal%20translation%20rate.pdf,1/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105067,Biochemical synthesis
-104300,Translation rate on culture of nitrogen bases and glucose,Budding yeast Saccharomyces cerevisiae,9.3,,aa/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104300,Biochemical synthesis
-104598,Translation rate,Human Homo sapiens,5.0,,aa/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104598,Biochemical synthesis
-100060,RNA polymerase transcription rate of stable RNA,Bacteria Escherichia coli,85.0,'Table link - http://bionumbers.hms.harvard.edu/files/Parameters%20pertaining%20to%20the%20macromolecular%20synthesis%20rates%20in%20exponentially%20growing%20E.%20coli%20Br%20as%20a%20function%20of%20growth%20rate%20at%2037%20degrees%20celsius.pdf,nt/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100060,Biochemical synthesis
-101904,Transcription elongation rate of rRNA operons,Bacteria Escherichia coli,42.0,'±2,nucleotides/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=101904,Biochemical synthesis
-100664,Single molecule RNA polymerase II transcription rates,Bacteria Escherichia coli,12.8,'±4.9,nucleotides/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100664,Biochemical synthesis
-100662,Maximum RNA polymerase II transcription elongation rate,Mammalian tissue culture cell,71.6,,nucleotides/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100662,Biochemical synthesis
-104089,Diffusion coefficient of glucose in water,Generic,600.0,'Table link - http://bionumbers.hms.harvard.edu/files/Diffusion%20coefficients%20of%20various%20substances%20in%20Water.pdf,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104089,Nutrient transport
-104437,Diffusion coefficient of ammonium in water,Generic,1860.0,'Table link - http://bionumbers.hms.harvard.edu/files/Biofilm%20model%20parameters.pdf,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104437,Nutrient transport
-104439,Diffusion coefficient of nitrate in water,Generic,1700.0,'Table link - http://bionumbers.hms.harvard.edu/files/Biofilm%20model%20parameters.pdf,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104439,Nutrient transport
-109504,Diffusion coefficient glucose in water at 25°C,Generic,673.0,,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=109504,Nutrient transport
-110618,Diffusion coefficient of CO2 in red blood cell,Human Homo sapiens,650.0,,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=110618,Nutrient transport
-117305,Diffusion coefficient of CO2 in air,air,1.4e-05,,m2/s,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=117305,Nutrient transport
-102428,Intracellular diffusion coefficient for glucose transporter,African clawed frog Xenopus laevis,100.0,,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=102428,Nutrient transport
-109673,Highest glucose uptake rate that still allows the maximal NADH formation rate,Bacteria Escherichia coli,2.4,,mmol/(gCDW·h),https://bionumbers.hms.harvard.edu/bionumber.aspx?id=109673,Nutrient transport
-109686,Glucose uptake rate of strain C-3000 in minimal M9 media,Bacteria Escherichia coli,12.0,'±0.5,mmol/gDW/h,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=109686,Nutrient transport
+bion_id,Properties,Organism,Value,Range,Units,URL
+100289,Generation time,Cyanobacteria Synechocystis PCC 6803,6.0,,Hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100289
+102211,Mean generation time (on acetate),Green algae chlorella,20.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=102211
+102212,mean generation time (photoautotrophic growth),Green algae chlorella,11.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=102212
+104195,Generation time,Diatom Phaeodactylum tricornutum,15.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104195
+104196,Generation time,Green algae Dunaliella tertiolecta,15.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104196
+105638,Generation time at 30°C,Green algae Dunaliella salina,20.0,,Hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105638
+111252,Doubling time,Cyanobacteria Synechocystis PCC 6803,12.0,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111252
+111335,Fastest generation time,Cyanobacteria Synechocystis PCC 6803,5.13,,hours,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=111335
+100233,Translation rate of beta-galactosidase in E. coli,Bacteria Escherichia coli,14.5,'13-16,aa/s,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100233
+105067,Translation rate for short peptides,Bacteria Escherichia coli,22.0,'Table link - http://bionumbers.hms.harvard.edu/files/Maximal%20translation%20rate.pdf,1/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105067
+104300,Translation rate on culture of nitrogen bases and glucose,Budding yeast Saccharomyces cerevisiae,9.3,,aa/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104300
+104598,Translation rate,Human Homo sapiens,5.0,,aa/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104598
+100060,RNA polymerase transcription rate of stable RNA,Bacteria Escherichia coli,85.0,'Table link - http://bionumbers.hms.harvard.edu/files/Parameters%20pertaining%20to%20the%20macromolecular%20synthesis%20rates%20in%20exponentially%20growing%20E.%20coli%20Br%20as%20a%20function%20of%20growth%20rate%20at%2037%20degrees%20celsius.pdf,nt/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100060
+101904,Transcription elongation rate of rRNA operons,Bacteria Escherichia coli,42.0,'±2,nucleotides/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=101904
+100664,Single molecule RNA polymerase II transcription rates,Bacteria Escherichia coli,12.8,'±4.9,nucleotides/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100664
+100662,Maximum RNA polymerase II transcription elongation rate,Mammalian tissue culture cell,71.6,,nucleotides/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100662
+104089,Diffusion coefficient of glucose in water,Generic,600.0,'Table link - http://bionumbers.hms.harvard.edu/files/Diffusion%20coefficients%20of%20various%20substances%20in%20Water.pdf,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104089
+104437,Diffusion coefficient of ammonium in water,Generic,1860.0,'Table link - http://bionumbers.hms.harvard.edu/files/Biofilm%20model%20parameters.pdf,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104437
+104439,Diffusion coefficient of nitrate in water,Generic,1700.0,'Table link - http://bionumbers.hms.harvard.edu/files/Biofilm%20model%20parameters.pdf,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104439
+109504,Diffusion coefficient glucose in water at 25°C,Generic,673.0,,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=109504
+110618,Diffusion coefficient of CO2 in red blood cell,Human Homo sapiens,650.0,,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=110618
+117305,Diffusion coefficient of CO2 in air,air,1.4e-05,,m2/s,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=117305
+102428,Intracellular diffusion coefficient for glucose transporter,African clawed frog Xenopus laevis,100.0,,µm^2/sec,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=102428
+109673,Highest glucose uptake rate that still allows the maximal NADH formation rate,Bacteria Escherichia coli,2.4,,mmol/(gCDW·h),https://bionumbers.hms.harvard.edu/bionumber.aspx?id=109673
+109686,Glucose uptake rate of strain C-3000 in minimal M9 media,Bacteria Escherichia coli,12.0,'±0.5,mmol/gDW/h,https://bionumbers.hms.harvard.edu/bionumber.aspx?id=109686
