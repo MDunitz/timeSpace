@@ -394,6 +394,20 @@ def _label_anchor(row, space_on_x=True):
         return None, None, None  # caller uses existing logic
 
 
+def _resolve_start_visible(row, default):
+    """Per-row visibility override from the `start_visible` CSV column.
+
+    Expects 'True' or 'False' (what pandas to_csv writes for bool columns).
+    Blank cell or missing column → fall back to `default`.
+    """
+    val = str(row.get("start_visible", "")).strip()
+    if val == "True":
+        return True
+    if val == "False":
+        return False
+    return default
+
+
 def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
     """Render predefined process glyphs with labels.
 
@@ -411,7 +425,8 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
         )
     visible = not interactive
     for i, row in process_df.iterrows():
-        _render_glyph(p, row, row.Color, row.FillAlpha, visible, row.Name, space_on_x=space_on_x)
+        row_visible = _resolve_start_visible(row, default=visible)
+        _render_glyph(p, row, row.Color, row.FillAlpha, row_visible, row.Name, space_on_x=space_on_x)
 
         lx, ly, align = _label_anchor(row, space_on_x=space_on_x)
         if lx is None:
@@ -429,10 +444,21 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
         has_yo = "y_offset" in process_df.columns
         xo_val = str(row.get("x_offset", "")).strip() if has_xo else ""
         yo_val = str(row.get("y_offset", "")).strip() if has_yo else ""
+
+        # Multi-line / alternate display text: if a non-empty `label_text`
+        # cell is present, render that; otherwise fall back to Name.
+        # Legend always uses Name so it stays single-line and matches
+        # what the user searches on.
+        lt_raw = row.get("label_text") if "label_text" in process_df.columns else None
+        if lt_raw is None or (isinstance(lt_raw, float) and pd.isna(lt_raw)):
+            display_text = row.Name
+        else:
+            lt_str = str(lt_raw).strip()
+            display_text = lt_str if lt_str else row.Name
         p.text(
             x=lx,
             y=ly,
-            text=[row.Name],
+            text=[display_text],
             text_font_size=font_size,
             text_color=row.Color,
             text_alpha=row.TextAlpha,
@@ -440,7 +466,7 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
             x_offset=int(float(xo_val)) if xo_val else 0,
             y_offset=int(float(yo_val)) if yo_val else 0,
             legend_label=row.Name,
-            visible=visible,
+            visible=row_visible,
         )
     return p
 
