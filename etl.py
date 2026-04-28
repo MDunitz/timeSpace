@@ -1,3 +1,5 @@
+import numpy as np
+
 from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.plotting_helpers import (
@@ -61,7 +63,11 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     Returns
     -------
     DataFrame
-        With added columns: Name, FillAlpha, TextAlpha, geometry, x_coords, y_coords.
+        With added columns: Name, FillAlpha, TextAlpha, geometry, x_coords,
+        y_coords, label_x, label_y. label_x is the geometric mean of
+        (Time_min, Time_max); label_y is the geometric mean of (Space_min,
+        Space_max). If label_x or label_y are already present in the input
+        (e.g. CSV-provided overrides), they are preserved unchanged.
     """
     # Validate required columns
     required = {"Time_min", "Time_max", "Space_min", "Space_max"}
@@ -87,6 +93,14 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     plottable_responses_df["TextAlpha"] = plottable_responses_df.apply(lambda row: min(1, 4 * row["FillAlpha"]), axis=1)
     plottable_responses_df["Time Max"] = plottable_responses_df.apply(lambda row: row["Time_max"].value, axis=1)
     plottable_responses_df["Space Min"] = plottable_responses_df.apply(lambda row: row["Space_min"].value, axis=1)
+    if "label_x" not in plottable_responses_df.columns:
+        plottable_responses_df["label_x"] = plottable_responses_df.apply(
+            lambda row: np.sqrt(row["Time_min"].value * row["Time_max"].value), axis=1
+        )
+    if "label_y" not in plottable_responses_df.columns:
+        plottable_responses_df["label_y"] = plottable_responses_df.apply(
+            lambda row: np.sqrt(row["Space_min"].value * row["Space_max"].value), axis=1
+        )
     plottable_responses_df["geometry"] = plottable_responses_df.apply(classify_process_geometry, axis=1)
     ellipse_mask = plottable_responses_df["geometry"] == "ellipse"
     if ellipse_mask.any():
