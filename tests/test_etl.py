@@ -1,7 +1,6 @@
 import pandas as pd
 import astropy.units as u
-
-from timeSpace.etl import process_magnitude_column
+from timeSpace.etl import process_magnitude_column, transform_predefined_processes
 from timeSpace.constants import base_time, base_space
 
 
@@ -34,7 +33,6 @@ class TestProcessMagnitudeColumn:
 
 class TestTransformPredefinedProcesses:
     def test_produces_expected_columns(self):
-        from timeSpace.etl import transform_predefined_processes
 
         df = pd.DataFrame(
             {
@@ -52,7 +50,6 @@ class TestTransformPredefinedProcesses:
             assert col in result.columns, f"Missing column: {col}"
 
     def test_units_applied(self):
-        from timeSpace.etl import transform_predefined_processes
 
         df = pd.DataFrame(
             {
@@ -71,7 +68,6 @@ class TestTransformPredefinedProcesses:
         assert row.Space_max.unit == u.m**3
 
     def test_ellipse_data_generated(self):
-        from timeSpace.etl import transform_predefined_processes
 
         df = pd.DataFrame(
             {

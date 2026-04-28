@@ -5,6 +5,11 @@ Run after installing from sdist/wheel (not editable mode):
     make test-package
 
 Generates test_stommel.html — an embeddable Stommel diagram.
+
+NOTE: Imports inside `main()` are intentional — verifying that the public
+API is importable post-install (and capturing SyntaxWarnings during
+`from timeSpace import constants`) is what this test does. Do not move
+them to module level.
 """
 
 import sys
