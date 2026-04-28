@@ -4,15 +4,20 @@ Build a static Bokeh HTML figure for the desert farm blog post.
 Shows all processes across 6 scales (Molecular → Global), colored by
 dominant energy type (Chemical / Radiative / Thermal / Mechanical).
 Designed for embedding on Google Sites via iframe.
-
-Uses package functions for ETL, figure setup, and reference grid.
-Hand-rolls the patches + hover + 4-row energy legend (see
-build_desert_farm_figure for why).
 """
 
 import pandas as pd
 import numpy as np
-from bokeh.models import ColumnDataSource, HoverTool, Legend, LegendItem
+from bokeh.models import (
+    BoxZoomTool,
+    ColumnDataSource,
+    HoverTool,
+    Legend,
+    LegendItem,
+    PanTool,
+    ResetTool,
+    WheelZoomTool,
+)
 from bokeh.resources import CDN
 from bokeh.embed import components
 
@@ -20,21 +25,16 @@ from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
 from timeSpace.plotting import create_space_time_figure, add_magnitude_labels
 
 # ── Configuration ──────────────────────────────────────────────────
-# Wider than create_space_time_figure's defaults (1e-3..1e12 time, 1e-21..1e21 space)
-# to fit fossil-fuel timescales and atomic / global volumes on this figure.
 X_RANGE = (1e-3, 1e13)
 Y_RANGE = (1e-28, 1e22)
 
-# 100 ellipse-vertices/half is plenty visually; cuts the rendered HTML ~10x
-# vs ETL's default 1000 (24 ellipses → ~200 KB instead of ~2 MB).
 EXPLORER_N_POINTS = 100
 
-# Energy type colors
 ENERGY_COLORS = {
-    "Chemical": "#0F793D",  # green — bonds, reactions, metabolism
-    "Radiative": "#FFCC33",  # gold — photons, solar
-    "Thermal": "#CC3333",  # red — heat, evaporation, climate
-    "Mechanical": "#336699",  # steel blue — kinetic, mixing, pumping
+    "Chemical": "#0F793D",
+    "Radiative": "#FFCC33",
+    "Thermal": "#CC3333",
+    "Mechanical": "#336699",
 }
 
 ENERGY_ORDER = ["Chemical", "Radiative", "Thermal", "Mechanical"]
@@ -49,34 +49,22 @@ COLAB_URL = "https://colab.research.google.com/github/MDunitz/timeSpace/blob/mai
 
 
 def load_processes(csv_path):
-    """Read desert farm process CSV and run the standard ETL pipeline.
+    """Read desert farm process CSV and run the ETL pipeline.
 
-    transform_process_response_sheet handles units, geometry classification,
-    ellipse polygon generation, and FillAlpha. Two pre-ETL hops here:
-    1. Compute Color from Energy_type (ETL doesn't know domain colors).
-    2. Rename Name → FullName so ETL's create_name doesn't overwrite it
-       with the ShortName fallback. We need both: FullName for hover,
-       Name (= ShortName-with-line-breaks) for legend label.
-    Plus two post-ETL hops for label positioning (geometric centers).
+    Pre-ETL: derive Color from Energy_type and rename Name → FullName so
+    create_name's ShortName fallback doesn't overwrite the original name.
+    The hover tooltip uses FullName; the legend groups by Energy_type.
     """
     df = pd.read_csv(csv_path)
     df = df.rename(columns={"Name": "FullName"})
     df["Color"] = df.Energy_type.map(ENERGY_COLORS)
 
-    process_df = transform_process_response_sheet(
+    return transform_process_response_sheet(
         df,
         possible_col_list=POSSIBLE_COL_LIST + ["FullName", "Scale", "Energy_type"],
         space_on_x=False,
         n_points=EXPLORER_N_POINTS,
     )
-
-    process_df["label_x"] = np.sqrt(
-        process_df.Time_min.apply(lambda q: q.value) * process_df.Time_max.apply(lambda q: q.value)
-    )
-    process_df["label_y"] = np.sqrt(
-        process_df.Space_min.apply(lambda q: q.value) * process_df.Space_max.apply(lambda q: q.value)
-    )
-    return process_df
 
 
 # ── Build ──────────────────────────────────────────────────────────
@@ -85,8 +73,6 @@ def load_processes(csv_path):
 def build_desert_farm_figure(csv_path, output_path):
     df = load_processes(csv_path)
 
-    # Package figure setup gives us Boyd orientation, x-axis-on-top, log scales,
-    # and matching axis labels. Override the defaults that don't fit this figure.
     p = create_space_time_figure(
         width=900,
         height=650,
@@ -101,23 +87,10 @@ def build_desert_farm_figure(csv_path, output_path):
     p.axis.major_label_text_font_size = "10pt"
     p.background_fill_color = "#fafafa"
     p.toolbar_location = "above"
-    # Match original tool set (drops SaveTool / HelpTool from Bokeh defaults)
-    from bokeh.models import PanTool, WheelZoomTool, BoxZoomTool, ResetTool
-
     p.toolbar.tools = [PanTool(), WheelZoomTool(), BoxZoomTool(), ResetTool()]
 
-    # Reference grid (TIME_MARKERS / SPACE_MARKERS as dashed Spans + Labels);
-    # bonus over the previous hand-rolled loop: labels stick to the visible edge
-    # on pan/zoom via CustomJS callbacks inside add_magnitude_labels.
     add_magnitude_labels(p, font_size=LABEL_FONT_SIZE, space_on_x=False)
 
-    # Plot processes by energy type. Hand-rolled rather than using the package's
-    # add_processes(category_col=, category_colors=) because that path would
-    #   (a) produce a 28-row legend (header + per-process) instead of the
-    #       compact 4-row legend (one row per energy, click-to-hide group), and
-    #   (b) lose the rich hover (Name, Scale, Energy, formatted ranges) — the
-    #       package patch glyph data source has only x/y, not the metadata
-    #       needed for tooltips.
     legend_items = []
 
     def _hover_display(val_min, val_max, unit):
