@@ -36,7 +36,7 @@ def process_magnitude_column(row, column):
         return float(new_val) * base_space
 
 
-def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_COL_LIST):
+def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_COL_LIST, space_on_x=True):
     """Clean and transform Google Form process responses for plotting.
 
     Applies unit conversion, filters invalid rows (min > max), generates
@@ -48,6 +48,10 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
         Raw Google Form responses with Time_min, Time_max, Space_min, Space_max.
     possible_col_list : list of str
         Column names to retain from the form response.
+    space_on_x : bool
+        Axis order to bake into ellipse `x_coords`/`y_coords`. Must match the
+        `space_on_x` passed to plotting functions (`add_processes`,
+        `create_space_time_figure`). Default True (Stommel: x=space, y=time).
 
     Returns
     -------
@@ -65,7 +69,7 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
         )
 
     columns_list = list(set(possible_col_list) & set(responses_df.columns))
-    plottable_responses_df = responses_df[columns_list].copy()
+    plottable_responses_df = responses_df[columns_list]
 
     for column in ["Time_min", "Time_max", "Space_min", "Space_max"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
@@ -83,7 +87,7 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     if ellipse_mask.any():
         ellipse_coords = (
             plottable_responses_df.loc[ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]]
-            .apply(create_ellipse_data, axis=1, result_type="expand")
+            .apply(create_ellipse_data, axis=1, result_type="expand", space_on_x=space_on_x)
             .rename(columns={0: "x_coords", 1: "y_coords"})
         )
         plottable_responses_df.loc[ellipse_mask, ["x_coords", "y_coords"]] = ellipse_coords
