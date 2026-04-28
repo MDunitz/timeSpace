@@ -360,7 +360,9 @@ def build_desert_farm_figure(csv_path, output_path):
 
 if __name__ == "__main__":
     import sys
+    from pathlib import Path
 
-    csv_path = sys.argv[1] if len(sys.argv) > 1 else "desert_farm_processes.csv"
-    output_path = sys.argv[2] if len(sys.argv) > 2 else "desert_farm_stommel.html"
+    HERE = Path(__file__).resolve().parent
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else HERE / "desert_farm_processes.csv"
+    output_path = sys.argv[2] if len(sys.argv) > 2 else HERE / "desert_farm_stommel.html"
     build_desert_farm_figure(csv_path, output_path)

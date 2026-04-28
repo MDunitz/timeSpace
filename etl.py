@@ -65,7 +65,7 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
         )
 
     columns_list = list(set(possible_col_list) & set(responses_df.columns))
-    plottable_responses_df = responses_df[columns_list]
+    plottable_responses_df = responses_df[columns_list].copy()
 
     for column in ["Time_min", "Time_max", "Space_min", "Space_max"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
