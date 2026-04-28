@@ -5,9 +5,9 @@ Shows all processes across 6 scales (Molecular → Global), colored by
 dominant energy type (Chemical / Radiative / Thermal / Mechanical).
 Designed for embedding on Google Sites via iframe.
 
-Uses package functions for figure setup, reference grid, and the
-ETL helpers. Hand-rolls the patches + hover + 4-row energy legend
-(see build_desert_farm_figure for why).
+Uses package functions for ETL, figure setup, and reference grid.
+Hand-rolls the patches + hover + 4-row energy legend (see
+build_desert_farm_figure for why).
 """
 
 import pandas as pd
@@ -16,10 +16,8 @@ from bokeh.models import ColumnDataSource, HoverTool, Legend, LegendItem
 from bokeh.resources import CDN
 from bokeh.embed import components
 
-from timeSpace.calculations import create_ellipse_data, classify_process_geometry
-from timeSpace.etl import process_magnitude_column
+from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
 from timeSpace.plotting import create_space_time_figure, add_magnitude_labels
-from timeSpace.plotting_helpers import set_fill_alpha
 
 # ── Configuration ──────────────────────────────────────────────────
 # Wider than create_space_time_figure's defaults (1e-3..1e12 time, 1e-21..1e21 space)
@@ -27,6 +25,8 @@ from timeSpace.plotting_helpers import set_fill_alpha
 X_RANGE = (1e-3, 1e13)
 Y_RANGE = (1e-28, 1e22)
 
+# 100 ellipse-vertices/half is plenty visually; cuts the rendered HTML ~10x
+# vs ETL's default 1000 (24 ellipses → ~200 KB instead of ~2 MB).
 EXPLORER_N_POINTS = 100
 
 # Energy type colors
@@ -45,48 +45,38 @@ LABEL_FONT_SIZE = "9pt"
 COLAB_URL = "https://colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/desert_farm_colab.ipynb"
 
 
-# ── Data loading (same pattern as explorer) ────────────────────────
+# ── Data loading ───────────────────────────────────────────────────
 
 
 def load_processes(csv_path):
-    """Read desert farm process CSV and generate render coordinates.
+    """Read desert farm process CSV and run the standard ETL pipeline.
 
-    Classifies each process geometry (ellipse/vline/hline/point) and only
-    generates ellipse polygon data for true ellipses. Degenerate axes
-    render as lines or point markers instead of fabricated ellipses.
-
-    Uses package functions:
-    - etl.process_magnitude_column for unit application (seconds, m³)
-    - calculations.classify_process_geometry for degeneracy detection
-    - calculations.create_ellipse_data for ellipse polygon vertices
-    - plotting_helpers.set_fill_alpha for area-based transparency
+    transform_process_response_sheet handles units, geometry classification,
+    ellipse polygon generation, and FillAlpha. Two pre-ETL hops here:
+    1. Compute Color from Energy_type (ETL doesn't know domain colors).
+    2. Rename Name → FullName so ETL's create_name doesn't overwrite it
+       with the ShortName fallback. We need both: FullName for hover,
+       Name (= ShortName-with-line-breaks) for legend label.
+    Plus two post-ETL hops for label positioning (geometric centers).
     """
     df = pd.read_csv(csv_path)
+    df = df.rename(columns={"Name": "FullName"})
+    df["Color"] = df.Energy_type.map(ENERGY_COLORS)
 
-    for col in ["Time_min", "Time_max", "Space_min", "Space_max"]:
-        df[col] = df.apply(process_magnitude_column, column=col, axis=1)
-
-    df["geometry"] = df.apply(classify_process_geometry, axis=1)
-
-    ellipse_mask = df["geometry"] == "ellipse"
-    df.loc[ellipse_mask, ["x_coords", "y_coords"]] = (
-        df.loc[ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]]
-        .apply(
-            create_ellipse_data,
-            axis=1,
-            result_type="expand",
-            n_points=EXPLORER_N_POINTS,
-            space_on_x=False,
-        )
-        .rename(columns={0: "x_coords", 1: "y_coords"})
+    process_df = transform_process_response_sheet(
+        df,
+        possible_col_list=POSSIBLE_COL_LIST + ["FullName", "Scale", "Energy_type"],
+        space_on_x=False,
+        n_points=EXPLORER_N_POINTS,
     )
 
-    df["color"] = df.Energy_type.map(ENERGY_COLORS)
-    df["label_x"] = np.sqrt(df.Time_min.apply(lambda q: q.value) * df.Time_max.apply(lambda q: q.value))
-    df["label_y"] = np.sqrt(df.Space_min.apply(lambda q: q.value) * df.Space_max.apply(lambda q: q.value))
-    df["fill_alpha"] = df.apply(set_fill_alpha, axis=1)
-
-    return df
+    process_df["label_x"] = np.sqrt(
+        process_df.Time_min.apply(lambda q: q.value) * process_df.Time_max.apply(lambda q: q.value)
+    )
+    process_df["label_y"] = np.sqrt(
+        process_df.Space_min.apply(lambda q: q.value) * process_df.Space_max.apply(lambda q: q.value)
+    )
+    return process_df
 
 
 # ── Build ──────────────────────────────────────────────────────────
@@ -150,8 +140,8 @@ def build_desert_farm_figure(csv_path, output_path):
                 data=dict(
                     xs=[row.x_coords.tolist() for _, row in ell.iterrows()],
                     ys=[row.y_coords.tolist() for _, row in ell.iterrows()],
-                    alpha=ell.fill_alpha.tolist(),
-                    name=ell.Name.tolist(),
+                    alpha=ell.FillAlpha.tolist(),
+                    name=ell.FullName.tolist(),
                     short_name=ell.ShortName.tolist(),
                     scale=ell.Scale.tolist(),
                     energy_type=ell.Energy_type.tolist(),
