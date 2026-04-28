@@ -77,7 +77,7 @@ def add_cascade_arrows(p, process_df):
 
 def build_summary_figure(csv_path=None, output_path=None):
     csv_path = csv_path or DEFAULT_CSV
-    output_path = output_path or "desert_farm_summary.html"
+    output_path = output_path or Path(__file__).resolve().parent / "desert_farm_summary.html"
 
     process_df = load_and_transform(csv_path)
 
