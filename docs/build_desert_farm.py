@@ -37,6 +37,8 @@ ENERGY_ORDER = ["Chemical", "Radiative", "Thermal", "Mechanical"]
 FONT_SIZE = "11pt"
 LABEL_FONT_SIZE = "9pt"
 
+COLAB_URL = "https://colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/desert_farm_colab.ipynb"
+
 
 # ── Data loading (same pattern as explorer) ────────────────────────
 
@@ -104,6 +106,7 @@ def build_desert_farm_figure(csv_path, output_path):
         y_range=Y_RANGE,
         title="Desert Farm — Processes Across Scale",
         toolbar_location="above",
+        x_axis_location="above",
         tools="pan,wheel_zoom,box_zoom,reset",
     )
     p.axis.axis_label_text_font_size = FONT_SIZE
@@ -345,7 +348,7 @@ def build_desert_farm_figure(csv_path, output_path):
     <div class="footer">
         <p>Built with <a href="https://github.com/MDunitz/timeSpace">timeSpace</a>.
            Want to add your own processes?
-           <a href="COLAB_LINK_HERE">Open the interactive notebook</a>.</p>
+           <a href="{COLAB_URL}">Open the interactive notebook</a>.</p>
     </div>
 </body>
 </html>"""
