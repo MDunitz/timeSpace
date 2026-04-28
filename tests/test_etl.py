@@ -168,17 +168,13 @@ class TestTransformProcessResponseSheet:
         # If input already has label_x, ETL should not overwrite
         df = self._basic_df()
         df["label_x"] = [42.0, 99.0]
-        result = transform_process_response_sheet(
-            df, possible_col_list=POSSIBLE_COL_LIST + ["label_x"]
-        )
+        result = transform_process_response_sheet(df, possible_col_list=POSSIBLE_COL_LIST + ["label_x"])
         assert result.label_x.iloc[0] == 42.0
         assert result.label_x.iloc[1] == 99.0
 
     def test_label_y_csv_override_preserved(self):
         df = self._basic_df()
         df["label_y"] = [1.5, 2.5]
-        result = transform_process_response_sheet(
-            df, possible_col_list=POSSIBLE_COL_LIST + ["label_y"]
-        )
+        result = transform_process_response_sheet(df, possible_col_list=POSSIBLE_COL_LIST + ["label_y"])
         assert result.label_y.iloc[0] == 1.5
         assert result.label_y.iloc[1] == 2.5
