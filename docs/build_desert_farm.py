@@ -4,21 +4,26 @@ Build a static Bokeh HTML figure for the desert farm blog post.
 Shows all processes across 6 scales (Molecular → Global), colored by
 dominant energy type (Chemical / Radiative / Thermal / Mechanical).
 Designed for embedding on Google Sites via iframe.
+
+Uses package functions for figure setup, reference grid, and the
+ETL helpers. Hand-rolls the patches + hover + 4-row energy legend
+(see build_desert_farm_figure for why).
 """
 
 import pandas as pd
 import numpy as np
-from bokeh.plotting import figure
-from bokeh.models import ColumnDataSource, Span, Label, HoverTool, Legend, LegendItem
+from bokeh.models import ColumnDataSource, HoverTool, Legend, LegendItem
 from bokeh.resources import CDN
 from bokeh.embed import components
 
-from timeSpace.constants import TIME_MARKERS, SPACE_MARKERS
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.etl import process_magnitude_column
+from timeSpace.plotting import create_space_time_figure, add_magnitude_labels
 from timeSpace.plotting_helpers import set_fill_alpha
 
 # ── Configuration ──────────────────────────────────────────────────
+# Wider than create_space_time_figure's defaults (1e-3..1e12 time, 1e-21..1e21 space)
+# to fit fossil-fuel timescales and atomic / global volumes on this figure.
 X_RANGE = (1e-3, 1e13)
 Y_RANGE = (1e-28, 1e22)
 
@@ -47,7 +52,7 @@ def load_processes(csv_path):
     """Read desert farm process CSV and generate render coordinates.
 
     Classifies each process geometry (ellipse/vline/hline/point) and only
-    generates ellipse polygon data for true ellipses.  Degenerate axes
+    generates ellipse polygon data for true ellipses. Degenerate axes
     render as lines or point markers instead of fabricated ellipses.
 
     Uses package functions:
@@ -58,14 +63,11 @@ def load_processes(csv_path):
     """
     df = pd.read_csv(csv_path)
 
-    # Apply units — same function as etl.py pipeline
     for col in ["Time_min", "Time_max", "Space_min", "Space_max"]:
         df[col] = df.apply(process_magnitude_column, column=col, axis=1)
 
-    # Classify geometry before generating coords
     df["geometry"] = df.apply(classify_process_geometry, axis=1)
 
-    # Only generate ellipse data for actual ellipses
     ellipse_mask = df["geometry"] == "ellipse"
     df.loc[ellipse_mask, ["x_coords", "y_coords"]] = (
         df.loc[ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]]
@@ -82,8 +84,6 @@ def load_processes(csv_path):
     df["color"] = df.Energy_type.map(ENERGY_COLORS)
     df["label_x"] = np.sqrt(df.Time_min.apply(lambda q: q.value) * df.Time_max.apply(lambda q: q.value))
     df["label_y"] = np.sqrt(df.Space_min.apply(lambda q: q.value) * df.Space_max.apply(lambda q: q.value))
-
-    # Fill alpha — same function as main Stommel figure pipeline
     df["fill_alpha"] = df.apply(set_fill_alpha, axis=1)
 
     return df
@@ -95,60 +95,39 @@ def load_processes(csv_path):
 def build_desert_farm_figure(csv_path, output_path):
     df = load_processes(csv_path)
 
-    p = figure(
+    # Package figure setup gives us Boyd orientation, x-axis-on-top, log scales,
+    # and matching axis labels. Override the defaults that don't fit this figure.
+    p = create_space_time_figure(
         width=900,
         height=650,
-        x_axis_type="log",
-        y_axis_type="log",
-        x_axis_label="Time (s)",
-        y_axis_label="Space (m³)",
-        x_range=X_RANGE,
-        y_range=Y_RANGE,
         title="Desert Farm — Processes Across Scale",
-        toolbar_location="above",
-        x_axis_location="above",
-        tools="pan,wheel_zoom,box_zoom,reset",
+        space_on_x=False,
     )
-    p.axis.axis_label_text_font_size = FONT_SIZE
-    p.axis.major_label_text_font_size = "10pt"
+    p.x_range.start, p.x_range.end = X_RANGE
+    p.y_range.start, p.y_range.end = Y_RANGE
     p.title.text_font_size = "16pt"
     p.title.text_font_style = "bold"
+    p.axis.axis_label_text_font_size = FONT_SIZE
+    p.axis.major_label_text_font_size = "10pt"
     p.background_fill_color = "#fafafa"
+    p.toolbar_location = "above"
+    # Match original tool set (drops SaveTool / HelpTool from Bokeh defaults)
+    from bokeh.models import PanTool, WheelZoomTool, BoxZoomTool, ResetTool
 
-    # Reference grid
-    for t, label_text in TIME_MARKERS.items():
-        if X_RANGE[0] <= t <= X_RANGE[1]:
-            p.add_layout(Span(location=t, dimension="height", line_color="#cccccc", line_dash="dashed", line_width=1))
-            p.add_layout(
-                Label(
-                    x=t,
-                    y=Y_RANGE[1],
-                    text=label_text,
-                    text_font_size=LABEL_FONT_SIZE,
-                    text_color="#aaaaaa",
-                    text_align="center",
-                    text_baseline="top",
-                )
-            )
+    p.toolbar.tools = [PanTool(), WheelZoomTool(), BoxZoomTool(), ResetTool()]
 
-    for s, label_text in SPACE_MARKERS.items():
-        if Y_RANGE[0] <= s <= Y_RANGE[1]:
-            p.add_layout(Span(location=s, dimension="width", line_color="#dddddd", line_dash="dashed", line_width=1))
-            p.add_layout(
-                Label(
-                    y=s,
-                    x=X_RANGE[0] * 1.5,
-                    text=label_text,
-                    text_font_size=LABEL_FONT_SIZE,
-                    text_color="#aaaaaa",
-                    text_align="left",
-                )
-            )
+    # Reference grid (TIME_MARKERS / SPACE_MARKERS as dashed Spans + Labels);
+    # bonus over the previous hand-rolled loop: labels stick to the visible edge
+    # on pan/zoom via CustomJS callbacks inside add_magnitude_labels.
+    add_magnitude_labels(p, font_size=LABEL_FONT_SIZE, space_on_x=False)
 
-    # Plot processes by energy type, building legend items.
-    # Split by geometry: ellipses use batched patches, lines/points
-    # use individual glyphs.  All renderers for the same energy type
-    # share a LegendItem so the legend toggle hides them together.
+    # Plot processes by energy type. Hand-rolled rather than using the package's
+    # add_processes(category_col=, category_colors=) because that path would
+    #   (a) produce a 28-row legend (header + per-process) instead of the
+    #       compact 4-row legend (one row per energy, click-to-hide group), and
+    #   (b) lose the rich hover (Name, Scale, Energy, formatted ranges) — the
+    #       package patch glyph data source has only x/y, not the metadata
+    #       needed for tooltips.
     legend_items = []
 
     def _hover_display(val_min, val_max, unit):
@@ -259,7 +238,6 @@ def build_desert_farm_figure(csv_path, output_path):
 
             renderers.append(r)
 
-            # Label for non-ellipse
             lx = row.Time_min.value if geom == "point" else row.label_x
             ly = row.Space_max.value if geom == "vline" else row.label_y
             tr = p.text(
@@ -278,7 +256,7 @@ def build_desert_farm_figure(csv_path, output_path):
         if renderers:
             legend_items.append(LegendItem(label=etype, renderers=renderers))
 
-    # Legend
+    # Compact legend — one row per energy type, click to hide
     legend = Legend(
         items=legend_items,
         location="top_left",
@@ -290,7 +268,7 @@ def build_desert_farm_figure(csv_path, output_path):
     )
     p.add_layout(legend, "right")
 
-    # Render
+    # ── Render HTML ────────────────────────────────────────────────
     script, div = components(p)
 
     html = f"""<!DOCTYPE html>
