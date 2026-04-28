@@ -36,7 +36,7 @@ def process_magnitude_column(row, column):
         return float(new_val) * base_space
 
 
-def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_COL_LIST, space_on_x=True):
+def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_COL_LIST, space_on_x=True, n_points=1000):
     """Clean and transform Google Form process responses for plotting.
 
     Applies unit conversion, filters invalid rows (min > max), generates
@@ -52,6 +52,11 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
         Axis order to bake into ellipse `x_coords`/`y_coords`. Must match the
         `space_on_x` passed to plotting functions (`add_processes`,
         `create_space_time_figure`). Default True (Stommel: x=space, y=time).
+    n_points : int
+        Number of x samples per half-ellipse (total vertices = 2 * n_points).
+        Default 1000 (smooth curves, ~16 KB per ellipse in serialized HTML).
+        Pass a smaller value (e.g. 100) for figures with many ellipses where
+        rendered HTML size matters more than perfect curve smoothness.
 
     Returns
     -------
@@ -87,7 +92,7 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     if ellipse_mask.any():
         ellipse_coords = (
             plottable_responses_df.loc[ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]]
-            .apply(create_ellipse_data, axis=1, result_type="expand", space_on_x=space_on_x)
+            .apply(create_ellipse_data, axis=1, result_type="expand", space_on_x=space_on_x, n_points=n_points)
             .rename(columns={0: "x_coords", 1: "y_coords"})
         )
         plottable_responses_df.loc[ellipse_mask, ["x_coords", "y_coords"]] = ellipse_coords
