@@ -1,7 +1,7 @@
 VENV := /tmp/ts-build-test
 DIST := dist
 
-.PHONY: help build test test-package clean lint publish-test publish
+.PHONY: help build test test-package build-docs clean lint publish-test publish
 
 help:  ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -44,6 +44,16 @@ test-package: build  ## Build, install in clean venv, run smoke test
 	cd /tmp && $(VENV)/bin/python -m pytest $(CURDIR)/tests/ -v
 	@echo ""
 	@echo "Package is ready. Run 'make publish-test' for TestPyPI or 'make publish' for PyPI."
+
+build-docs:  ## Regenerate all docs/*.html from build scripts
+	python docs/build_desert_farm.py
+	python docs/build_desert_farm_summary.py
+	python docs/build_explorer.py
+	@echo ""
+	@echo "Regenerated:"
+	@echo "  docs/desert_farm_stommel.html"
+	@echo "  docs/desert_farm_summary.html"
+	@echo "  docs/explorer.html"
 
 publish-test: build  ## Upload to TestPyPI
 	pip install twine

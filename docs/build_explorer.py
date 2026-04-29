@@ -76,9 +76,11 @@ def load_reference_objects(csv_path):
 
     # Only generate ellipse data for actual ellipses
     ellipse_mask = df["geometry"] == "ellipse"
-    df.loc[ellipse_mask, ["x_coords", "y_coords"]] = df.loc[
-        ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]
-    ].apply(create_ellipse_data, axis=1, result_type="expand", n_points=EXPLORER_N_POINTS, space_on_x=False)
+    df.loc[ellipse_mask, ["x_coords", "y_coords"]] = (
+        df.loc[ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]]
+        .apply(create_ellipse_data, axis=1, result_type="expand", n_points=EXPLORER_N_POINTS, space_on_x=False)
+        .rename(columns={0: "x_coords", 1: "y_coords"})
+    )
 
     df["color"] = df.Category.map(CATEGORY_COLORS)
 
@@ -740,6 +742,6 @@ def build_explorer(csv_path, output_path):
 if __name__ == "__main__":
     import sys
 
-    csv_path = sys.argv[1] if len(sys.argv) > 1 else "data/local_data/time_space_reference_objects.csv"
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else "data/datasets/time_space_reference_objects.csv"
     output_path = sys.argv[2] if len(sys.argv) > 2 else "docs/explorer.html"
     build_explorer(csv_path, output_path)
