@@ -270,7 +270,7 @@ def build_desert_farm_figure(csv_path, output_path):
             color: #888;
         }}
         .footer a {{
-            color: #0F793D;
+            color: #7A8C5C;
         }}
     </style>
 </head>
