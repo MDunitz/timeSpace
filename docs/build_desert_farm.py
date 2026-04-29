@@ -31,10 +31,10 @@ Y_RANGE = (1e-28, 1e22)
 EXPLORER_N_POINTS = 100
 
 ENERGY_COLORS = {
-    "Chemical": "#0F793D",
-    "Radiative": "#FFCC33",
-    "Thermal": "#CC3333",
-    "Mechanical": "#336699",
+    "Chemical": "#7A8C5C",  # olive — bonds, reactions, metabolism
+    "Radiative": "#E5C16E",  # warm sand — photons, solar
+    "Thermal": "#7B3F3F",  # deep rust — heat, evaporation, climate
+    "Mechanical": "#4F6B82",  # slate — kinetic, mixing, pumping
 }
 
 ENERGY_ORDER = ["Chemical", "Radiative", "Thermal", "Mechanical"]
@@ -281,7 +281,7 @@ def build_desert_farm_figure(csv_path, output_path):
            Stommel diagram. The x-axis is time (seconds to millennia), the
            y-axis is the volume of space involved (cubic angstroms to the
            atmosphere). Color indicates the dominant energy type:
-           chemical (green), radiative (gold), thermal (red), mechanical (blue).
+           chemical (olive), radiative (sand), thermal (rust), mechanical (slate).
            Click the legend to toggle energy types on/off.</p>
     </div>
     {div}
