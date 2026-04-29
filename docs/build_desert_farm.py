@@ -26,10 +26,10 @@ EXPLORER_N_POINTS = 100
 
 # Energy type colors
 ENERGY_COLORS = {
-    "Chemical": "#0F793D",  # green — bonds, reactions, metabolism
-    "Radiative": "#FFCC33",  # gold — photons, solar
-    "Thermal": "#CC3333",  # red — heat, evaporation, climate
-    "Mechanical": "#336699",  # steel blue — kinetic, mixing, pumping
+    "Chemical": "#7A8C5C",  # olive — bonds, reactions, metabolism
+    "Radiative": "#E5C16E",  # warm sand — photons, solar
+    "Thermal": "#7B3F3F",  # deep rust — heat, evaporation, climate
+    "Mechanical": "#4F6B82",  # slate — kinetic, mixing, pumping
 }
 
 ENERGY_ORDER = ["Chemical", "Radiative", "Thermal", "Mechanical"]
@@ -329,7 +329,7 @@ def build_desert_farm_figure(csv_path, output_path):
             color: #888;
         }}
         .footer a {{
-            color: #0F793D;
+            color: #7A8C5C;
         }}
     </style>
 </head>
