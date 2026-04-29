@@ -281,7 +281,7 @@ def build_desert_farm_figure(csv_path, output_path):
            Stommel diagram. The x-axis is time (seconds to millennia), the
            y-axis is the volume of space involved (cubic angstroms to the
            atmosphere). Color indicates the dominant energy type:
-           chemical (green), radiative (gold), thermal (red), mechanical (blue).
+           chemical (olive), radiative (sand), thermal (rust), mechanical (slate).
            Click the legend to toggle energy types on/off.</p>
     </div>
     {div}
