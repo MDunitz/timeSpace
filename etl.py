@@ -1,3 +1,5 @@
+import numpy as np
+
 from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.plotting_helpers import (
@@ -36,7 +38,7 @@ def process_magnitude_column(row, column):
         return float(new_val) * base_space
 
 
-def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_COL_LIST, space_on_x=True):
+def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_COL_LIST, space_on_x=True, n_points=1000):
     """Clean and transform Google Form process responses for plotting.
 
     Applies unit conversion, filters invalid rows (min > max), generates
@@ -52,11 +54,20 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
         Axis order to bake into ellipse `x_coords`/`y_coords`. Must match the
         `space_on_x` passed to plotting functions (`add_processes`,
         `create_space_time_figure`). Default True (Stommel: x=space, y=time).
+    n_points : int
+        Number of x samples per half-ellipse (total vertices = 2 * n_points).
+        Default 1000 (smooth curves, ~16 KB per ellipse in serialized HTML).
+        Pass a smaller value (e.g. 100) for figures with many ellipses where
+        rendered HTML size matters more than perfect curve smoothness.
 
     Returns
     -------
     DataFrame
-        With added columns: Name, FillAlpha, TextAlpha, geometry, x_coords, y_coords.
+        With added columns: Name, FillAlpha, TextAlpha, geometry, x_coords,
+        y_coords, label_x, label_y. label_x is the geometric mean of
+        (Time_min, Time_max); label_y is the geometric mean of (Space_min,
+        Space_max). If label_x or label_y are already present in the input
+        (e.g. CSV-provided overrides), they are preserved unchanged.
     """
     # Validate required columns
     required = {"Time_min", "Time_max", "Space_min", "Space_max"}
@@ -82,12 +93,20 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     plottable_responses_df["TextAlpha"] = plottable_responses_df.apply(lambda row: min(1, 4 * row["FillAlpha"]), axis=1)
     plottable_responses_df["Time Max"] = plottable_responses_df.apply(lambda row: row["Time_max"].value, axis=1)
     plottable_responses_df["Space Min"] = plottable_responses_df.apply(lambda row: row["Space_min"].value, axis=1)
+    if "label_x" not in plottable_responses_df.columns:
+        plottable_responses_df["label_x"] = plottable_responses_df.apply(
+            lambda row: np.sqrt(row["Time_min"].value * row["Time_max"].value), axis=1
+        )
+    if "label_y" not in plottable_responses_df.columns:
+        plottable_responses_df["label_y"] = plottable_responses_df.apply(
+            lambda row: np.sqrt(row["Space_min"].value * row["Space_max"].value), axis=1
+        )
     plottable_responses_df["geometry"] = plottable_responses_df.apply(classify_process_geometry, axis=1)
     ellipse_mask = plottable_responses_df["geometry"] == "ellipse"
     if ellipse_mask.any():
         ellipse_coords = (
             plottable_responses_df.loc[ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]]
-            .apply(create_ellipse_data, axis=1, result_type="expand", space_on_x=space_on_x)
+            .apply(create_ellipse_data, axis=1, result_type="expand", space_on_x=space_on_x, n_points=n_points)
             .rename(columns={0: "x_coords", 1: "y_coords"})
         )
         plottable_responses_df.loc[ellipse_mask, ["x_coords", "y_coords"]] = ellipse_coords

@@ -8,15 +8,21 @@ Designed for embedding on Google Sites via iframe.
 
 import pandas as pd
 import numpy as np
-from bokeh.plotting import figure
-from bokeh.models import ColumnDataSource, Span, Label, HoverTool, Legend, LegendItem
+from bokeh.models import (
+    BoxZoomTool,
+    ColumnDataSource,
+    HoverTool,
+    Legend,
+    LegendItem,
+    PanTool,
+    ResetTool,
+    WheelZoomTool,
+)
 from bokeh.resources import CDN
 from bokeh.embed import components
 
-from timeSpace.constants import TIME_MARKERS, SPACE_MARKERS
-from timeSpace.calculations import create_ellipse_data, classify_process_geometry
-from timeSpace.etl import process_magnitude_column
-from timeSpace.plotting_helpers import set_fill_alpha
+from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
+from timeSpace.plotting import create_space_time_figure, add_magnitude_labels
 
 # ── Configuration ──────────────────────────────────────────────────
 X_RANGE = (1e-3, 1e13)
@@ -24,12 +30,11 @@ Y_RANGE = (1e-28, 1e22)
 
 EXPLORER_N_POINTS = 100
 
-# Energy type colors
 ENERGY_COLORS = {
-    "Chemical": "#7A8C5C",  # olive — bonds, reactions, metabolism
-    "Radiative": "#E5C16E",  # warm sand — photons, solar
-    "Thermal": "#7B3F3F",  # deep rust — heat, evaporation, climate
-    "Mechanical": "#4F6B82",  # slate — kinetic, mixing, pumping
+    "Chemical": "#0F793D",
+    "Radiative": "#FFCC33",
+    "Thermal": "#CC3333",
+    "Mechanical": "#336699",
 }
 
 ENERGY_ORDER = ["Chemical", "Radiative", "Thermal", "Mechanical"]
@@ -40,53 +45,26 @@ LABEL_FONT_SIZE = "9pt"
 COLAB_URL = "https://colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/desert_farm_colab.ipynb"
 
 
-# ── Data loading (same pattern as explorer) ────────────────────────
+# ── Data loading ───────────────────────────────────────────────────
 
 
 def load_processes(csv_path):
-    """Read desert farm process CSV and generate render coordinates.
+    """Read desert farm process CSV and run the ETL pipeline.
 
-    Classifies each process geometry (ellipse/vline/hline/point) and only
-    generates ellipse polygon data for true ellipses.  Degenerate axes
-    render as lines or point markers instead of fabricated ellipses.
-
-    Uses package functions:
-    - etl.process_magnitude_column for unit application (seconds, m³)
-    - calculations.classify_process_geometry for degeneracy detection
-    - calculations.create_ellipse_data for ellipse polygon vertices
-    - plotting_helpers.set_fill_alpha for area-based transparency
+    Pre-ETL: derive Color from Energy_type and rename Name → FullName so
+    create_name's ShortName fallback doesn't overwrite the original name.
+    The hover tooltip uses FullName; the legend groups by Energy_type.
     """
     df = pd.read_csv(csv_path)
+    df = df.rename(columns={"Name": "FullName"})
+    df["Color"] = df.Energy_type.map(ENERGY_COLORS)
 
-    # Apply units — same function as etl.py pipeline
-    for col in ["Time_min", "Time_max", "Space_min", "Space_max"]:
-        df[col] = df.apply(process_magnitude_column, column=col, axis=1)
-
-    # Classify geometry before generating coords
-    df["geometry"] = df.apply(classify_process_geometry, axis=1)
-
-    # Only generate ellipse data for actual ellipses
-    ellipse_mask = df["geometry"] == "ellipse"
-    df.loc[ellipse_mask, ["x_coords", "y_coords"]] = (
-        df.loc[ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]]
-        .apply(
-            create_ellipse_data,
-            axis=1,
-            result_type="expand",
-            n_points=EXPLORER_N_POINTS,
-            space_on_x=False,
-        )
-        .rename(columns={0: "x_coords", 1: "y_coords"})
+    return transform_process_response_sheet(
+        df,
+        possible_col_list=POSSIBLE_COL_LIST + ["FullName", "Scale", "Energy_type"],
+        space_on_x=False,
+        n_points=EXPLORER_N_POINTS,
     )
-
-    df["color"] = df.Energy_type.map(ENERGY_COLORS)
-    df["label_x"] = np.sqrt(df.Time_min.apply(lambda q: q.value) * df.Time_max.apply(lambda q: q.value))
-    df["label_y"] = np.sqrt(df.Space_min.apply(lambda q: q.value) * df.Space_max.apply(lambda q: q.value))
-
-    # Fill alpha — same function as main Stommel figure pipeline
-    df["fill_alpha"] = df.apply(set_fill_alpha, axis=1)
-
-    return df
 
 
 # ── Build ──────────────────────────────────────────────────────────
@@ -95,60 +73,24 @@ def load_processes(csv_path):
 def build_desert_farm_figure(csv_path, output_path):
     df = load_processes(csv_path)
 
-    p = figure(
+    p = create_space_time_figure(
         width=900,
         height=650,
-        x_axis_type="log",
-        y_axis_type="log",
-        x_axis_label="Time (s)",
-        y_axis_label="Space (m³)",
-        x_range=X_RANGE,
-        y_range=Y_RANGE,
         title="Desert Farm — Processes Across Scale",
-        toolbar_location="above",
-        x_axis_location="above",
-        tools="pan,wheel_zoom,box_zoom,reset",
+        space_on_x=False,
     )
-    p.axis.axis_label_text_font_size = FONT_SIZE
-    p.axis.major_label_text_font_size = "10pt"
+    p.x_range.start, p.x_range.end = X_RANGE
+    p.y_range.start, p.y_range.end = Y_RANGE
     p.title.text_font_size = "16pt"
     p.title.text_font_style = "bold"
+    p.axis.axis_label_text_font_size = FONT_SIZE
+    p.axis.major_label_text_font_size = "10pt"
     p.background_fill_color = "#fafafa"
+    p.toolbar_location = "above"
+    p.toolbar.tools = [PanTool(), WheelZoomTool(), BoxZoomTool(), ResetTool()]
 
-    # Reference grid
-    for t, label_text in TIME_MARKERS.items():
-        if X_RANGE[0] <= t <= X_RANGE[1]:
-            p.add_layout(Span(location=t, dimension="height", line_color="#cccccc", line_dash="dashed", line_width=1))
-            p.add_layout(
-                Label(
-                    x=t,
-                    y=Y_RANGE[1],
-                    text=label_text,
-                    text_font_size=LABEL_FONT_SIZE,
-                    text_color="#aaaaaa",
-                    text_align="center",
-                    text_baseline="top",
-                )
-            )
+    add_magnitude_labels(p, font_size=LABEL_FONT_SIZE, space_on_x=False)
 
-    for s, label_text in SPACE_MARKERS.items():
-        if Y_RANGE[0] <= s <= Y_RANGE[1]:
-            p.add_layout(Span(location=s, dimension="width", line_color="#dddddd", line_dash="dashed", line_width=1))
-            p.add_layout(
-                Label(
-                    y=s,
-                    x=X_RANGE[0] * 1.5,
-                    text=label_text,
-                    text_font_size=LABEL_FONT_SIZE,
-                    text_color="#aaaaaa",
-                    text_align="left",
-                )
-            )
-
-    # Plot processes by energy type, building legend items.
-    # Split by geometry: ellipses use batched patches, lines/points
-    # use individual glyphs.  All renderers for the same energy type
-    # share a LegendItem so the legend toggle hides them together.
     legend_items = []
 
     def _hover_display(val_min, val_max, unit):
@@ -171,8 +113,8 @@ def build_desert_farm_figure(csv_path, output_path):
                 data=dict(
                     xs=[row.x_coords.tolist() for _, row in ell.iterrows()],
                     ys=[row.y_coords.tolist() for _, row in ell.iterrows()],
-                    alpha=ell.fill_alpha.tolist(),
-                    name=ell.Name.tolist(),
+                    alpha=ell.FillAlpha.tolist(),
+                    name=ell.FullName.tolist(),
                     short_name=ell.ShortName.tolist(),
                     scale=ell.Scale.tolist(),
                     energy_type=ell.Energy_type.tolist(),
@@ -259,7 +201,6 @@ def build_desert_farm_figure(csv_path, output_path):
 
             renderers.append(r)
 
-            # Label for non-ellipse
             lx = row.Time_min.value if geom == "point" else row.label_x
             ly = row.Space_max.value if geom == "vline" else row.label_y
             tr = p.text(
@@ -278,7 +219,7 @@ def build_desert_farm_figure(csv_path, output_path):
         if renderers:
             legend_items.append(LegendItem(label=etype, renderers=renderers))
 
-    # Legend
+    # Compact legend — one row per energy type, click to hide
     legend = Legend(
         items=legend_items,
         location="top_left",
@@ -290,7 +231,7 @@ def build_desert_farm_figure(csv_path, output_path):
     )
     p.add_layout(legend, "right")
 
-    # Render
+    # ── Render HTML ────────────────────────────────────────────────
     script, div = components(p)
 
     html = f"""<!DOCTYPE html>
