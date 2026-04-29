@@ -12,7 +12,6 @@ To upgrade to Bokeh server later: replace CustomJS callbacks with Python callbac
 """
 
 import pandas as pd
-import numpy as np
 from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource, CustomJS, Select, TextInput, Button, Div, Span, Label, HoverTool
 from bokeh.layouts import column, row
@@ -20,8 +19,7 @@ from bokeh.resources import CDN
 from bokeh.embed import components
 
 from timeSpace.constants import TIME_MARKERS, SPACE_MARKERS
-from timeSpace.calculations import create_ellipse_data, classify_process_geometry
-from timeSpace.etl import process_magnitude_column
+from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
 
 # ── Configuration ──────────────────────────────────────────────────
 # Match main figure axis ranges (from plotting.py's create_space_time_figure)
@@ -56,37 +54,33 @@ LABEL_FONT_SIZE = "9pt"
 
 
 def load_reference_objects(csv_path):
-    """Read reference objects CSV and generate render coordinates.
+    """Read reference objects CSV and run the package ETL pipeline.
 
-    Classifies each object's geometry (ellipse/vline/hline/point) and only
-    generates ellipse polygon data for true ellipses.  Degenerate axes are
-    flagged so the rendering layer can use lines or point markers.
+    Pre-ETL adapter: the reference-objects CSV uses a different schema
+    from a Google Form response sheet, so we adapt before delegating to
+    transform_process_response_sheet:
+      - Rename Name → FullName so create_name's ShortName fallback inside
+        the ETL doesn't overwrite the descriptive name we want for hover
+        tooltips and labels.
+      - Map Category → Color (uppercase to match POSSIBLE_COL_LIST).
+      - Set ShortName = FullName since reference objects don't have
+        separate short forms; create_name needs ShortName to exist.
 
-    Applies astropy units (seconds, m³) to match the package's ETL pipeline,
-    then calls create_ellipse_data from timeSpace.calculations.
+    transform_process_response_sheet handles unit conversion, geometry
+    classification, ellipse polygon generation, label_x/label_y, and
+    filters out rows where Time_min > Time_max or Space_min > Space_max.
     """
     df = pd.read_csv(csv_path)
+    df = df.rename(columns={"Name": "FullName"})
+    df["Color"] = df.Category.map(CATEGORY_COLORS)
+    df["ShortName"] = df.FullName
 
-    # Apply units — same function as etl.py pipeline
-    for col in ["Time_min", "Time_max", "Space_min", "Space_max"]:
-        df[col] = df.apply(process_magnitude_column, column=col, axis=1)
-
-    # Classify geometry before generating coords
-    df["geometry"] = df.apply(classify_process_geometry, axis=1)
-
-    # Only generate ellipse data for actual ellipses
-    ellipse_mask = df["geometry"] == "ellipse"
-    df.loc[ellipse_mask, ["x_coords", "y_coords"]] = df.loc[
-        ellipse_mask, ["Time_min", "Time_max", "Space_min", "Space_max"]
-    ].apply(create_ellipse_data, axis=1, result_type="expand", n_points=EXPLORER_N_POINTS, space_on_x=False)
-
-    df["color"] = df.Category.map(CATEGORY_COLORS)
-
-    # Center position for labels (geometric mean in log space)
-    df["label_x"] = np.sqrt(df.Time_min.apply(lambda q: q.value) * df.Time_max.apply(lambda q: q.value))
-    df["label_y"] = np.sqrt(df.Space_min.apply(lambda q: q.value) * df.Space_max.apply(lambda q: q.value))
-
-    return df
+    return transform_process_response_sheet(
+        df,
+        possible_col_list=POSSIBLE_COL_LIST + ["FullName", "Category"],
+        space_on_x=False,
+        n_points=EXPLORER_N_POINTS,
+    )
 
 
 # ── Figure construction ───────────────────────────────────────────
@@ -289,10 +283,10 @@ def build_explorer(csv_path, output_path):
         data=dict(
             xs=[_patch_coords(row)[0] for _, row in df.iterrows()],
             ys=[_patch_coords(row)[1] for _, row in df.iterrows()],
-            color=df.color.tolist(),
+            color=df.Color.tolist(),
             alpha=[0.0] * len(df),  # start hidden
             line_alpha=[0.0] * len(df),
-            name=df.Name.tolist(),
+            name=df.FullName.tolist(),
             category=df.Category.tolist(),
             time_min=[row.Time_min.value for _, row in df.iterrows()],
             time_max=[row.Time_max.value for _, row in df.iterrows()],
@@ -326,7 +320,7 @@ def build_explorer(csv_path, output_path):
         data=dict(
             xs=[_line_coords(row)[0] for _, row in df.iterrows()],
             ys=[_line_coords(row)[1] for _, row in df.iterrows()],
-            color=df.color.tolist(),
+            color=df.Color.tolist(),
             alpha=[0.0] * len(df),
         )
     )
@@ -345,7 +339,7 @@ def build_explorer(csv_path, output_path):
         data=dict(
             x=[row.Time_min.value if row.geometry == "point" else float("nan") for _, row in df.iterrows()],
             y=[row.Space_min.value if row.geometry == "point" else float("nan") for _, row in df.iterrows()],
-            color=df.color.tolist(),
+            color=df.Color.tolist(),
             alpha=[0.0] * len(df),
         )
     )
@@ -385,9 +379,9 @@ def build_explorer(csv_path, output_path):
         data=dict(
             x=df.label_x.tolist(),
             y=df.label_y.tolist(),
-            text=df.Name.tolist(),
+            text=df.FullName.tolist(),
             alpha=[0.0] * len(df),
-            color=df.color.tolist(),
+            color=df.Color.tolist(),
         )
     )
 
@@ -480,7 +474,7 @@ def build_explorer(csv_path, output_path):
     categories = ["— Select category —"] + sorted(CATEGORY_COLORS.keys())
     cat_select = Select(title="Filter by category:", value=categories[0], options=categories, width=220)
 
-    objects = ["— Select object —"] + sorted(df.Name.tolist())
+    objects = ["— Select object —"] + sorted(df.FullName.tolist())
     obj_select = Select(title="Or pick an object:", value=objects[0], options=objects, width=280)
 
     # Custom input fields
@@ -740,6 +734,6 @@ def build_explorer(csv_path, output_path):
 if __name__ == "__main__":
     import sys
 
-    csv_path = sys.argv[1] if len(sys.argv) > 1 else "data/local_data/time_space_reference_objects.csv"
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else "data/datasets/time_space_reference_objects.csv"
     output_path = sys.argv[2] if len(sys.argv) > 2 else "docs/explorer.html"
     build_explorer(csv_path, output_path)
