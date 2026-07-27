@@ -2,7 +2,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 __all__ = [
     "PROJECT_ROOT",
@@ -11,6 +11,7 @@ __all__ = [
     "add_magnitude_labels",
     "add_processes",
     "add_predefined_processes",
+    "add_icons",
     "add_diffusion_lines",
     "add_light_cone",
     "add_legend",
@@ -69,6 +70,9 @@ from timeSpace.measurements import (
 
 # Label collision detection
 from timeSpace.plotting_helpers import resolve_label_overlaps, count_overlaps
+
+# Icons
+from timeSpace.icons import add_icons
 
 # Data access
 from timeSpace.data_processing import extract_google_sheet

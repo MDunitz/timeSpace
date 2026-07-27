@@ -28,7 +28,7 @@ colors = [
     "#724419",
 ]
 
-POSSIBLE_COL_LIST = ["Prefix", "ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "Color", "Lab"]
+POSSIBLE_COL_LIST = ["Prefix", "ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "Color", "Lab", "icon"]
 
 
 PREDEFINED_PROCESSES_URI = "16ENjOsx4j2DD24mz0k-I08zF3R0CkfiujjqyYCGuAxg"
