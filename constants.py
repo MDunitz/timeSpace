@@ -107,8 +107,8 @@ cubic_Mm = 1e18 * base_space
 
 # Add time markers on x-axis
 TIME_MARKERS = {
-    1e-18: "Electron movement",  # attosecond
-    1e-15: "Period of wave \nof visible light",  # https://en.wikipedia.org/wiki/Femtosecond
+    2.42e-17: "Electron movement",  # atomic unit of time, hbar/E_h = 2.419e-17 s
+    1.8e-15: "Period of wave \nof visible light",  # T = lambda/c, 550 nm
     1e-6: "Protein Folding",  # https://en.wikipedia.org/wiki/Microsecond
     1e-3: "Neuron Firing",  # https://en.wikipedia.org/wiki/Millisecond
     1e0: "Second",
@@ -117,7 +117,7 @@ TIME_MARKERS = {
     3.156e9: "Century",  # 100 years
     3.156e12: "Glacial-interglacial",  # 100 kyr eccentricity cycle
     1e15: "Geologic",
-    1e18: "Deep Time",
+    1.43e17: "Deep Time",  # age of Earth, 4.54 Gyr
 }
 # to do how can i access the relevant prefix from the astropy type?
 SPACE_MARKERS = {
