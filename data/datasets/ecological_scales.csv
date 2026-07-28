@@ -36,7 +36,7 @@ detritus or faecal pellets) in an
 aqueous environment.",Plumes: micrometers to centimeters. Plume lifetime: hours to days for sinking particles ,
 8,Omics,1.00E+02: ~2 minutes , 1.00E+04: ~3 hours ,1.00E-15: 10 cubic µm (typical yeast cell volume),1.00E-6: 1 cubic cm (1 milliliter),,Highly sensitive spatial transcriptomics at near-cellular resolution with Slide-seqV2 - PMC,Scaling up spatial transcriptomics for large-sized tissues: uncovering cellular-level tissue architecture beyond conventional platforms with iSCALE | Nature Methods,,"Temporal and spatial omics technologies for 4D profiling | Nature Methods
 Note: In a single experiment, the temporal upper limit could be hours in continuous imaging/profiling. However, if sampled regularly, it could be months. Depending on the -omics approach too.",
-9,Microscopy,1.00E-06: micro (µ) ,1.00E+06: ~12 days,1.00E-24: 10 cubic nm (typcial virus volume),1.00E-6: 1 cubic cm (1 milliliter),,Optical microscopy beyond the diffraction limit - PMC,,,,
+9,Microscopy,1.00E-06: micro (µ) ,1.00E+06: ~12 days,1.00E-24: 10 cubic nm (protein complex),1.00E-6: 1 cubic cm (1 milliliter),,Optical microscopy beyond the diffraction limit - PMC,,,,
 10,Environmental Samples (mesocosms),1.00E+06: ~12 days,1.00E+08: ~3 years ,1.00E0: one cubic meter (1000 liters),1.00E+03: deka (da),,sp-2-oae2023-6-2023.pdf,Mesocosm Experiments as a Tool for Ecological Climate-Change Research - ScienceDirect,,,
 11,Bacterial aggregation,,,,,,,,,,
 12,Molecular Fingerprinting,,,,,,,,,,
