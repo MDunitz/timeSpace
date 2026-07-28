@@ -9,6 +9,11 @@ __all__ = [
     "validate_dataset",
     "errors",
     "format_findings",
+    "ENERGY_COLORS",
+    "ENERGY_ORDER",
+    "assign_energy_colors",
+    "energy_types_present",
+    "validate_energy_types",
     "PROJECT_ROOT",
     # Plotting
     "create_space_time_figure",
@@ -86,6 +91,14 @@ from timeSpace.validation import (
     validate_dataset,
     errors,
     format_findings,
+)
+
+from timeSpace.energy import (
+    ENERGY_COLORS,
+    ENERGY_ORDER,
+    assign_energy_colors,
+    energy_types_present,
+    validate_energy_types,
 )
 
 # Library logging — silent by default, user opts in with:

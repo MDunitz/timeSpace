@@ -23,21 +23,13 @@ from bokeh.embed import components
 
 from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
 from timeSpace.plotting import create_space_time_figure, add_magnitude_labels
+from timeSpace.energy import ENERGY_COLORS, assign_energy_colors, energy_types_present
 
 # ── Configuration ──────────────────────────────────────────────────
 X_RANGE = (1e-3, 1e13)
 Y_RANGE = (1e-28, 1e22)
 
 EXPLORER_N_POINTS = 100
-
-ENERGY_COLORS = {
-    "Chemical": "#7A8C5C",  # olive — bonds, reactions, metabolism
-    "Radiative": "#E5C16E",  # warm sand — photons, solar
-    "Thermal": "#7B3F3F",  # deep rust — heat, evaporation, climate
-    "Mechanical": "#4F6B82",  # slate — kinetic, mixing, pumping
-}
-
-ENERGY_ORDER = ["Chemical", "Radiative", "Thermal", "Mechanical"]
 
 FONT_SIZE = "11pt"
 LABEL_FONT_SIZE = "9pt"
@@ -57,7 +49,7 @@ def load_processes(csv_path):
     """
     df = pd.read_csv(csv_path)
     df = df.rename(columns={"Name": "FullName"})
-    df["Color"] = df.Energy_type.map(ENERGY_COLORS)
+    df = assign_energy_colors(df)
 
     return transform_process_response_sheet(
         df,
@@ -99,7 +91,7 @@ def build_desert_farm_figure(csv_path, output_path):
             return f"{val_min:.1e} {unit}"
         return f"{val_min:.1e} → {val_max:.1e} {unit}"
 
-    for etype in ENERGY_ORDER:
+    for etype in energy_types_present(df):
         edf = df[df.Energy_type == etype]
         if edf.empty:
             continue
