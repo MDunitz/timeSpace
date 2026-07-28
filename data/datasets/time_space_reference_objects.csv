@@ -26,7 +26,7 @@ Domestic cat lifespan,380000000.0,630000000.0,0.003,0.01,Organism,
 Dog lifespan,300000000.0,500000000.0,0.005,0.05,Organism,
 Human lifespan,2200000000.0,3200000000.0,0.05,0.1,Organism,WHO life expectancy tables; body volume ~0.07 m³
 Blue whale lifespan,2500000000.0,3500000000.0,50.0,150.0,Organism,Sears & Perrin (2018) Mammalian Species 50(966):15-29
-Giant tortoise lifespan,3500000000.0,5700000000.0,0.2,0.4,Organism,Galapagos/Aldabra adults 200-400 kg at ~1000 kg/m3
+Giant tortoise lifespan,3500000000.0,5700000000.0,0.1,0.4,Organism,Jaffe et al. (2011) PLoS ONE 6:e22045; Chiari et al. (2017) — adult Chelonoidis niger commonly >100 kg to ~400 kg; V = m / 1000 kg m-3
 Bowhead whale lifespan,6300000000.0,6300000000.0,30.0,100.0,Organism,
 Greenland shark lifespan,8600000000.0,16000000000.0,1.0,5.0,Organism,Nielsen et al. (2016) Science 353(6300):702-704
 Grass blade growth,86400.0,2600000.0,1e-07,1e-05,Organism,
@@ -47,17 +47,17 @@ Mangrove forest succession,3200000000.0,32000000000.0,100000.0,100000000.0,Ecosy
 Lake turnover (seasonal mixing),86400.0,2600000.0,1000000.0,10000000000.0,Ecosystem,
 River delta formation,32000000000.0,3200000000000.0,1000000000.0,1000000000000.0,Ecosystem,
 Soil formation (1 cm topsoil),32000000000.0,320000000000.0,0.01,10000.0,Ecosystem,
-Raindrop fall,100.0,1000.0,1e-10,1e-07,Atmosphere,Drops break up above ~5-6 mm diameter (Villermaux & Bossa 2009 Nat Phys 5:697); 0.6-6 mm -> 1e-10 to 1e-7 m3
+Raindrop fall,100.0,1000.0,1.1e-10,1.1e-07,Atmosphere,Villermaux & Bossa (2009) Nat Phys 5:697 — drops break up above ~5-6 mm diameter; V = (pi/6) d^3 for d = 0.6-6 mm
 Thunderstorm cell,1800.0,7200.0,1000000000.0,100000000000.0,Atmosphere,
 Tornado,600.0,7200.0,1000000.0,1000000000.0,Atmosphere,
-Hurricane lifetime,86400.0,2600000.0,1e+17,1e+19,Atmosphere,Circulation envelope: 100-500 km radius x 10-15 km troposphere depth
+Hurricane lifetime,86400.0,2600000.0,3e+14,4e+16,Atmosphere,Merrill (1984) Mon Wea Rev 112:1408 — ROCI 2-8 deg lat (~220-890 km); V = pi r^2 h over a 10-16 km tropical troposphere
 Monsoon season,10000000.0,16000000.0,1e+16,1e+18,Atmosphere,
 El Niño event,30000000.0,60000000.0,1e+17,1e+18,Atmosphere,
-Ice age cycle (Milankovitch),3200000000000.0,4000000000000.0,1.5e+18,5.1e+19,Planetary,Ocean (1.37e18 m3) to full atmosphere to 100 km (5.1e19 m3); previous 1e20 exceeded both
+Ice age cycle (Milankovitch),3200000000000.0,4000000000000.0,1.335e+18,5.1e+19,Planetary,Charette & Smith (2010) Oceanography 23:112 — ocean 1.335e18 m3; atmosphere to 100 km = 5.1e14 m2 x 1e5 m = 5.1e19 m3. Bracket is a framing choice: which reservoir a glacial cycle 'occupies' is not well defined
 Surface wave,1,20,0.1,1000.0,Ocean,
 Internal wave,600.0,86400.0,1000000.0,10000000000.0,Ocean,
 Tidal cycle,43000.0,45000.0,1000000000000.0,1000000000000000.0,Ocean,
-Ocean eddy (mesoscale),864000.0,10000000.0,50000000000.0,2e+15,Ocean,Aligned with stommel_boyd2015_volumes.csv; L_v = 500-2000 m thermocline depth
+Ocean eddy (mesoscale),864000.0,10000000.0,6e+11,1.4e+14,Ocean,Chelton et al. (2011) Prog Oceanogr 91:167 — radii 25-150 km; V = pi r^2 h over a 300-2000 m thermocline
 Thermohaline circulation (full loop),32000000000.0,63000000000.0,1e+17,1.3e+18,Ocean,
 Tsunami propagation,3600.0,72000.0,10000000000.0,100000000000000.0,Ocean,
 Computer transistor switch,1e-10,1e-09,1e-21,1e-18,Human-built,
