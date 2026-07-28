@@ -157,7 +157,7 @@ so `hecto (h)` is (100 m)³ = 1e6 m³ and `deka (da)` is (10 m)³ = 1e3 m³.
 |---|---|---|---|
 | 1e-30 | cubic angstrom | 1 Å | CO₂ ≈ 51 Å³ (see `constants.py`) |
 | 1e-27 | 1 cubic nm | 1 nm | small protein |
-| 1e-24 | 10 cubic nm | 10 nm | protein complex |
+| 1e-24 | 10 cubic nm | 10 nm | small virion (circovirus, parvovirus) |
 | 1e-21 | 100 cubic nm | 100 nm | typical virion (influenza, HIV) |
 | 1e-18 | 1 cubic µm | 1 µm | bacterial cell |
 | 1e-15 | 10 cubic µm | 10 µm | small eukaryotic cell |
@@ -177,6 +177,13 @@ The convention was previously recorded only in a `Notes` cell on one row
 of `data/datasets/models.csv`. Read conventionally, `10 cubic µm` parses
 as 10 µm³ and every rung looks 100× off — it is not, but nothing outside
 that one cell said so.
+
+The anchors are **volumes, not diameters**. A rung's anchor is an object
+whose *volume* lands on that rung, which is not the object whose diameter
+equals the cube side. A 17 nm circovirus is a sphere of 2.6e-24 m³, so it
+anchors the `10 cubic nm` rung even though no virion is 10 nm across —
+its equivalent cube side is 13.7 nm. Reading the cube side as a particle
+diameter shifts every biological anchor one rung too low.
 
 ### Optional columns
 
