@@ -145,6 +145,39 @@ Time and space values can be plain floats (`1e3`) or colon-separated
 with a human-readable description (`1.00E+03: ~15 minutes`). The ETL
 layer parses only the numeric portion before the colon.
 
+#### Spatial label vocabulary
+
+The bundled datasets use a fixed vocabulary for the human-readable half
+of `Space_min` / `Space_max`. **"N cubic X" means an N-by-X cube, not N
+cubic units of X.** `10 cubic µm` is (10 µm)³ = 10³ µm³ = 1e-15 m³, not
+10 µm³. SI prefixes are applied to the linear dimension before cubing,
+so `hecto (h)` is (100 m)³ = 1e6 m³ and `deka (da)` is (10 m)³ = 1e3 m³.
+
+| Value (m³) | Label | Cube side | Physical anchor |
+|---|---|---|---|
+| 1e-30 | cubic angstrom | 1 Å | CO₂ ≈ 51 Å³ (see `constants.py`) |
+| 1e-27 | 1 cubic nm | 1 nm | small protein |
+| 1e-24 | 10 cubic nm | 10 nm | protein complex |
+| 1e-21 | 100 cubic nm | 100 nm | typical virion (influenza, HIV) |
+| 1e-18 | 1 cubic µm | 1 µm | bacterial cell |
+| 1e-15 | 10 cubic µm | 10 µm | small eukaryotic cell |
+| 1e-12 | 100 cubic µm | 100 µm | large pollen grain |
+| 1e-9 | 1 cubic mm | 1 mm | 1 µL |
+| 1e-6 | 1 cubic cm | 1 cm | 1 mL |
+| 1e-3 | 1 cubic dm | 10 cm | 1 L |
+| 1e0 | one cubic meter | 1 m | 1000 L |
+| 1e3 | deka (da) | 10 m | |
+| 1e6 | hecto (h) | 100 m | |
+| 1e9 | cubic km | 1 km | |
+| 1e12 | 10s of cubic km | 10 km | |
+| 1e15 | 100s of cubic km | 100 km | |
+| 1e18 | cubic Mm | 1 Mm | ≈ global ocean (1.37e18 m³) |
+
+The convention was previously recorded only in a `Notes` cell on one row
+of `data/datasets/models.csv`. Read conventionally, `10 cubic µm` parses
+as 10 µm³ and every rung looks 100× off — it is not, but nothing outside
+that one cell said so.
+
 ### Optional columns
 
 | Column       | Type   | Description                                       |
