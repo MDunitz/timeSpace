@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST
@@ -7,6 +9,7 @@ from timeSpace.plotting_helpers import (
     set_fill_alpha,
     set_measurement_text_jitter,
 )
+from timeSpace.validation import check_spatial_values_look_like_volumes
 
 
 def process_magnitude_column(row, column):
@@ -113,7 +116,7 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     return plottable_responses_df
 
 
-def transform_predefined_processes(plottable_responses_df, space_on_x=True):
+def transform_predefined_processes(plottable_responses_df, space_on_x=True, warn_on_lengths=True):
     """Transform a predefined process CSV for plotting on a Stommel diagram.
 
     Normalizes column names (Process/EcologicalUnit/Model → Name), applies
@@ -126,6 +129,9 @@ def transform_predefined_processes(plottable_responses_df, space_on_x=True):
         CSV data with Time_min, Time_max, Space_min, Space_max columns.
         Name column can be called Name, Process, EcologicalUnit, or Model.
         Legacy names emit a FutureWarning.
+    warn_on_lengths : bool
+        Emit a UserWarning when the spatial column looks like characteristic
+        lengths rather than volumes. See validation.check_spatial_values_look_like_volumes.
 
     Returns
     -------
@@ -146,6 +152,10 @@ def transform_predefined_processes(plottable_responses_df, space_on_x=True):
         raise ValueError(
             f"DataFrame missing required columns: {missing}. " f"Expected: Time_min, Time_max, Space_min, Space_max."
         )
+
+    if warn_on_lengths:
+        for finding in check_spatial_values_look_like_volumes(plottable_responses_df):
+            warnings.warn(finding.message, UserWarning, stacklevel=2)
 
     for column in ["Time_min", "Time_max", "Space_min", "Space_max"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
