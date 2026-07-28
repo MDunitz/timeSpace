@@ -387,12 +387,3 @@ def create_scale_cascade_html(category_colors, globe_height=700):
         f"</div>"
     )
     return cascade_html
-
-
-# ---------------------------------------------------------------------------
-# Back-compat stub
-# ---------------------------------------------------------------------------
-def create_scale_popout(*args, **kwargs):
-    raise NotImplementedError(
-        "create_scale_popout() replaced by create_scale_cascade_html(). " "Embed the returned HTML string directly."
-    )
