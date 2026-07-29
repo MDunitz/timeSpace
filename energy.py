@@ -63,7 +63,10 @@ def assign_energy_colors(df, column=ENERGY_COLUMN, default=None):
             f"Pass default='#hex' to colour them anyway."
         )
     out = df.copy()
-    out["Color"] = out[column].map(ENERGY_COLORS).fillna(default)
+    colors = out[column].map(ENERGY_COLORS)
+    # fillna(None) raises on pandas < 2.2; unknown tags already raised above when
+    # default is None, so there is nothing to fill in that branch.
+    out["Color"] = colors if default is None else colors.fillna(default)
     return out
 
 
