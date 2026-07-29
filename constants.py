@@ -89,7 +89,8 @@ e_coli_motility_coefficient = 5e-6 * diffusion_unit  # Berg & Brown (1972) Natur
 # k_B = 1.381e-23 J/K, T = 298.15 K, η = 8.9e-4 Pa·s, r ≈ 0.5 µm
 e_coli_diffusion_rate = 4.9e-9 * diffusion_unit  # Stokes-Einstein, r ≈ 0.5 µm at 25°C
 
-virus_diffusion_rate = 1.55e-7 * diffusion_unit  # ~100 nm particle; Stokes-Einstein approx.
+# D = kT / (6πηr), k_B = 1.381e-23 J/K, T = 298.15 K, η = 8.9e-4 Pa·s, r = 50 nm
+virus_diffusion_rate = 4.9e-8 * diffusion_unit  # 100 nm virion, Stokes-Einstein
 
 DIFFUSION_COEFFICIENTS = {
     "CO2": CO2_diffusion_rate,
@@ -106,17 +107,17 @@ cubic_Mm = 1e18 * base_space
 
 # Add time markers on x-axis
 TIME_MARKERS = {
-    1e-19: "Electron movement",
-    1e-15: "Period of wave \nof visible light",  # https://en.wikipedia.org/wiki/Femtosecond
+    2.42e-17: "Electron movement",  # atomic unit of time, hbar/E_h = 2.419e-17 s
+    1.8e-15: "Period of wave \nof visible light",  # T = lambda/c, 550 nm
     1e-6: "Protein Folding",  # https://en.wikipedia.org/wiki/Microsecond
     1e-3: "Neuron Firing",  # https://en.wikipedia.org/wiki/Millisecond
     1e0: "Second",
-    1e5: "Day",
+    8.64e4: "Day",
     3.156e7: "Year",  # 365.25 days
     3.156e9: "Century",  # 100 years
-    1e12: "Glacial-interglacial",
+    3.156e12: "Glacial-interglacial",  # 100 kyr eccentricity cycle
     1e15: "Geologic",
-    1e18: "Deep Time",
+    1.43e17: "Deep Time",  # age of Earth, 4.54 Gyr
 }
 # to do how can i access the relevant prefix from the astropy type?
 SPACE_MARKERS = {
