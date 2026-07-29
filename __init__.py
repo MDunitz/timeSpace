@@ -5,6 +5,10 @@ PROJECT_ROOT = Path(__file__).parent
 __version__ = "0.2.0"
 
 __all__ = [
+    "Finding",
+    "validate_dataset",
+    "errors",
+    "format_findings",
     "PROJECT_ROOT",
     # Plotting
     "create_space_time_figure",
@@ -76,6 +80,13 @@ from timeSpace.icons import add_icons
 
 # Data access
 from timeSpace.data_processing import extract_google_sheet
+
+from timeSpace.validation import (
+    Finding,
+    validate_dataset,
+    errors,
+    format_findings,
+)
 
 # Library logging — silent by default, user opts in with:
 #   import logging
