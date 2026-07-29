@@ -53,7 +53,6 @@ timeSpace = [
     "data/datasets/ecological_scales.csv",
     "data/datasets/microbial_processes.csv",
     "data/datasets/models.csv",
-    "data/datasets/scale_popout_boxes.csv",
     "data/datasets/stommel_boyd2015_volumes.csv",
     "data/datasets/time_space_reference_objects.csv",
     "data/datasets/us_measurements.csv",
