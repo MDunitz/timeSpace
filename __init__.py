@@ -31,6 +31,7 @@ __all__ = [
     "create_ellipse_data",
     "calculate_diffusion_length",
     "calculate_sphere_volume",
+    "calculate_sphere_volume_from_diameter",
     "classify_process_geometry",
     # Label placement
     "resolve_label_overlaps",
@@ -61,6 +62,7 @@ from timeSpace.calculations import (
     create_ellipse_data,
     calculate_diffusion_length,
     calculate_sphere_volume,
+    calculate_sphere_volume_from_diameter,
     classify_process_geometry,
 )
 

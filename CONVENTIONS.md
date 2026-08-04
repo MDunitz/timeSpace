@@ -27,12 +27,25 @@ extent consistently across scales. This is a deliberate simplification:
 real processes may be better characterised by length, area, or
 anisotropic dimensions.
 
-The conversion from a characteristic length *L* to volume uses the sphere
-approximation:
+The conversion from a characteristic length to volume uses the sphere
+approximation, treating that length as the sphere **radius** *r*:
 
-    V = (4/3) π L³
+    V = (4/3) π r³        (calculate_sphere_volume)
 
-This assumes **isotropy**. Ocean processes are famously anisotropic —
+**Radius-vs-diameter trap.** For a particle, "characteristic length"
+usually means a *diameter*; feeding a diameter into the formula above (or
+into `calculate_sphere_volume`) over-estimates the volume by 2³ = 8×. If
+your length is a diameter *d*, halve it first, or use
+`calculate_sphere_volume_from_diameter(d)`, which computes V = (π/6) d³.
+
+Note that the "N cubic X" label ladder below uses a **cube** of side *s*,
+V = s³ — not this sphere. At equal characteristic length read as
+radius = side, the sphere is (4/3)π ≈ 4.19× the cube; read as
+diameter = side, the sphere is (π/6) ≈ 0.52× the cube (i.e. the cube is
+1.91× larger). The ladder is a decade scale, not a particle model, so the
+two conventions are not meant to coincide.
+
+This sphere approximation assumes **isotropy**. Ocean processes are famously anisotropic —
 horizontal length scales are often 10²–10⁴× larger than vertical scales.
 A mesoscale eddy might be 100 km wide but only 1 km deep; the sphere
 approximation collapses that into a single volume number.

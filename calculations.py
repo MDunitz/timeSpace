@@ -60,6 +60,31 @@ def calculate_sphere_volume(length) -> u.m**3:
     return (4 / 3) * np.pi * length**3
 
 
+@u.quantity_input(diameter=u.m)
+def calculate_sphere_volume_from_diameter(diameter) -> u.m**3:
+    """Volume of a sphere with the given diameter.
+
+    Equation:
+        V = (π / 6) * d³        (equivalently (4/3)·π·(d/2)³)
+
+    Convenience wrapper for the common case where the characteristic
+    length is a diameter (the usual meaning for a particle) rather than a
+    radius. calculate_sphere_volume() takes a radius; passing a diameter
+    to it directly over-estimates the volume by 8×.
+
+    Parameters
+    ----------
+    diameter : astropy Quantity [m]
+        Sphere diameter.
+
+    Returns
+    -------
+    astropy Quantity [m³]
+        Sphere volume.
+    """
+    return calculate_sphere_volume(diameter / 2)
+
+
 def calculate_log_center(min_val, max_val):
     """Geometric center of an interval in log10 space.
 
