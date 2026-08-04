@@ -31,6 +31,17 @@ def calculate_diffusion_length(time, diffusion_coefficient=O2_diffusion_rate) ->
 
     Notes
     -----
+    The Fickian scaling L ∝ t^(1/2) is load-bearing: this function is valid
+    only for ordinary molecular diffusion in a simple fluid. Do **not** use
+    it for eddy/turbulent dispersion (Richardson, L ∝ t^(3/2)) or for
+    subdiffusion in crowded media such as cytoplasm or biofilm
+    (L ∝ t^(α/2), α < 1). Those regimes differ from Fickian in the log-log
+    *slope* by 3–5×, and no coefficient change fixes a wrong exponent.
+    Non-Fickian processes should carry hand-entered Space_min/Space_max
+    instead (as the bundled datasets do). Temperature and medium shift the
+    coefficient (intercept) only, not the exponent, so they are handled via
+    diffusion_coefficient above.
+
     Built-in diffusion coefficients (O₂, CO₂, glucose, etc. in constants.py)
     are measured at 25°C in pure water. For other temperatures or media,
     pass a custom diffusion_coefficient. See constants.py for sources.
