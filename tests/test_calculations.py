@@ -9,6 +9,7 @@ from timeSpace.calculations import (
     calculate_log_center,
     calculate_log_width,
     calculate_sphere_volume,
+    calculate_sphere_volume_from_diameter,
     classify_process_geometry,
     create_ellipse_data,
 )
@@ -31,6 +32,28 @@ class TestCalculateSphereVolume:
     def test_rejects_wrong_unit(self):
         with pytest.raises(u.UnitsError):
             calculate_sphere_volume(1 * u.second)
+
+
+class TestCalculateSphereVolumeFromDiameter:
+    # V = (pi/6) * d^3  ==  calculate_sphere_volume(d/2)
+
+    def test_matches_radius_form_at_half(self):
+        d = 100 * u.nm
+        from_diameter = calculate_sphere_volume_from_diameter(d)
+        from_radius = calculate_sphere_volume(d / 2)
+        assert from_diameter.unit == u.m**3
+        np.testing.assert_allclose(from_diameter.value, from_radius.value, rtol=1e-12)
+
+    def test_eight_times_smaller_than_radius_misuse(self):
+        # Passing a diameter to the radius form over-estimates by 2**3 = 8x.
+        d = 1 * u.um
+        correct = calculate_sphere_volume_from_diameter(d)
+        misused = calculate_sphere_volume(d)
+        np.testing.assert_allclose(misused.value / correct.value, 8.0, rtol=1e-12)
+
+    def test_rejects_wrong_unit(self):
+        with pytest.raises(u.UnitsError):
+            calculate_sphere_volume_from_diameter(1 * u.second)
 
 
 class TestCalculateDiffusionLength:
