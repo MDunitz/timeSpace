@@ -1,6 +1,6 @@
 # timeSpace
 
-Stommel diagrams for visualizing biogeochemical and physical processes across scales of time, space, and energy.
+Stommel diagrams for visualizing biogeochemical and physical processes across scales of time and space.
 
 [![tests](https://github.com/MDunitz/timeSpace/actions/workflows/test.yml/badge.svg)](https://github.com/MDunitz/timeSpace/actions/workflows/test.yml)
 
@@ -201,7 +201,7 @@ from timeSpace import (
 
     # Calculations
     create_ellipse_data,          # Generate ellipse polygon vertices in log space
-    calculate_diffusion_length,   # L = sqrt(4Dt/π), returns astropy Quantity
+    calculate_diffusion_length,   # L = sqrt(6Dt) (3D RMS), returns astropy Quantity
     calculate_sphere_volume,      # V = (4/3)πr³, returns astropy Quantity
     classify_process_geometry,    # Detect degenerate axes → ellipse/line/point
 
