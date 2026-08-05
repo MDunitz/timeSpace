@@ -4,7 +4,16 @@ import pytest
 from astropy import units
 
 from timeSpace.calculations import calculate_log_center
-from timeSpace.icons import add_icons, load_icon, log_span, measure_ink_area, normalize_icon
+from timeSpace.icons import (
+    add_icons,
+    load_icon,
+    load_raster_icon,
+    log_span,
+    measure_ink_area,
+    measure_raster_ink,
+    normalize_icon,
+    raster_display_size,
+)
 from timeSpace.plotting import create_space_time_figure
 
 SQUARE = (
@@ -179,3 +188,98 @@ def test_repeated_icon_is_loaded_once(icon_dir, monkeypatch):
     )
     add_icons(create_space_time_figure(), df, icon_dir, size_px=40)
     assert len(calls) == 1
+
+
+def write_png(path, width, height, opaque_box, alpha=255):
+    """Write an RGBA PNG: transparent canvas with one opaque (or semi-opaque) box."""
+    from PIL import Image, ImageDraw
+
+    image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    x0, y0, x1, y1 = opaque_box
+    ImageDraw.Draw(image).rectangle([x0, y0, x1 - 1, y1 - 1], fill=(51, 102, 153, alpha))
+    image.save(path)
+
+
+@pytest.fixture
+def png_icon_dir(tmp_path):
+    write_png(tmp_path / "block.png", 100, 100, (10, 10, 90, 90))  # 80x80 opaque
+    write_png(tmp_path / "wide.png", 100, 100, (10, 40, 90, 60))  # 80x20 opaque, 4:1
+    write_png(tmp_path / "faint.png", 100, 100, (10, 10, 90, 90), alpha=128)  # half alpha
+    return tmp_path
+
+
+def image_renderers(p):
+    return [r for r in p.renderers if type(r.glyph).__name__ == "ImageURL"]
+
+
+def test_measure_raster_ink_is_alpha_weighted(png_icon_dir):
+    """Opaque ink counts full pixels; half-alpha counts half."""
+    from PIL import Image
+
+    opaque = measure_raster_ink(Image.open(png_icon_dir / "block.png").convert("RGBA"))
+    faint = measure_raster_ink(Image.open(png_icon_dir / "faint.png").convert("RGBA"))
+    assert opaque == pytest.approx(80 * 80, rel=0.001)
+    assert faint == pytest.approx(80 * 80 * 128 / 255, rel=0.01)
+
+
+def test_raster_display_size_gives_equal_ink(png_icon_dir):
+    """On-screen ink after scaling equals size_px**2 regardless of density."""
+    size_px = 28.0
+    for name in ("block", "wide", "faint"):
+        _uri, w, h, ink = load_raster_icon(png_icon_dir / f"{name}.png")
+        dw, dh = raster_display_size(w, h, ink, size_px)
+        on_screen_ink = ink * (dw / w) * (dh / h)
+        assert on_screen_ink == pytest.approx(size_px**2, rel=0.001)
+
+
+def test_raster_display_size_preserves_aspect(png_icon_dir):
+    """A 4:1 opaque region in a square canvas stays a square canvas scaled uniformly."""
+    _uri, w, h, ink = load_raster_icon(png_icon_dir / "wide.png")
+    dw, dh = raster_display_size(w, h, ink, 28.0)
+    assert dw / dh == pytest.approx(w / h, rel=1e-9)
+
+
+def test_load_raster_icon_is_self_contained(png_icon_dir):
+    """URI is an embedded base64 PNG so standalone HTML has no external deps."""
+    uri, _w, _h, _ink = load_raster_icon(png_icon_dir / "block.png")
+    assert uri.startswith("data:image/png;base64,")
+
+
+def test_raster_icon_is_centred_on_its_ellipse(png_icon_dir):
+    """The image glyph anchors on the same log-space centre as the ellipse."""
+    df = pd.DataFrame([process_row("a", "block", 1e2, 1e6, 1e-9, 1e-3)])
+    p = create_space_time_figure()
+    add_icons(p, df, png_icon_dir, size_px=40)
+
+    renderer = image_renderers(p)[0]
+    assert renderer.glyph.anchor == "center"
+    assert renderer.glyph.w_units == "screen" and renderer.glyph.h_units == "screen"
+    x = renderer.data_source.data["x"][0]
+    y = renderer.data_source.data["y"][0]
+    assert np.log10(x) == pytest.approx(calculate_log_center(1e-9, 1e-3), abs=1e-9)
+    assert np.log10(y) == pytest.approx(calculate_log_center(1e2, 1e6), abs=1e-9)
+
+
+def test_png_is_preferred_over_svg(png_icon_dir):
+    """When both {name}.png and {name}.svg exist, the raster path wins."""
+    (png_icon_dir / "block.svg").write_text(SQUARE)
+    df = pd.DataFrame([process_row("a", "block", 1e2, 1e6, 1e-9, 1e-3)])
+    p = create_space_time_figure()
+    add_icons(p, df, png_icon_dir, size_px=40)
+    assert len(image_renderers(p)) == 1
+    assert len(patch_renderers(p)) == 0
+
+
+def test_raster_and_vector_icons_coexist(png_icon_dir):
+    """A PNG row and an SVG row in the same call each get their own glyph type."""
+    (png_icon_dir / "sq.svg").write_text(SQUARE)
+    df = pd.DataFrame(
+        [
+            process_row("a", "block", 1e2, 1e6, 1e-9, 1e-3),
+            process_row("b", "sq", 1e3, 1e7, 1e-8, 1e-2),
+        ]
+    )
+    p = create_space_time_figure()
+    add_icons(p, df, png_icon_dir, size_px=40)
+    assert len(image_renderers(p)) == 1
+    assert len(patch_renderers(p)) == 1
