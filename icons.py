@@ -1,10 +1,14 @@
-"""SVG icon glyphs for Stommel diagrams.
+"""Icon glyphs for Stommel diagrams.
 
-Icons are drawn as filled Bokeh patches at the log-space centre of each
-process ellipse. Every icon is scaled to the same ink area, so a sparse
-outline drawing and a solid shape carry equal visual weight.
+Icons are drawn at the log-space centre of each process ellipse. An SVG icon
+is flattened to filled Bokeh patches; a PNG icon is drawn as a raster image
+glyph, which preserves gradients and soft alpha edges that the vector path
+collapses to a flat colour. Either way every icon is scaled to the same ink
+area, so a sparse drawing and a solid shape carry equal visual weight.
 """
 
+import base64
+import io
 from pathlib import Path as FilePath
 
 import numpy as np
@@ -153,6 +157,80 @@ def place_icon(p, shapes, x_center_log, y_center_log, x_span, y_span, width_px, 
     return p
 
 
+def measure_raster_ink(rgba):
+    """Alpha-weighted ink of an RGBA raster, in whole-pixel equivalents.
+
+    Equation:
+        ink_px = sum(alpha) / 255
+
+    This is the raster analogue of measure_ink_area: a fully opaque pixel
+    counts as one unit of ink and a fully transparent one as zero, so a
+    gradient that fades to transparent carries proportionally less ink and a
+    hard-edged silhouette carries its full pixel count. Anti-aliased and
+    semi-transparent edges are handled by the weighting rather than a binary
+    threshold.
+    """
+    alpha = np.asarray(rgba, dtype=float)[..., 3]
+    return alpha.sum() / 255.0
+
+
+def load_raster_icon(png_path):
+    """Load a transparent PNG as a self-contained data URI plus its geometry.
+
+    Returns
+    -------
+    (uri, width_px, height_px, ink_px)
+        `uri` is a base64 ``data:image/png`` string so the icon embeds in a
+        standalone HTML document with no external file dependency. `ink_px`
+        is the alpha-weighted ink from measure_raster_ink.
+    """
+    image = Image.open(png_path).convert("RGBA")
+    ink_px = measure_raster_ink(image)
+    width_px, height_px = image.size
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    uri = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
+    return uri, float(width_px), float(height_px), ink_px
+
+
+def raster_display_size(width_px, height_px, ink_px, size_px):
+    """Screen size that scales a raster to a target on-screen ink area.
+
+    Equal-ink normalization (uniform scale, aspect preserved):
+        scale = size_px / sqrt(ink_px)
+        on-screen ink = ink_px * scale**2 = size_px**2
+
+    Returns
+    -------
+    (display_w_px, display_h_px)
+        Screen-unit width and height for the image glyph.
+    """
+    scale = size_px / np.sqrt(ink_px)
+    return width_px * scale, height_px * scale
+
+
+def place_raster_icon(p, uri, x_center_log, y_center_log, display_w_px, display_h_px, alpha=1.0):
+    """Draw a raster icon centred on a log-space point at a fixed screen size.
+
+    Screen-unit sizing keeps the icon a constant pixel size independent of the
+    axis ranges, matching place_icon; anchor="center" puts the raster's own
+    centre on the process ellipse centre. Transparent regions of the PNG let
+    the grid and ellipse behind it show through.
+    """
+    p.image_url(
+        url=[uri],
+        x=[10**x_center_log],
+        y=[10**y_center_log],
+        w=display_w_px,
+        h=display_h_px,
+        w_units="screen",
+        h_units="screen",
+        anchor="center",
+        global_alpha=alpha,
+    )
+    return p
+
+
 def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px=None, alpha=1.0):
     """Draw an icon at the log-space centre of each process ellipse.
 
@@ -169,7 +247,8 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
         Quantities, plus an `icon` column naming a file in `icon_dir`
         without its extension. Rows with a blank icon are skipped.
     icon_dir : path-like
-        Folder of .svg icons.
+        Folder of .png and/or .svg icons. For a given name a PNG is used
+        when present (raster, gradients preserved), else the SVG.
     size_px : float
         Nominal icon size. Every icon is scaled to cover size_px**2 of ink,
         regardless of the size of the process ellipse it sits on.
@@ -194,22 +273,36 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
         if not name or name == "nan":
             continue
         if name not in cache:
-            cache[name] = normalize_icon(load_icon(icon_dir / f"{name}.svg"), target_area)
+            cache[name] = _prepare_icon(icon_dir, name, target_area, size_px)
         time_center = calculate_log_center(row.Time_min.value, row.Time_max.value)
         space_center = calculate_log_center(row.Space_min.value, row.Space_max.value)
         if space_on_x:
             x_center_log, y_center_log = space_center, time_center
         else:
             x_center_log, y_center_log = time_center, space_center
-        place_icon(
-            p,
-            cache[name],
-            x_center_log,
-            y_center_log,
-            x_span,
-            y_span,
-            width_px,
-            height_px,
-            alpha=alpha,
-        )
+        kind, payload = cache[name]
+        if kind == "raster":
+            uri, display_w_px, display_h_px = payload
+            place_raster_icon(p, uri, x_center_log, y_center_log, display_w_px, display_h_px, alpha=alpha)
+        else:
+            place_icon(p, payload, x_center_log, y_center_log, x_span, y_span, width_px, height_px, alpha=alpha)
     return p
+
+
+def _prepare_icon(icon_dir, name, target_area, size_px):
+    """Load and normalize one icon, dispatching on the file present in icon_dir.
+
+    A ``{name}.png`` is drawn as a raster image glyph (gradients and soft
+    alpha edges survive); otherwise ``{name}.svg`` is flattened to vector
+    patches. PNG is preferred when both exist.
+
+    Returns
+    -------
+    ("raster", (uri, display_w_px, display_h_px)) or ("vector", shapes)
+    """
+    png_path = icon_dir / f"{name}.png"
+    if png_path.exists():
+        uri, width_px, height_px, ink_px = load_raster_icon(png_path)
+        display_w_px, display_h_px = raster_display_size(width_px, height_px, ink_px, size_px)
+        return "raster", (uri, display_w_px, display_h_px)
+    return "vector", normalize_icon(load_icon(icon_dir / f"{name}.svg"), target_area)
