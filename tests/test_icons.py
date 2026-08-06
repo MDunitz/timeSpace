@@ -293,3 +293,20 @@ def test_raster_and_vector_icons_coexist(png_icon_dir):
     add_icons(p, df, png_icon_dir, size_px=40)
     assert len(image_renderers(p)) == 1
     assert len(patch_renderers(p)) == 1
+
+
+def test_icon_scale_column_enlarges_named_icon(png_icon_dir):
+    """A row's icon_scale multiplies its display size vs an unscaled row."""
+    df = pd.DataFrame(
+        [
+            process_row("a", "block", 1e2, 1e6, 1e-9, 1e-3),
+            process_row("b", "block", 1e3, 1e7, 1e-8, 1e-2),
+        ]
+    )
+    df["icon_scale"] = [1.0, 2.0]
+    p = create_space_time_figure()
+    add_icons(p, df, png_icon_dir, size_px=40)
+    imgs = image_renderers(p)
+    w1 = imgs[0].glyph.w
+    w2 = imgs[1].glyph.w
+    assert w2 == pytest.approx(2 * w1, rel=1e-6)
