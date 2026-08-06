@@ -5,10 +5,12 @@ from bokeh.models.glyphs import Text
 
 import timeSpace
 from timeSpace import transform_predefined_processes
+from timeSpace.etl import transform_process_response_sheet
 from timeSpace.plotting import (
     _resolve_start_visible,
     add_magnitude_labels,
     add_predefined_processes,
+    add_processes,
     create_space_time_figure,
 )
 
@@ -157,3 +159,42 @@ class TestStartVisibleColumn:
         hidden = set(df.loc[~df["start_visible"].astype(bool), "Name"])
         expected = {"Habitat-scale hydrodynamics", "Biological pump"}
         assert hidden == expected, f"unexpected hidden set: {hidden}"
+
+
+class TestAddProcessesOffsetGuard:
+    """add_processes must not require x_offset/y_offset columns.
+
+    Regression for the AttributeError raised when scaling to datasets
+    (e.g. time_space_reference_objects.csv) that carry no offset columns.
+    """
+
+    def _df_without_offsets(self):
+        raw = pd.DataFrame(
+            {
+                "ShortName": ["A", "B", "C"],
+                "Prefix": ["g", "g", "g"],
+                "Color": ["#1f77b4", "#ff7f0e", "#2ca02c"],
+                "Time_min": ["1e-3", "1e2", "1e0"],
+                "Time_max": ["1e0", "1e6", "1e3"],
+                "Space_min": ["1e-12", "1e-9", "1e-6"],
+                "Space_max": ["1e-6", "1e-3", "1e0"],
+            }
+        )
+        return transform_process_response_sheet(raw, space_on_x=False, n_points=50)
+
+    def test_renders_without_offset_columns(self):
+        df = self._df_without_offsets()
+        assert "x_offset" not in df.columns and "y_offset" not in df.columns
+        p = create_space_time_figure(space_on_x=False)
+        add_processes(p, df, group="Prefix", space_on_x=False)
+        assert len(p.renderers) > 0
+
+    def test_offset_columns_still_applied_when_present(self):
+        df = self._df_without_offsets()
+        df["x_offset"] = ["5", "", "10"]
+        df["y_offset"] = ["", "3", ""]
+        p = create_space_time_figure(space_on_x=False)
+        add_processes(p, df, group="Prefix", space_on_x=False)
+        text_renderers = [r for r in p.renderers if isinstance(r.glyph, Text)]
+        offsets = {(r.glyph.x_offset, r.glyph.y_offset) for r in text_renderers}
+        assert (5, 0) in offsets and (0, 3) in offsets and (10, 0) in offsets
