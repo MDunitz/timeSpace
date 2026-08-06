@@ -208,3 +208,15 @@ def test_x_axis_location_param():
     below = create_space_time_figure(space_on_x=False, x_axis_location="below")
     assert below.xaxis[0] in list(below.below)
     assert below.xaxis[0].axis_label == "Time (s)"
+
+
+def test_add_magnitude_labels_custom_markers_and_bottom_axis():
+    """time_markers overrides the defaults; labels hug the bottom when x is below."""
+    p = create_space_time_figure(space_on_x=False, x_axis_location="below")
+    p = add_magnitude_labels(p, space_on_x=False, time_markers={1.0: "Second", 3.156e10: "Millennia"})
+    labels = [a for a in p.center if type(a).__name__ == "Label"]
+    texts = {la.text for la in labels}
+    assert "Second" in texts and "Millennia" in texts
+    assert "Day" not in texts and "Protein Folding" not in texts
+    sec = next(la for la in labels if la.text == "Second")
+    assert sec.text_baseline == "bottom"

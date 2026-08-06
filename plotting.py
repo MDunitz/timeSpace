@@ -209,7 +209,7 @@ def add_light_cone(p, color="#8B8000", line_dash="solid", line_width=1.5, line_a
     return p
 
 
-def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
+def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True, time_markers=None, space_markers=None):
     """Add axis reference lines and labels.
 
     Parameters
@@ -217,7 +217,17 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
     space_on_x : bool
         If True, TIME→y-axis (horizontal), SPACE→x-axis (vertical).
         If False, TIME→x-axis (vertical), SPACE→y-axis (horizontal).
+    time_markers, space_markers : dict, optional
+        {value: label} maps overriding the default TIME_MARKERS / SPACE_MARKERS
+        for this figure. Use to drop, rename, or reposition reference labels
+        without mutating the module constants.
     """
+    time_markers = TIME_MARKERS if time_markers is None else time_markers
+    space_markers = SPACE_MARKERS if space_markers is None else space_markers
+
+    # When TIME is on x, place its labels at whichever edge the x axis sits on.
+    x_on_bottom = any(a in list(p.xaxis) for a in p.below)
+
     # Orientation: which markers go on which axis
     if space_on_x:
         time_dim, space_dim = "width", "height"
@@ -226,16 +236,18 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
 
     time_labels = []
     edge = p.x_range.start if hasattr(p.x_range, "start") else 10**-27
-    for time_val, label_text in TIME_MARKERS.items():
+    y_end = p.y_range.end if hasattr(p.y_range, "end") else 1e21
+    y_start = p.y_range.start if hasattr(p.y_range, "start") else 1e-21
+    for time_val, label_text in time_markers.items():
         time_span = Span(location=time_val, dimension=time_dim, line_color="#cccccc", line_dash="dashed", line_width=1)
         if space_on_x:
             lbl_kwargs = dict(x=edge, y=time_val, text_align="left", text_baseline="middle")
         else:
             lbl_kwargs = dict(
                 x=time_val,
-                y=p.y_range.end if hasattr(p.y_range, "end") else 1e21,
+                y=y_start if x_on_bottom else y_end,
                 text_align="center",
-                text_baseline="top",
+                text_baseline="bottom" if x_on_bottom else "top",
             )
         label = Label(
             **lbl_kwargs,
@@ -248,7 +260,7 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
         time_labels.append(label)
 
     space_labels = []
-    for space_val, label_text in SPACE_MARKERS.items():
+    for space_val, label_text in space_markers.items():
         space_span = Span(
             location=space_val, dimension=space_dim, line_color="#dddddd", line_dash="dashed", line_width=1
         )
@@ -287,9 +299,10 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
         p.y_range.js_on_change("start", space_cb)
         p.y_range.js_on_change("end", space_cb)
     else:
+        edge_js = "Math.min" if x_on_bottom else "Math.max"
         time_cb = CustomJS(
             args=dict(labels=time_labels, y_range=p.y_range),
-            code="const top = Math.max(y_range.start, y_range.end); for (const l of labels) { l.y = top; }",
+            code=f"const edge = {edge_js}(y_range.start, y_range.end); for (const l of labels) {{ l.y = edge; }}",
         )
         p.y_range.js_on_change("start", time_cb)
         p.y_range.js_on_change("end", time_cb)
