@@ -126,7 +126,7 @@ class TestTransformProcessResponseSheet:
         assert len(result) == 1
         assert result.iloc[0].ShortName == "valid"
 
-    def test_space_on_x_default_stommel_orientation(self):
+    def test_space_on_x_default_boyd_orientation(self):
         # Default: x_coords come from space, y_coords from time
         # x bounds are exact (logspace endpoints); y bounds are within 0.1% (ellipse equation)
         result = transform_process_response_sheet(self._basic_df())
@@ -136,7 +136,7 @@ class TestTransformProcessResponseSheet:
         assert row.y_coords.min() == pytest.approx(row.Time_min.value, rel=1e-3)
         assert row.y_coords.max() == pytest.approx(row.Time_max.value, rel=1e-3)
 
-    def test_space_on_x_false_boyd_orientation(self):
+    def test_space_on_x_false_stommel_orientation(self):
         # space_on_x=False: x_coords come from time, y_coords from space
         result = transform_process_response_sheet(self._basic_df(), space_on_x=False)
         row = result.iloc[0]
