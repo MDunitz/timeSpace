@@ -55,9 +55,9 @@ TIME_MARKERS = {
     86400.0: "Day",
     1 * YEAR_S: "Year",
     100 * YEAR_S: "Century",
-    1e4 * YEAR_S: "10,000 years",
-    1e6 * YEAR_S: "1 million years",
-    1e9 * YEAR_S: "1 billion years",
+    1e4 * YEAR_S: "10,000 \nyears",
+    1e6 * YEAR_S: "1 million \nyears",
+    1e9 * YEAR_S: "1 billion \nyears",
 }
 
 # Time axis spans seconds to ~1 Gyr so decadal detail and geological markers coexist
