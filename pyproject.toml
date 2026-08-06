@@ -41,6 +41,9 @@ dev = ["pytest", "ipykernel", "black", "flake8"]
 ssl-fallback = ["certifi"]
 globe = ["cartopy"]
 
+[project.scripts]
+timespace = "timeSpace.cli:main"
+
 [tool.setuptools.package-dir]
 timeSpace = "."
 
