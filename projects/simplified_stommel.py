@@ -39,7 +39,7 @@ def transform_data(config_data):
     data["Prefix"] = data.apply(lambda x: x["ShortName"][0:3], axis=1)
 
     columns = ["Prefix", "ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "Color"]
-    # Top-level ETL now defaults to is_boyd=True orientation (x=space, y=time)
+    # Top-level ETL defaults to space_on_x=True (Boyd 2015 orientation: x=space, y=time)
     transformed_data = transform_process_response_sheet(data, possible_col_list=columns)
     transformed_data = set_color_by_prefix(transformed_data)
 
