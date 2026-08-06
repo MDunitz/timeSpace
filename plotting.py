@@ -85,13 +85,16 @@ def add_legend(p, position="right", font_size="12pt"):
     return p
 
 
-def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True):
+def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True, x_axis_location="above"):
     """Create a Stommel-style time-space figure.
 
     Parameters
     ----------
     space_on_x : bool
         If True (default), x=Space, y=Time (reversed). If False, x=Time, y=Space.
+    x_axis_location : str
+        Where the x axis is drawn: "above" (default) or "below". Use "below"
+        for a conventional time-on-bottom Stommel layout with space_on_x=False.
     """
     if space_on_x:
         xl, yl = "Space (m\u00b3)", "Time (s)"
@@ -110,7 +113,7 @@ def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True)
         y_range=yr,
         title=title,
         toolbar_location="below",
-        x_axis_location="above",
+        x_axis_location=x_axis_location,
     )
     p.axis.axis_label_text_font_size = "24pt"
     p.axis.major_label_text_font_size = "12pt"
@@ -206,7 +209,7 @@ def add_light_cone(p, color="#8B8000", line_dash="solid", line_width=1.5, line_a
     return p
 
 
-def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
+def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True, time_markers=None, space_markers=None):
     """Add axis reference lines and labels.
 
     Parameters
@@ -214,7 +217,17 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
     space_on_x : bool
         If True, TIME→y-axis (horizontal), SPACE→x-axis (vertical).
         If False, TIME→x-axis (vertical), SPACE→y-axis (horizontal).
+    time_markers, space_markers : dict, optional
+        {value: label} maps overriding the default TIME_MARKERS / SPACE_MARKERS
+        for this figure. Use to drop, rename, or reposition reference labels
+        without mutating the module constants.
     """
+    time_markers = TIME_MARKERS if time_markers is None else time_markers
+    space_markers = SPACE_MARKERS if space_markers is None else space_markers
+
+    # When TIME is on x, place its labels at whichever edge the x axis sits on.
+    x_on_bottom = any(a in list(p.xaxis) for a in p.below)
+
     # Orientation: which markers go on which axis
     if space_on_x:
         time_dim, space_dim = "width", "height"
@@ -223,16 +236,18 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
 
     time_labels = []
     edge = p.x_range.start if hasattr(p.x_range, "start") else 10**-27
-    for time_val, label_text in TIME_MARKERS.items():
+    y_end = p.y_range.end if hasattr(p.y_range, "end") else 1e21
+    y_start = p.y_range.start if hasattr(p.y_range, "start") else 1e-21
+    for time_val, label_text in time_markers.items():
         time_span = Span(location=time_val, dimension=time_dim, line_color="#cccccc", line_dash="dashed", line_width=1)
         if space_on_x:
             lbl_kwargs = dict(x=edge, y=time_val, text_align="left", text_baseline="middle")
         else:
             lbl_kwargs = dict(
                 x=time_val,
-                y=p.y_range.end if hasattr(p.y_range, "end") else 1e21,
+                y=y_start if x_on_bottom else y_end,
                 text_align="center",
-                text_baseline="top",
+                text_baseline="bottom" if x_on_bottom else "top",
             )
         label = Label(
             **lbl_kwargs,
@@ -245,7 +260,7 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
         time_labels.append(label)
 
     space_labels = []
-    for space_val, label_text in SPACE_MARKERS.items():
+    for space_val, label_text in space_markers.items():
         space_span = Span(
             location=space_val, dimension=space_dim, line_color="#dddddd", line_dash="dashed", line_width=1
         )
@@ -284,9 +299,10 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True):
         p.y_range.js_on_change("start", space_cb)
         p.y_range.js_on_change("end", space_cb)
     else:
+        edge_js = "Math.min" if x_on_bottom else "Math.max"
         time_cb = CustomJS(
             args=dict(labels=time_labels, y_range=p.y_range),
-            code="const top = Math.max(y_range.start, y_range.end); for (const l of labels) { l.y = top; }",
+            code=f"const edge = {edge_js}(y_range.start, y_range.end); for (const l of labels) {{ l.y = edge; }}",
         )
         p.y_range.js_on_change("start", time_cb)
         p.y_range.js_on_change("end", time_cb)
@@ -486,7 +502,7 @@ def add_processes(
     """Render process ellipses and labels on a Stommel diagram.
 
     label_side: global default — "left" or "right".
-    Per-row override: set a "label_side" column in process_df to "left" or "right".
+    Per-row override: set a "label_side" column to "left", "right", "above", or "below".
       "left"  → anchor at Space_min, right-aligned (label sits left of ellipse)
       "right" → anchor at Space_max, left-aligned  (label sits right of ellipse)
 
@@ -532,7 +548,8 @@ def add_processes(
             )
             _render_glyph(p, row, glyph_color, row.FillAlpha, visible, row.Name, space_on_x=space_on_x)
 
-            side = row.label_side if has_col and row.label_side in ("left", "right") else label_side
+            side = row.label_side if has_col and row.label_side in ("left", "right", "above", "below") else label_side
+            baseline = {"above": "bottom", "below": "top"}.get(side, "middle")
             # For non-ellipse geometries, use geometry-aware label placement
             geom_lx, geom_ly, geom_align = _label_anchor(row, space_on_x=space_on_x)
             if geom_lx is not None:
@@ -541,21 +558,29 @@ def add_processes(
                 align = geom_align
             else:
                 if space_on_x:
+                    # space=x, time=y (reversed: small time at top)
+                    time_mid = np.sqrt(row.Time_min.value * row.Time_max.value)
+                    space_mid = np.sqrt(row.Space_min.value * row.Space_max.value)
                     if side == "left":
-                        lx = row.Space_min.value
-                        align = "right"
-                    else:
-                        lx = row.Space_max.value
-                        align = "left"
-                    ly = np.sqrt(row.Time_min.value * row.Time_max.value)
+                        lx, align, ly = row.Space_min.value, "right", time_mid
+                    elif side == "right":
+                        lx, align, ly = row.Space_max.value, "left", time_mid
+                    elif side == "above":
+                        lx, align, ly = space_mid, "center", row.Time_min.value
+                    else:  # below
+                        lx, align, ly = space_mid, "center", row.Time_max.value
                 else:
+                    # time=x, space=y
+                    time_mid = np.sqrt(row.Time_min.value * row.Time_max.value)
+                    space_mid = np.sqrt(row.Space_min.value * row.Space_max.value)
                     if side == "left":
-                        lx = row.Time_min.value
-                        align = "right"
-                    else:
-                        lx = row.Time_max.value
-                        align = "left"
-                    ly = np.sqrt(row.Space_min.value * row.Space_max.value)
+                        lx, align, ly = row.Time_min.value, "right", space_mid
+                    elif side == "right":
+                        lx, align, ly = row.Time_max.value, "left", space_mid
+                    elif side == "above":
+                        lx, align, ly = time_mid, "center", row.Space_max.value
+                    else:  # below
+                        lx, align, ly = time_mid, "center", row.Space_min.value
             has_label_text = "label_text" in process_df.columns
             display = row.label_text if has_label_text else row.ShortName
             lines = display.split("\n")
@@ -578,6 +603,7 @@ def add_processes(
                     text_color=glyph_color,
                     text_alpha=1.0,
                     text_align=align,
+                    text_baseline=baseline,
                     legend_label=row.Name,
                     visible=visible,
                 )

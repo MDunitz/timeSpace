@@ -198,3 +198,54 @@ class TestAddProcessesOffsetGuard:
         text_renderers = [r for r in p.renderers if isinstance(r.glyph, Text)]
         offsets = {(r.glyph.x_offset, r.glyph.y_offset) for r in text_renderers}
         assert (5, 0) in offsets and (0, 3) in offsets and (10, 0) in offsets
+
+
+def test_x_axis_location_param():
+    """x_axis_location routes the x axis above (default) or below."""
+    default = create_space_time_figure()
+    assert default.xaxis[0] in list(default.above)
+
+    below = create_space_time_figure(space_on_x=False, x_axis_location="below")
+    assert below.xaxis[0] in list(below.below)
+    assert below.xaxis[0].axis_label == "Time (s)"
+
+
+def test_add_magnitude_labels_custom_markers_and_bottom_axis():
+    """time_markers overrides the defaults; labels hug the bottom when x is below."""
+    p = create_space_time_figure(space_on_x=False, x_axis_location="below")
+    p = add_magnitude_labels(p, space_on_x=False, time_markers={1.0: "Second", 3.156e10: "Millennia"})
+    labels = [a for a in p.center if type(a).__name__ == "Label"]
+    texts = {la.text for la in labels}
+    assert "Second" in texts and "Millennia" in texts
+    assert "Day" not in texts and "Protein Folding" not in texts
+    sec = next(la for la in labels if la.text == "Second")
+    assert sec.text_baseline == "bottom"
+
+
+def test_label_side_above_below_center_aligned():
+    """above/below place the label centered at the time-midpoint, at space max/min."""
+    raw = pd.DataFrame(
+        [
+            {
+                "ShortName": "P",
+                "Time_min": "1.0: s",
+                "Time_max": "100.0: s",
+                "Space_min": "1e-18: a",
+                "Space_max": "1e-12: b",
+                "label_side": "below",
+                "Color": "#333333",
+            }
+        ]
+    )
+    tdf = transform_process_response_sheet(
+        raw,
+        possible_col_list=["ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "label_side", "Color"],
+        space_on_x=False,
+    )
+    p = create_space_time_figure(space_on_x=False, x_axis_location="below")
+    add_processes(p, tdf, group="Name", interactive=False, space_on_x=False)
+    texts = [r for r in p.renderers if type(r.glyph).__name__ == "Text"]
+    g = texts[0].glyph
+    assert g.text_align == "center"
+    # below -> anchored at Space_min (bottom of the ellipse's space range)
+    assert abs(float(g.y) - 1e-18) < 1e-24  # anchored at Space_min (bottom of ellipse)
