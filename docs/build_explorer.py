@@ -13,7 +13,18 @@ To upgrade to Bokeh server later: replace CustomJS callbacks with Python callbac
 
 import pandas as pd
 from bokeh.plotting import figure
-from bokeh.models import ColumnDataSource, CustomJS, Select, TextInput, Button, Div, Span, Label, HoverTool
+from bokeh.models import (
+    ColumnDataSource,
+    CustomJS,
+    Select,
+    TextInput,
+    Button,
+    Div,
+    Span,
+    Label,
+    HoverTool,
+    CheckboxGroup,
+)
 from bokeh.layouts import column, row
 from bokeh.resources import CDN
 from bokeh.embed import components
@@ -262,10 +273,116 @@ CUSTOM_OBJECT_JS = """
 """
 
 
+# Toggle-mode callback: recompute visibility from the set of checked
+# categories plus the optionally-pinned individual object. Accumulates
+# (multiple categories on at once). Labels are tiered — only the pinned
+# object gets a label; everything else is identified via hover — so the
+# ~100-object view never needs a label-collision solver.
+TOGGLE_JS = """
+    const activeSet = checkbox.active.map(k => cats[k]);
+    const sel = obj_select.value;
+    const NONE = obj_select.options[0];
+    const a = source.data['alpha'];
+    const la = source.data['line_alpha'];
+    const lal = label_source.data['alpha'];
+    const lna = line_source.data['alpha'];
+    const pta = point_source.data['alpha'];
+    let shown = 0;
+    for (let i = 0; i < a.length; i++) {
+        const inCat = activeSet.indexOf(data[i].Category) !== -1;
+        const isSel = sel !== NONE && data[i].Name === sel;
+        const on = inCat || isSel;
+        a[i] = on ? (isSel ? 0.5 : 0.30) : 0.0;
+        la[i] = on ? (isSel ? 1.0 : 0.7) : 0.0;
+        lna[i] = on ? (isSel ? 1.0 : 0.7) : 0.0;
+        pta[i] = on ? (isSel ? 0.8 : 0.6) : 0.0;
+        lal[i] = isSel ? 1.0 : 0.0;
+        if (on) shown++;
+    }
+    source.change.emit();
+    label_source.change.emit();
+    line_source.change.emit();
+    point_source.change.emit();
+    info.text = '<b>' + shown + '</b> objects shown across ' + activeSet.length +
+        ' categor' + (activeSet.length === 1 ? 'y' : 'ies') +
+        '. Hover for names; pick an object to pin its label.';
+"""
+
+CLEAR_TOGGLE_JS = """
+    checkbox.active = [];
+    obj_select.value = obj_select.options[0];
+"""
+
+
+# ── Shared HTML emit ───────────────────────────────────────────────
+
+
+def _write_explorer_html(output_path, layout, header_html):
+    """Serialise a Bokeh layout into a self-contained explorer page.
+
+    Uses components() + a hand-rolled wrapper to avoid the Bokeh 3
+    sanitizer stripping <script> from Div content (issue #89).
+    """
+    script, div = components(layout)
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>timeSpace Reference Object Explorer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {CDN.render()}
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: #fff;
+        }}
+        .header {{
+            max-width: 820px;
+            margin: 0 auto 8px auto;
+        }}
+        .header h2 {{
+            margin: 0 0 4px 0;
+            font-size: 18px;
+            color: #333;
+        }}
+        .header p {{
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        {header_html}
+    </div>
+    {div}
+    {script}
+</body>
+</html>"""
+    with open(output_path, "w") as f:
+        f.write(html)
+    print(f"Built {output_path} ({len(html):,} bytes)")
+
+
 # ── Build the page ─────────────────────────────────────────────────
 
 
-def build_explorer(csv_path, output_path):
+def build_explorer(csv_path, output_path, mode="select"):
+    """Build the reference-object explorer as a self-contained HTML page.
+
+    mode : {"select", "toggle"}
+        "select" (default) — one category or one object visible at a time
+        via dropdowns; picking a new one replaces the last. Includes the
+        define-your-own-object panel.
+        "toggle" — category CheckboxGroup with accumulate visibility
+        (multiple categories on at once) plus an object dropdown to pin an
+        individual. Labels are tiered (only the pinned object is labelled;
+        the rest are identified on hover), so no label-collision solver is
+        needed. See docs/EXPLORER.md.
+    """
     df = load_reference_objects(csv_path)
 
     p = create_figure()
@@ -471,11 +588,14 @@ def build_explorer(csv_path, output_path):
     )
 
     # ── Widgets ────────────────────────────────────────────────────
-    categories = ["— Select category —"] + sorted(CATEGORY_COLORS.keys())
-    cat_select = Select(title="Filter by category:", value=categories[0], options=categories, width=220)
-
+    cat_labels = sorted(CATEGORY_COLORS.keys())
     objects = ["— Select object —"] + sorted(df.FullName.tolist())
     obj_select = Select(title="Or pick an object:", value=objects[0], options=objects, width=280)
+    if mode == "toggle":
+        cat_checkbox = CheckboxGroup(labels=cat_labels, active=list(range(len(cat_labels))), width=240)
+    else:
+        categories = ["— Select category —"] + cat_labels
+        cat_select = Select(title="Filter by category:", value=categories[0], options=categories, width=220)
 
     # Custom input fields
     custom_name = TextInput(title="Name:", value="My process", width=180)
@@ -505,6 +625,50 @@ def build_explorer(csv_path, output_path):
         }
         for _, r in df.iterrows()
     ]
+
+    # ── Toggle mode: category checkboxes + accumulate visibility ───
+    if mode == "toggle":
+        # Default: all categories on. Bake the initial visible state into
+        # the sources (js_on_change does not fire on load). Labels stay
+        # hidden — tiered visibility, revealed only on pin/hover.
+        n = len(df)
+        source.data["alpha"] = [0.30] * n
+        source.data["line_alpha"] = [0.7] * n
+        line_source.data["alpha"] = [0.7] * n
+        point_source.data["alpha"] = [0.6] * n
+
+        toggle_cb = CustomJS(
+            args=dict(
+                source=source,
+                label_source=label_source,
+                line_source=line_source,
+                point_source=point_source,
+                checkbox=cat_checkbox,
+                obj_select=obj_select,
+                info=info_div,
+                data=full_data,
+                cats=cat_labels,
+            ),
+            code=TOGGLE_JS,
+        )
+        cat_checkbox.js_on_change("active", toggle_cb)
+        obj_select.js_on_change("value", toggle_cb)
+
+        clear_toggle_cb = CustomJS(
+            args=dict(checkbox=cat_checkbox, obj_select=obj_select),
+            code=CLEAR_TOGGLE_JS,
+        )
+        clear_btn.js_on_click(clear_toggle_cb)
+
+        controls = row(cat_checkbox, obj_select, clear_btn)
+        layout = column(controls, info_div, p)
+        header = (
+            "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
+            "<p>102 reference objects across 10 categories. Toggle categories with the "
+            "checkboxes; pick an object to pin its label. Hover any glyph for details.</p>"
+        )
+        _write_explorer_html(output_path, layout, header)
+        return
 
     # ── JS Callbacks ───────────────────────────────────────────────
 
@@ -682,53 +846,12 @@ def build_explorer(csv_path, output_path):
     custom_row = row(custom_name, custom_tmin, custom_tmax, custom_smin, custom_smax, custom_btn)
     layout = column(dropdown_row, custom_row, info_div, p)
 
-    # ── Render via components() (avoids Bokeh sanitizer issue #89) ─
-    script, div = components(layout)
-
-    html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>timeSpace Reference Object Explorer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {CDN.render()}
-    <style>
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 16px;
-            background: #fff;
-        }}
-        .header {{
-            max-width: 820px;
-            margin: 0 auto 8px auto;
-        }}
-        .header h2 {{
-            margin: 0 0 4px 0;
-            font-size: 18px;
-            color: #333;
-        }}
-        .header p {{
-            margin: 0;
-            font-size: 13px;
-            color: #666;
-        }}
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h2>timeSpace — Reference Object Explorer</h2>
-        <p>102 reference objects spanning molecular to planetary scales.
-           Select a category, pick an individual object, or define your own.</p>
-    </div>
-    {div}
-    {script}
-</body>
-</html>"""
-
-    with open(output_path, "w") as f:
-        f.write(html)
-    print(f"Built {output_path} ({len(html):,} bytes)")
+    header = (
+        "<h2>timeSpace — Reference Object Explorer</h2>"
+        "<p>102 reference objects spanning molecular to planetary scales. "
+        "Select a category, pick an individual object, or define your own.</p>"
+    )
+    _write_explorer_html(output_path, layout, header)
 
 
 if __name__ == "__main__":
@@ -737,3 +860,4 @@ if __name__ == "__main__":
     csv_path = sys.argv[1] if len(sys.argv) > 1 else "data/datasets/time_space_reference_objects.csv"
     output_path = sys.argv[2] if len(sys.argv) > 2 else "docs/explorer.html"
     build_explorer(csv_path, output_path)
+    build_explorer(csv_path, output_path.replace(".html", "_toggle.html"), mode="toggle")
