@@ -220,3 +220,32 @@ def test_add_magnitude_labels_custom_markers_and_bottom_axis():
     assert "Day" not in texts and "Protein Folding" not in texts
     sec = next(la for la in labels if la.text == "Second")
     assert sec.text_baseline == "bottom"
+
+
+def test_label_side_above_below_center_aligned():
+    """above/below place the label centered at the time-midpoint, at space max/min."""
+    raw = pd.DataFrame(
+        [
+            {
+                "ShortName": "P",
+                "Time_min": "1.0: s",
+                "Time_max": "100.0: s",
+                "Space_min": "1e-18: a",
+                "Space_max": "1e-12: b",
+                "label_side": "below",
+                "Color": "#333333",
+            }
+        ]
+    )
+    tdf = transform_process_response_sheet(
+        raw,
+        possible_col_list=["ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "label_side", "Color"],
+        space_on_x=False,
+    )
+    p = create_space_time_figure(space_on_x=False, x_axis_location="below")
+    add_processes(p, tdf, group="Name", interactive=False, space_on_x=False)
+    texts = [r for r in p.renderers if type(r.glyph).__name__ == "Text"]
+    g = texts[0].glyph
+    assert g.text_align == "center"
+    # below -> anchored at Space_min (bottom of the ellipse's space range)
+    assert abs(float(g.y) - 1e-18) < 1e-24  # anchored at Space_min (bottom of ellipse)

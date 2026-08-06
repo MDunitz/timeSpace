@@ -502,7 +502,7 @@ def add_processes(
     """Render process ellipses and labels on a Stommel diagram.
 
     label_side: global default — "left" or "right".
-    Per-row override: set a "label_side" column in process_df to "left" or "right".
+    Per-row override: set a "label_side" column to "left", "right", "above", or "below".
       "left"  → anchor at Space_min, right-aligned (label sits left of ellipse)
       "right" → anchor at Space_max, left-aligned  (label sits right of ellipse)
 
@@ -548,7 +548,8 @@ def add_processes(
             )
             _render_glyph(p, row, glyph_color, row.FillAlpha, visible, row.Name, space_on_x=space_on_x)
 
-            side = row.label_side if has_col and row.label_side in ("left", "right") else label_side
+            side = row.label_side if has_col and row.label_side in ("left", "right", "above", "below") else label_side
+            baseline = {"above": "bottom", "below": "top"}.get(side, "middle")
             # For non-ellipse geometries, use geometry-aware label placement
             geom_lx, geom_ly, geom_align = _label_anchor(row, space_on_x=space_on_x)
             if geom_lx is not None:
@@ -557,21 +558,29 @@ def add_processes(
                 align = geom_align
             else:
                 if space_on_x:
+                    # space=x, time=y (reversed: small time at top)
+                    time_mid = np.sqrt(row.Time_min.value * row.Time_max.value)
+                    space_mid = np.sqrt(row.Space_min.value * row.Space_max.value)
                     if side == "left":
-                        lx = row.Space_min.value
-                        align = "right"
-                    else:
-                        lx = row.Space_max.value
-                        align = "left"
-                    ly = np.sqrt(row.Time_min.value * row.Time_max.value)
+                        lx, align, ly = row.Space_min.value, "right", time_mid
+                    elif side == "right":
+                        lx, align, ly = row.Space_max.value, "left", time_mid
+                    elif side == "above":
+                        lx, align, ly = space_mid, "center", row.Time_min.value
+                    else:  # below
+                        lx, align, ly = space_mid, "center", row.Time_max.value
                 else:
+                    # time=x, space=y
+                    time_mid = np.sqrt(row.Time_min.value * row.Time_max.value)
+                    space_mid = np.sqrt(row.Space_min.value * row.Space_max.value)
                     if side == "left":
-                        lx = row.Time_min.value
-                        align = "right"
-                    else:
-                        lx = row.Time_max.value
-                        align = "left"
-                    ly = np.sqrt(row.Space_min.value * row.Space_max.value)
+                        lx, align, ly = row.Time_min.value, "right", space_mid
+                    elif side == "right":
+                        lx, align, ly = row.Time_max.value, "left", space_mid
+                    elif side == "above":
+                        lx, align, ly = time_mid, "center", row.Space_max.value
+                    else:  # below
+                        lx, align, ly = time_mid, "center", row.Space_min.value
             has_label_text = "label_text" in process_df.columns
             display = row.label_text if has_label_text else row.ShortName
             lines = display.split("\n")
@@ -594,6 +603,7 @@ def add_processes(
                     text_color=glyph_color,
                     text_alpha=1.0,
                     text_align=align,
+                    text_baseline=baseline,
                     legend_label=row.Name,
                     visible=visible,
                 )
