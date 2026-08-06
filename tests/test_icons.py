@@ -7,10 +7,10 @@ from timeSpace.calculations import calculate_log_center
 from timeSpace.icons import (
     add_icons,
     load_icon,
+    crop_to_content,
     load_raster_icon,
     log_span,
     measure_ink_area,
-    measure_raster_ink,
     normalize_icon,
     raster_display_size,
 )
@@ -202,9 +202,10 @@ def write_png(path, width, height, opaque_box, alpha=255):
 
 @pytest.fixture
 def png_icon_dir(tmp_path):
-    write_png(tmp_path / "block.png", 100, 100, (10, 10, 90, 90))  # 80x80 opaque
-    write_png(tmp_path / "wide.png", 100, 100, (10, 40, 90, 60))  # 80x20 opaque, 4:1
-    write_png(tmp_path / "faint.png", 100, 100, (10, 10, 90, 90), alpha=128)  # half alpha
+    write_png(tmp_path / "block.png", 100, 100, (10, 10, 90, 90))  # 80x80 content, 20px margin
+    write_png(tmp_path / "wide.png", 100, 100, (10, 40, 90, 60))  # 80x20 content, 4:1
+    write_png(tmp_path / "faint.png", 100, 100, (10, 10, 90, 90), alpha=128)  # same box, half alpha
+    write_png(tmp_path / "big.png", 1000, 1000, (0, 0, 1000, 1000))  # 1000px content, no margin
     return tmp_path
 
 
@@ -212,36 +213,45 @@ def image_renderers(p):
     return [r for r in p.renderers if type(r.glyph).__name__ == "ImageURL"]
 
 
-def test_measure_raster_ink_is_alpha_weighted(png_icon_dir):
-    """Opaque ink counts full pixels; half-alpha counts half."""
+def test_crop_to_content_returns_opaque_bbox(png_icon_dir):
+    """crop_to_content tightens a padded canvas to just its opaque pixels."""
     from PIL import Image
 
-    opaque = measure_raster_ink(Image.open(png_icon_dir / "block.png").convert("RGBA"))
-    faint = measure_raster_ink(Image.open(png_icon_dir / "faint.png").convert("RGBA"))
-    assert opaque == pytest.approx(80 * 80, rel=0.001)
-    assert faint == pytest.approx(80 * 80 * 128 / 255, rel=0.01)
+    cropped = crop_to_content(Image.open(png_icon_dir / "block.png").convert("RGBA"))
+    assert cropped.size == (80, 80)
 
 
-def test_raster_display_size_gives_equal_ink(png_icon_dir):
-    """On-screen ink after scaling equals size_px**2 regardless of density."""
+def test_crop_to_content_removes_transparent_margin(png_icon_dir):
+    """The 20px transparent border is dropped; loader reports content dimensions."""
+    _uri, w, h = load_raster_icon(png_icon_dir / "block.png")
+    assert (w, h) == (80, 80)
+
+
+def test_raster_display_size_fits_longest_side(png_icon_dir):
+    """The content's longest side becomes size_px, giving a consistent footprint."""
     size_px = 28.0
-    for name in ("block", "wide", "faint"):
-        _uri, w, h, ink = load_raster_icon(png_icon_dir / f"{name}.png")
-        dw, dh = raster_display_size(w, h, ink, size_px)
-        on_screen_ink = ink * (dw / w) * (dh / h)
-        assert on_screen_ink == pytest.approx(size_px**2, rel=0.001)
+    _uri, w, h = load_raster_icon(png_icon_dir / "wide.png")  # 80x20 content
+    dw, dh = raster_display_size(w, h, size_px)
+    assert max(dw, dh) == pytest.approx(size_px, rel=1e-9)
+    assert dw / dh == pytest.approx(w / h, rel=1e-9)  # aspect preserved
 
 
-def test_raster_display_size_preserves_aspect(png_icon_dir):
-    """A 4:1 opaque region in a square canvas stays a square canvas scaled uniformly."""
-    _uri, w, h, ink = load_raster_icon(png_icon_dir / "wide.png")
-    dw, dh = raster_display_size(w, h, ink, 28.0)
-    assert dw / dh == pytest.approx(w / h, rel=1e-9)
+def test_raster_size_is_independent_of_alpha_level(png_icon_dir):
+    """A half-alpha icon and an opaque one with the same box size identically."""
+    solid = load_raster_icon(png_icon_dir / "block.png")[1:]
+    faint = load_raster_icon(png_icon_dir / "faint.png")[1:]
+    assert solid == faint
+
+
+def test_downscale_cap_limits_longest_side(png_icon_dir):
+    """A 1000px content icon is capped to max_source_px on load."""
+    _uri, w, h = load_raster_icon(png_icon_dir / "big.png", max_source_px=128)
+    assert max(w, h) == pytest.approx(128, abs=1)
 
 
 def test_load_raster_icon_is_self_contained(png_icon_dir):
     """URI is an embedded base64 PNG so standalone HTML has no external deps."""
-    uri, _w, _h, _ink = load_raster_icon(png_icon_dir / "block.png")
+    uri, _w, _h = load_raster_icon(png_icon_dir / "block.png")
     assert uri.startswith("data:image/png;base64,")
 
 

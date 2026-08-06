@@ -157,55 +157,60 @@ def place_icon(p, shapes, x_center_log, y_center_log, x_span, y_span, width_px, 
     return p
 
 
-def measure_raster_ink(rgba):
-    """Alpha-weighted ink of an RGBA raster, in whole-pixel equivalents.
+def crop_to_content(image):
+    """Crop an RGBA image to the bounding box of its opaque pixels.
 
-    Equation:
-        ink_px = sum(alpha) / 255
-
-    This is the raster analogue of measure_ink_area: a fully opaque pixel
-    counts as one unit of ink and a fully transparent one as zero, so a
-    gradient that fades to transparent carries proportionally less ink and a
-    hard-edged silhouette carries its full pixel count. Anti-aliased and
-    semi-transparent edges are handled by the weighting rather than a binary
-    threshold.
+    Removes the transparent margin so anchor="center" lands on the artwork's
+    own centre rather than the canvas centre, and so bounding-box sizing
+    measures the content rather than the exported canvas. A fully transparent
+    image is returned unchanged.
     """
-    alpha = np.asarray(rgba, dtype=float)[..., 3]
-    return alpha.sum() / 255.0
+    bbox = image.getchannel("A").getbbox()
+    return image.crop(bbox) if bbox else image
 
 
-def load_raster_icon(png_path):
+def load_raster_icon(png_path, max_source_px=256):
     """Load a transparent PNG as a self-contained data URI plus its geometry.
+
+    The image is cropped to its opaque content and downscaled so its longest
+    side is at most `max_source_px`, since the icon is displayed at a fixed
+    pixel size far below a typical export resolution; capping the source keeps
+    the base64 payload small without affecting appearance.
 
     Returns
     -------
-    (uri, width_px, height_px, ink_px)
+    (uri, width_px, height_px)
         `uri` is a base64 ``data:image/png`` string so the icon embeds in a
-        standalone HTML document with no external file dependency. `ink_px`
-        is the alpha-weighted ink from measure_raster_ink.
+        standalone HTML document with no external file dependency; width and
+        height are the cropped (and possibly downscaled) content dimensions.
     """
-    image = Image.open(png_path).convert("RGBA")
-    ink_px = measure_raster_ink(image)
+    image = crop_to_content(Image.open(png_path).convert("RGBA"))
+    longest = max(image.size)
+    if longest > max_source_px:
+        scale = max_source_px / longest
+        image = image.resize((max(1, round(image.width * scale)), max(1, round(image.height * scale))), Image.LANCZOS)
     width_px, height_px = image.size
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")
     uri = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
-    return uri, float(width_px), float(height_px), ink_px
+    return uri, float(width_px), float(height_px)
 
 
-def raster_display_size(width_px, height_px, ink_px, size_px):
-    """Screen size that scales a raster to a target on-screen ink area.
+def raster_display_size(width_px, height_px, size_px):
+    """Screen size that fits a raster's content bounding box to size_px.
 
-    Equal-ink normalization (uniform scale, aspect preserved):
-        scale = size_px / sqrt(ink_px)
-        on-screen ink = ink_px * scale**2 = size_px**2
+    Bounding-box normalization (uniform scale, aspect preserved):
+        scale = size_px / max(width_px, height_px)
+
+    The longest side of the content becomes size_px, so every icon occupies a
+    consistent footprint regardless of how sparse or dense its artwork is.
 
     Returns
     -------
     (display_w_px, display_h_px)
         Screen-unit width and height for the image glyph.
     """
-    scale = size_px / np.sqrt(ink_px)
+    scale = size_px / max(width_px, height_px)
     return width_px * scale, height_px * scale
 
 
@@ -231,7 +236,7 @@ def place_raster_icon(p, uri, x_center_log, y_center_log, display_w_px, display_
     return p
 
 
-def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px=None, alpha=1.0):
+def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px=None, alpha=1.0, max_source_px=256):
     """Draw an icon at the log-space centre of each process ellipse.
 
     Icon size is fixed in pixels, which means vertices are baked into data
@@ -250,8 +255,10 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
         Folder of .png and/or .svg icons. For a given name a PNG is used
         when present (raster, gradients preserved), else the SVG.
     size_px : float
-        Nominal icon size. Every icon is scaled to cover size_px**2 of ink,
-        regardless of the size of the process ellipse it sits on.
+        Nominal icon size in pixels. An SVG icon is scaled to cover size_px**2
+        of ink; a PNG icon has its content bounding box fitted so its longest
+        side is size_px. Either way the size is independent of the process
+        ellipse the icon sits on.
     space_on_x : bool
         Must match the value passed to create_space_time_figure.
     plot_size_px : tuple of (width, height), optional
@@ -260,6 +267,9 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
         frame size for exact sizing.
     alpha : float
         Opacity applied to every icon.
+    max_source_px : int
+        PNG icons are downscaled so their longest side is at most this before
+        being embedded, capping the base64 payload.
     """
     width_px, height_px = plot_size_px or (p.width, p.height)
     x_span = log_span(p.x_range)
@@ -273,7 +283,7 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
         if not name or name == "nan":
             continue
         if name not in cache:
-            cache[name] = _prepare_icon(icon_dir, name, target_area, size_px)
+            cache[name] = _prepare_icon(icon_dir, name, target_area, size_px, max_source_px)
         time_center = calculate_log_center(row.Time_min.value, row.Time_max.value)
         space_center = calculate_log_center(row.Space_min.value, row.Space_max.value)
         if space_on_x:
@@ -289,12 +299,13 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
     return p
 
 
-def _prepare_icon(icon_dir, name, target_area, size_px):
+def _prepare_icon(icon_dir, name, target_area, size_px, max_source_px):
     """Load and normalize one icon, dispatching on the file present in icon_dir.
 
     A ``{name}.png`` is drawn as a raster image glyph (gradients and soft
-    alpha edges survive); otherwise ``{name}.svg`` is flattened to vector
-    patches. PNG is preferred when both exist.
+    alpha edges survive), cropped to content and fitted by bounding box;
+    otherwise ``{name}.svg`` is flattened to vector patches and normalized by
+    ink area. PNG is preferred when both exist.
 
     Returns
     -------
@@ -302,7 +313,7 @@ def _prepare_icon(icon_dir, name, target_area, size_px):
     """
     png_path = icon_dir / f"{name}.png"
     if png_path.exists():
-        uri, width_px, height_px, ink_px = load_raster_icon(png_path)
-        display_w_px, display_h_px = raster_display_size(width_px, height_px, ink_px, size_px)
+        uri, width_px, height_px = load_raster_icon(png_path, max_source_px)
+        display_w_px, display_h_px = raster_display_size(width_px, height_px, size_px)
         return "raster", (uri, display_w_px, display_h_px)
     return "vector", normalize_icon(load_icon(icon_dir / f"{name}.svg"), target_area)
