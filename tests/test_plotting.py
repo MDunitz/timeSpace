@@ -198,3 +198,13 @@ class TestAddProcessesOffsetGuard:
         text_renderers = [r for r in p.renderers if isinstance(r.glyph, Text)]
         offsets = {(r.glyph.x_offset, r.glyph.y_offset) for r in text_renderers}
         assert (5, 0) in offsets and (0, 3) in offsets and (10, 0) in offsets
+
+
+def test_x_axis_location_param():
+    """x_axis_location routes the x axis above (default) or below."""
+    default = create_space_time_figure()
+    assert default.xaxis[0] in list(default.above)
+
+    below = create_space_time_figure(space_on_x=False, x_axis_location="below")
+    assert below.xaxis[0] in list(below.below)
+    assert below.xaxis[0].axis_label == "Time (s)"

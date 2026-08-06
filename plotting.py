@@ -85,13 +85,16 @@ def add_legend(p, position="right", font_size="12pt"):
     return p
 
 
-def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True):
+def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True, x_axis_location="above"):
     """Create a Stommel-style time-space figure.
 
     Parameters
     ----------
     space_on_x : bool
         If True (default), x=Space, y=Time (reversed). If False, x=Time, y=Space.
+    x_axis_location : str
+        Where the x axis is drawn: "above" (default) or "below". Use "below"
+        for a conventional time-on-bottom Stommel layout with space_on_x=False.
     """
     if space_on_x:
         xl, yl = "Space (m\u00b3)", "Time (s)"
@@ -110,7 +113,7 @@ def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True)
         y_range=yr,
         title=title,
         toolbar_location="below",
-        x_axis_location="above",
+        x_axis_location=x_axis_location,
     )
     p.axis.axis_label_text_font_size = "24pt"
     p.axis.major_label_text_font_size = "12pt"
