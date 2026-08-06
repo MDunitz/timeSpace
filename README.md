@@ -147,7 +147,7 @@ timeSpace uses Bokeh for rendering. There are three main ways to display or save
 
 - `show(p)` — opens the diagram in your default browser with full interactivity (hover, zoom, pan).
 - `output_file("diagram.html")` + `save(p)` — writes a self-contained static HTML file.
-- `components(p)` — returns `(script, div)` HTML strings for embedding in your own page or iframe. Use this for embedding in Google Sites or other CMS platforms (see [`docs/explorer.html`](https://github.com/MDunitz/timeSpace/blob/main/docs/explorer.html) for an example).
+- `components(p)` — returns `(script, div)` HTML strings for embedding in your own page or iframe. Use this for embedding in Google Sites or other CMS platforms (see [`docs/explorer.html`](https://github.com/MDunitz/timeSpace/blob/main/docs/explorer.html) for an example). The reference-object explorer has two interaction modes — `select` (single-select dropdowns) and `toggle` (category checkboxes with accumulate visibility); see [`docs/EXPLORER.md`](https://github.com/MDunitz/timeSpace/blob/main/docs/EXPLORER.md).
 
 ```python
 from bokeh.plotting import output_file, save, show
