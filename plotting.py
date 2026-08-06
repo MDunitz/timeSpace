@@ -559,13 +559,19 @@ def add_processes(
             has_label_text = "label_text" in process_df.columns
             display = row.label_text if has_label_text else row.ShortName
             lines = display.split("\n")
+            has_xo = "x_offset" in process_df.columns
+            has_yo = "y_offset" in process_df.columns
+            xo_val = str(row.get("x_offset", "")).strip() if has_xo else ""
+            yo_val = str(row.get("y_offset", "")).strip() if has_yo else ""
+            xo = int(float(xo_val)) if xo_val else 0
+            yo = int(float(yo_val)) if yo_val else 0
             LINE_PX = 15  # vertical gap between lines in screen pixels
             for line_i, line_text in enumerate(lines):
                 p.text(
                     x=lx,
                     y=ly,
-                    y_offset=row.y_offset + line_i * LINE_PX,
-                    x_offset=row.x_offset,
+                    y_offset=yo + line_i * LINE_PX,
+                    x_offset=xo,
                     text=[line_text],
                     text_font_size=font_size,
                     text_font_style="bold",
