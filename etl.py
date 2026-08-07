@@ -2,7 +2,13 @@ import warnings
 
 import numpy as np
 
-from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST
+from timeSpace.constants import (
+    base_space,
+    base_time,
+    POSSIBLE_COL_LIST,
+    FORM_RESPONSE_HEADER_MAP,
+    MEASUREMENT_RESPONSE_HEADER_MAP,
+)
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.plotting_helpers import (
     create_name,
@@ -72,6 +78,13 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
         Space_max). If label_x or label_y are already present in the input
         (e.g. CSV-provided overrides), they are preserved unchanged.
     """
+    # Normalize raw Google Form headers to the ETL schema. Strip surrounding
+    # whitespace first: live Google Forms emit trailing spaces in question
+    # titles ("Minimum Time Scale "), which an exact-match rename would miss.
+    # Then map human-readable labels. Idempotent for already-schema input.
+    responses_df = responses_df.rename(columns=lambda c: c.strip() if isinstance(c, str) else c)
+    responses_df = responses_df.rename(columns=FORM_RESPONSE_HEADER_MAP)
+
     # Validate required columns
     required = {"Time_min", "Time_max", "Space_min", "Space_max"}
     missing = required - set(responses_df.columns)
@@ -84,6 +97,13 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
 
     columns_list = list(set(possible_col_list) & set(responses_df.columns))
     plottable_responses_df = responses_df[columns_list].copy()
+
+    # Drop incomplete responses: a plottable process needs all four bounds and,
+    # if a name column is present, a name. Real forms admit partial submissions.
+    drop_subset = ["Time_min", "Time_max", "Space_min", "Space_max"]
+    if "ShortName" in plottable_responses_df.columns:
+        drop_subset.append("ShortName")
+    plottable_responses_df = plottable_responses_df.dropna(subset=drop_subset).reset_index(drop=True)
 
     for column in ["Time_min", "Time_max", "Space_min", "Space_max"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
@@ -204,6 +224,11 @@ def transform_measurement_sheet(sheet_df):
     DataFrame
         With columns: Time_value, Space_value, Name, x_offset, y_offset, etc.
     """
+    # Normalize raw measurement-form headers (Initials, Short Project Name...)
+    # to the ETL schema; strip surrounding whitespace first (Forms emit trailing
+    # spaces in titles). Idempotent for already-schema input.
+    sheet_df = sheet_df.rename(columns=lambda c: c.strip() if isinstance(c, str) else c)
+    sheet_df = sheet_df.rename(columns=MEASUREMENT_RESPONSE_HEADER_MAP)
     possible_col_list = [
         "Prefix",
         "ShortName",
@@ -219,6 +244,10 @@ def transform_measurement_sheet(sheet_df):
             "Spatial Scale": "Space",
         }
     )
+    # Drop incomplete responses: a plottable measurement needs both scales and,
+    # when present, a name.
+    drop_subset = [c for c in ["Time", "Space", "ShortName"] if c in plottable_responses_df.columns]
+    plottable_responses_df = plottable_responses_df.dropna(subset=drop_subset).reset_index(drop=True)
     for column in ["Time", "Space"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
     plottable_responses_df["Name"] = plottable_responses_df.apply(create_name, axis=1)

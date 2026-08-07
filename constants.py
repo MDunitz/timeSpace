@@ -30,6 +30,24 @@ colors = [
 
 POSSIBLE_COL_LIST = ["Prefix", "ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "Color", "Lab", "icon"]
 
+# Raw Google Form response headers -> ETL schema. The form asks human-readable
+# questions ("Minimum Time Scale"); the ETL and plotting layers expect the short
+# schema names. transform_process_response_sheet applies this before validating.
+FORM_RESPONSE_HEADER_MAP = {
+    "Your initials": "Prefix",
+    "Short Project Name (max 10 char)": "ShortName",
+    "Minimum Time Scale": "Time_min",
+    "Maximum Time Scale": "Time_max",
+    "Minimum Spatial Scale": "Space_min",
+    "Maximum Spatial Scale": "Space_max",
+}
+
+# Raw measurement-form headers -> ETL schema (default MEASUREMENTS form).
+MEASUREMENT_RESPONSE_HEADER_MAP = {
+    "Initials": "Prefix",
+    "Short Project Name (max 10 char)": "ShortName",
+}
+
 
 PREDEFINED_PROCESSES_URI = "16ENjOsx4j2DD24mz0k-I08zF3R0CkfiujjqyYCGuAxg"
 PROCESSES_URI = "14WirbmkElI-ALP9dBNciObL_nnpNwkGc2cfh_7Wm7YQ"
