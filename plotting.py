@@ -5,6 +5,7 @@ from bokeh.plotting import figure
 from bokeh.models import Label, Span, CustomJS
 from timeSpace.constants import DIFFUSION_COEFFICIENTS, TIME_MARKERS, SPACE_MARKERS, base_time
 from timeSpace.calculations import calculate_diffusion_length, calculate_sphere_volume
+from timeSpace.plotting_helpers import ensure_color_column
 
 DEFAULT_FONT_SIZE = "14pt"
 
@@ -518,6 +519,10 @@ def add_processes(
             f"process_df is missing columns: {missing}. "
             f"Did you forget to call transform_process_response_sheet() first?"
         )
+    # Color is optional: a caller-supplied Color column is used as-is; otherwise
+    # default one color per Prefix so a raw form export plots without a manual
+    # color-assignment step.
+    process_df = ensure_color_column(process_df)
     visible = not interactive
     has_col = "label_side" in process_df.columns
 
