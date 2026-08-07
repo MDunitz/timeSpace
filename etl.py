@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST
+from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST, COORD_ORIENTATION_COL
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.plotting_helpers import (
     create_name,
@@ -113,6 +113,7 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
             .rename(columns={0: "x_coords", 1: "y_coords"})
         )
         plottable_responses_df.loc[ellipse_mask, ["x_coords", "y_coords"]] = ellipse_coords
+    plottable_responses_df[COORD_ORIENTATION_COL] = space_on_x
     return plottable_responses_df
 
 
@@ -185,6 +186,7 @@ def transform_predefined_processes(plottable_responses_df, space_on_x=True, warn
         plottable_responses_df.loc[ellipse_mask, ["x_coords", "y_coords"]] = ellipse_coords
     plottable_responses_df["FillAlpha"] = plottable_responses_df.apply(set_fill_alpha, axis=1)
     plottable_responses_df["TextAlpha"] = plottable_responses_df.apply(lambda row: min(1, 3 * row["FillAlpha"]), axis=1)
+    plottable_responses_df[COORD_ORIENTATION_COL] = space_on_x
     return plottable_responses_df
 
 
