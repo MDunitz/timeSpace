@@ -6,10 +6,14 @@ authors:
   - given-names: Madison
     family-names: Dunitz
     orcid: "https://orcid.org/0000-0001-7062-7528"
+# identifiers:  # uncomment and paste the Zenodo concept DOI after cutting the v0.2.0 release
+#   - type: doi
+#     value: "10.5281/zenodo.XXXXXXX"
+#     description: "Concept DOI (all versions)"
 repository-code: "https://github.com/MDunitz/timeSpace"
 license: MIT
-version: 0.1.0
-date-released: "2026-04-05"
+version: 0.2.0
+date-released: "2026-08-06"  # update to the actual release date when v0.2.0 is published
 abstract: >-
   timeSpace is a Python package for visualizing biogeochemical and physical
   processes on log-log Stommel diagrams. Processes are rendered as ellipses
