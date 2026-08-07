@@ -11,10 +11,14 @@ from timeSpace.plotting import (
 from timeSpace.constants import (
     DIFFUSION_COEFFICIENTS,
     PREDEFINED_PROCESSES_URI,
-    US_PROCESS_COLUMN_MAP,
-    US_MEASUREMENT_COLUMN_MAP,
 )
-from timeSpace.etl import transform_process_response_sheet, transform_measurement_sheet, transform_predefined_processes
+from timeSpace.etl import (
+    transform_process_response_sheet,
+    transform_measurement_sheet,
+    transform_predefined_processes,
+    normalize_form_responses,
+    normalize_measurement_form_responses,
+)
 from timeSpace.data_processing import extract_google_sheet
 from timeSpace.measurements import add_grouped_measurement, add_measurements
 from timeSpace.plotting_helpers import set_color_palettes_by_lab
@@ -38,8 +42,8 @@ measurements_df = extract_google_sheet(PRIME_MEASUREMENTS_URI, "us-measurements"
 # processes_df = extract_google_sheet(PROCESSES_URI)
 # measurements_df = extract_google_sheet(MEASUREMENTS_URI)
 # #
-processes_df.rename(columns=US_PROCESS_COLUMN_MAP, inplace=True)
-measurements_df.rename(columns=US_MEASUREMENT_COLUMN_MAP, inplace=True)
+processes_df = normalize_form_responses(processes_df)
+measurements_df = normalize_measurement_form_responses(measurements_df)
 
 transformed_processes_df = transform_process_response_sheet(processes_df)
 
