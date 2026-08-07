@@ -56,6 +56,32 @@ def set_color_by_prefix(df, palette=colors):
     return df
 
 
+def ensure_color_column(df, palette=colors):
+    """Return df with a Color column, auto-assigning one per Prefix if absent.
+
+    add_processes reads ``row.Color`` for every glyph. A raw form export has no
+    Color column, so default it (one color per unique Prefix, from the base
+    palette) when it is missing. A caller-supplied Color column is passed
+    through untouched, so explicit colors always win. Never mutates the caller's
+    DataFrame when adding the column.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Must have a 'Prefix' column when Color is absent.
+    palette : list
+        Color palette to sample from (default constants.colors).
+
+    Returns
+    -------
+    DataFrame
+        With a 'Color' column guaranteed present.
+    """
+    if "Color" in df.columns:
+        return df
+    return set_color_by_prefix(df.copy(), palette=palette)
+
+
 def set_color_by_lab(row, palette, lab_list):
     """Assign a color to a row based on Lab and within-lab ordering.
 
