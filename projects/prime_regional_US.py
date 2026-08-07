@@ -11,6 +11,8 @@ from timeSpace.plotting import (
 from timeSpace.constants import (
     DIFFUSION_COEFFICIENTS,
     PREDEFINED_PROCESSES_URI,
+    US_PROCESS_COLUMN_MAP,
+    US_MEASUREMENT_COLUMN_MAP,
 )
 from timeSpace.etl import transform_process_response_sheet, transform_measurement_sheet, transform_predefined_processes
 from timeSpace.data_processing import extract_google_sheet
@@ -36,18 +38,8 @@ measurements_df = extract_google_sheet(PRIME_MEASUREMENTS_URI, "us-measurements"
 # processes_df = extract_google_sheet(PROCESSES_URI)
 # measurements_df = extract_google_sheet(MEASUREMENTS_URI)
 # #
-processes_df.rename(
-    columns={
-        "Your initials": "Prefix",
-        "Short Project Name (max 10 char)": "ShortName",
-        "Minimum Time Scale": "Time_min",
-        "Maximum Time Scale": "Time_max",
-        "Minimum Spatial Scale": "Space_min",
-        "Maximum Spatial Scale": "Space_max",
-    },
-    inplace=True,
-)
-measurements_df.rename(columns={"Initials": "Prefix", "Short Project Name (max 10 char)": "ShortName"}, inplace=True)
+processes_df.rename(columns=US_PROCESS_COLUMN_MAP, inplace=True)
+measurements_df.rename(columns=US_MEASUREMENT_COLUMN_MAP, inplace=True)
 
 transformed_processes_df = transform_process_response_sheet(processes_df)
 
