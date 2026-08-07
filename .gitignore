@@ -5,3 +5,6 @@ build/
 *.egg-info/
 .pytest_cache/
 test_*.html
+.venv/
+venv/
+env/
