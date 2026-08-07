@@ -92,16 +92,29 @@ p = add_processes(p, df, category_col="category_type", category_colors={"Physica
 
 timeSpace can pull process and measurement data directly from Google Sheets, which is useful for collaborative data entry via Google Forms.
 
-### Using Google Sheets with pip install
+### Fetching and plotting a form-linked sheet
 
-If you installed via pip (no git clone), you can fetch sheet data directly:
+This works the same whether you `pip install`ed the package or cloned the repo —
+pass the sheet ID directly. `transform_process_response_sheet` accepts a **raw**
+form export (human-readable headers like `Minimum Time Scale`) and normalizes it
+to the plotting schema; incomplete responses are dropped. Assign colors before
+plotting (`add_processes` needs a `Color`):
 
 ```python
-from timeSpace import extract_google_sheet
+from timeSpace import (
+    extract_google_sheet,
+    create_space_time_figure,
+    add_processes,
+    set_color_palettes_by_lab,
+)
 from timeSpace.etl import transform_process_response_sheet
+from bokeh.plotting import show
 
 df = extract_google_sheet(spreadsheet_id="YOUR_SHEET_ID", data_name="processes")
-processed = transform_process_response_sheet(df)
+processed = transform_process_response_sheet(df)   # raw form headers OK
+processed = set_color_palettes_by_lab(processed)   # per-lab colors
+p = add_processes(create_space_time_figure(), processed)
+show(p)
 ```
 
 ### Setting up a processes form
@@ -110,8 +123,14 @@ processed = transform_process_response_sheet(df)
 2. After renaming the form / updating the description and questions, go to the Responses tab and click "Link to Sheets"
 3. Update the permissions on the newly created sheet to be viewable by anyone with the link
 4. Copy the sheet URL
-5. In `constants.py`, set `PROCESSES_URI` to the identifying string between `/d/` and `/edit` in the sheet URL.
+5. Copy the identifying string between `/d/` and `/edit` in the sheet URL — this is the sheet ID.
    For example: `https://docs.google.com/spreadsheets/d/USE_THIS_PART/edit?gid=0#gid=0`
+   Pass it as `spreadsheet_id` to `extract_google_sheet` (see the example above).
+
+> The `PROCESSES_URI` / `MEASUREMENTS_URI` / `PREDEFINED_PROCESSES_URI` constants
+> in `constants.py` are only read by the bundled `projects/` scripts, not by the
+> package API. For your own code, pass the sheet ID to `extract_google_sheet`
+> directly rather than editing `constants.py`.
 
 > **Editing the Time / Space scale answer options**
 >
@@ -133,12 +152,13 @@ Follow the same steps as above, using [the measurement form template](https://do
 ### Using Google Sheets data in code
 
 ```python
-from timeSpace.data_processing import extract_google_sheet
+from timeSpace import extract_google_sheet, set_color_palettes_by_lab
 from timeSpace.etl import transform_process_response_sheet
 
 # Fetch sheet data (caches locally as CSV)
 df = extract_google_sheet(spreadsheet_id="YOUR_SHEET_ID", data_name="processes")
-processed = transform_process_response_sheet(df)
+processed = transform_process_response_sheet(df)   # raw form headers OK
+processed = set_color_palettes_by_lab(processed)   # assign colors before add_processes
 ```
 
 ## Bokeh Output Modes
@@ -194,6 +214,7 @@ from timeSpace import (
     add_diffusion_lines,       # Overlay molecular diffusion curves
     add_light_cone,            # Add speed-of-light causality boundary
     add_legend,                # Move legend to right panel with toggle
+    set_color_palettes_by_lab, # Assign per-lab colors to a Color column
 
     # Measurements
     add_measurements,          # Add measurement scatter points with labels
