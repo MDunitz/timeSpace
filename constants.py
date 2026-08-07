@@ -138,3 +138,31 @@ SPACE_EXAMPLES = {
 }
 
 OFFSETS = {"6": [-10, 35], "4": [0, 20], "1": [10, 5], "5": [15, -10], "2": [10, -25], "3": [-10, -40]}
+
+
+# ── US regional Google Form ingestion ──────────────────────────────
+# Maps raw Google Form question titles to the internal column names the
+# ETL transforms require. Single source of truth shared by the project
+# ingestion scripts (projects/prime_regional_US.py) and the form-schema
+# regression tests (tests/test_form_integration.py) so the two cannot
+# drift. A changed question title (or a re-introduced trailing space,
+# cf. #77) surfaces as a failing schema test rather than a silently
+# dropped column.
+US_PROCESS_COLUMN_MAP = {
+    "Your initials": "Prefix",
+    "Short Project Name (max 10 char)": "ShortName",
+    "Minimum Time Scale": "Time_min",
+    "Maximum Time Scale": "Time_max",
+    "Minimum Spatial Scale": "Space_min",
+    "Maximum Spatial Scale": "Space_max",
+}
+
+US_MEASUREMENT_COLUMN_MAP = {
+    "Initials": "Prefix",
+    "Short Project Name (max 10 char)": "ShortName",
+}
+
+# Copied US regional response sheets (2026). Provenance for the saved
+# fixtures data/datasets/us_processes_copy.csv and us_measurements_copy.csv.
+US_PROCESS_COPY_URI = "1kDh5Ja8x3ic1OhsYR3aPT7ZHu7MDoM3HN5aiYprIONA"
+US_MEASUREMENT_COPY_URI = "1xlgy0Mos930oAFEUBp4P1S87aOWzdWMdB6bebKJRY-c"
