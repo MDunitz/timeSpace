@@ -138,3 +138,31 @@ SPACE_EXAMPLES = {
 }
 
 OFFSETS = {"6": [-10, 35], "4": [0, 20], "1": [10, 5], "5": [15, -10], "2": [10, -25], "3": [-10, -40]}
+
+
+# ── Google Form response schema ────────────────────────────────────
+# Maps the raw question titles emitted by the interactive-activity Google
+# Forms to the internal column names the ETL requires. These are the
+# canonical current-form schema: anyone who copies the template forms and
+# collects their own responses gets these headers. Consumed by
+# etl.normalize_form_responses, the CLI --form path, and the project
+# ingestion scripts, so the schema lives in exactly one place.
+PROCESS_FORM_COLUMN_MAP = {
+    "Your initials": "Prefix",
+    "Short Project Name (max 10 char)": "ShortName",
+    "Minimum Time Scale": "Time_min",
+    "Maximum Time Scale": "Time_max",
+    "Minimum Spatial Scale": "Space_min",
+    "Maximum Spatial Scale": "Space_max",
+}
+
+MEASUREMENT_FORM_COLUMN_MAP = {
+    "Initials": "Prefix",
+    "Short Project Name (max 10 char)": "ShortName",
+}
+
+# Reference copies of the current forms, used to pin the schema in
+# tests/test_form_integration.py. Not workshop data — the responses are
+# test submissions. Fixtures: tests/fixtures/form_*_responses.csv
+TEMPLATE_PROCESS_FORM_URI = "1kDh5Ja8x3ic1OhsYR3aPT7ZHu7MDoM3HN5aiYprIONA"
+TEMPLATE_MEASUREMENT_FORM_URI = "1xlgy0Mos930oAFEUBp4P1S87aOWzdWMdB6bebKJRY-c"

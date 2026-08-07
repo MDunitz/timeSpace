@@ -6,14 +6,23 @@ Thin wrapper over the package pipeline:
       -> create_space_time_figure + add_processes
       -> self-contained HTML
 
-Input schema (CSV columns or Google Sheet headers) must already conform to
-the ETL contract: a name column (Name, Process, EcologicalUnit, or Model),
-Time_min, Time_max, Space_min, Space_max, and a non-null Color.
+Two input modes:
+
+--form (interactive-activity mode)
+    Raw Google Form response sheets, headers as form question titles
+    ("Minimum Time Scale", etc). Copy the template form, share the response
+    sheet publicly, pass its ID. Colors are assigned per Lab automatically.
+
+default (curated-dataset mode)
+    Data already conforming to the ETL contract: a name column (Name,
+    Process, EcologicalUnit, or Model), Time_min, Time_max, Space_min,
+    Space_max, and a non-null Color.
 
 Usage
 -----
     timespace --csv data.csv --output stommel.html
     timespace --sheet-id 1abc123 --output stommel.html
+    timespace --sheet-id 1abc123 --form --sheet-gid 243872990 -o activity.html
     timespace --csv data.csv --output out.html --time-on-x --open
 """
 
@@ -27,8 +36,18 @@ from bokeh.embed import file_html
 from bokeh.resources import CDN
 
 from timeSpace.data_processing import extract_google_sheet
-from timeSpace.etl import transform_predefined_processes
-from timeSpace.plotting import create_space_time_figure, add_predefined_processes
+from timeSpace.etl import (
+    transform_predefined_processes,
+    transform_process_response_sheet,
+    normalize_form_responses,
+)
+from timeSpace.plotting import (
+    create_space_time_figure,
+    add_predefined_processes,
+    add_processes,
+    add_magnitude_labels,
+)
+from timeSpace.plotting_helpers import set_color_palettes_by_lab
 
 DEFAULT_N_POINTS = 1000
 
@@ -55,6 +74,26 @@ def build_figure(raw_df, space_on_x=True, n_points=DEFAULT_N_POINTS, title=" ", 
     return p
 
 
+def build_form_figure(raw_df, space_on_x=True, n_points=DEFAULT_N_POINTS, title=" ", interactive=True):
+    """Build a figure from a raw Google Form process-response sheet.
+
+    The interactive-activity path: normalize question titles -> transform ->
+    assign one color ramp per Lab -> plot. Unlike build_figure this accepts
+    the sheet exactly as the form emits it, so a copied form needs no manual
+    column editing before it renders.
+
+    Rows whose min exceeds max are dropped by transform_process_response_sheet
+    (participants sometimes invert the two dropdowns).
+    """
+    normalized = normalize_form_responses(raw_df)
+    transformed = transform_process_response_sheet(normalized, space_on_x=space_on_x, n_points=n_points)
+    transformed = set_color_palettes_by_lab(transformed)
+    p = create_space_time_figure(space_on_x=space_on_x, title=title)
+    add_magnitude_labels(p, space_on_x=space_on_x)
+    add_processes(p, transformed, interactive=interactive, space_on_x=space_on_x)
+    return p
+
+
 def write_html(figure, output_path, title="Stommel diagram"):
     """Write a self-contained HTML file and return its Path."""
     output = Path(output_path)
@@ -71,6 +110,11 @@ def parse_args(argv):
     src.add_argument("--csv", help="Path to a local CSV in the ETL schema.")
     src.add_argument("--sheet-id", help="Google Sheet ID (the part between /d/ and /edit).")
     parser.add_argument("--sheet-gid", type=int, default=0, help="Sheet GID for multi-tab workbooks (default 0).")
+    parser.add_argument(
+        "--form",
+        action="store_true",
+        help="Input is a raw Google Form response sheet (question-title headers); colors assigned per Lab.",
+    )
     parser.add_argument("--output", "-o", default="stommel.html", help="Output HTML path (default stommel.html).")
     parser.add_argument("--title", default=" ", help="Figure title.")
     parser.add_argument(
@@ -92,7 +136,8 @@ def parse_args(argv):
 def main(argv=None):
     args = parse_args(sys.argv[1:] if argv is None else argv)
     raw_df = load_dataframe(csv=args.csv, sheet_id=args.sheet_id, sheet_gid=args.sheet_gid)
-    figure = build_figure(
+    builder = build_form_figure if args.form else build_figure
+    figure = builder(
         raw_df,
         space_on_x=not args.time_on_x,
         n_points=args.n_points,
