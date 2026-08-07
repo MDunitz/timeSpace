@@ -122,7 +122,7 @@ processed = transform_process_response_sheet(df)
 
 ### Setting up a measurement form
 
-Follow the same steps as above, using your measurement form template, and set `MEASUREMENTS_URI` in `constants.py`.
+Follow the same steps as above, using [the measurement form template](https://docs.google.com/forms/d/1Wgsb8KwUu9fzQxjjUkl0k8FMhjqbjOoqyNEfxLSU7Io/copy), and set `MEASUREMENTS_URI` in `constants.py`.
 
 ### Setting up predefined processes
 
