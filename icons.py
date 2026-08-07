@@ -236,7 +236,17 @@ def place_raster_icon(p, uri, x_center_log, y_center_log, display_w_px, display_
     return p
 
 
-def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px=None, alpha=1.0, max_source_px=256):
+def add_icons(
+    p,
+    process_df,
+    icon_dir,
+    size_px=28,
+    space_on_x=True,
+    plot_size_px=None,
+    alpha=1.0,
+    max_source_px=256,
+    scale_col="icon_scale",
+):
     """Draw an icon at the log-space centre of each process ellipse.
 
     Icon size is fixed in pixels, which means vertices are baked into data
@@ -270,11 +280,13 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
     max_source_px : int
         PNG icons are downscaled so their longest side is at most this before
         being embedded, capping the base64 payload.
+    scale_col : str
+        Optional per-row column of size multipliers on size_px (default 1.0),
+        so individual icons can be enlarged or shrunk. Missing/blank -> 1.0.
     """
     width_px, height_px = plot_size_px or (p.width, p.height)
     x_span = log_span(p.x_range)
     y_span = log_span(p.y_range)
-    target_area = float(size_px) ** 2
     icon_dir = FilePath(icon_dir)
     cache = {}
 
@@ -283,7 +295,8 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
         if not name or name == "nan":
             continue
         if name not in cache:
-            cache[name] = _prepare_icon(icon_dir, name, target_area, size_px, max_source_px)
+            cache[name] = _load_icon(icon_dir, name, max_source_px)
+        row_size = size_px * _row_scale(row, scale_col)
         time_center = calculate_log_center(row.Time_min.value, row.Time_max.value)
         space_center = calculate_log_center(row.Space_min.value, row.Space_max.value)
         if space_on_x:
@@ -292,28 +305,36 @@ def add_icons(p, process_df, icon_dir, size_px=28, space_on_x=True, plot_size_px
             x_center_log, y_center_log = time_center, space_center
         kind, payload = cache[name]
         if kind == "raster":
-            uri, display_w_px, display_h_px = payload
+            uri, width_px_src, height_px_src = payload
+            display_w_px, display_h_px = raster_display_size(width_px_src, height_px_src, row_size)
             place_raster_icon(p, uri, x_center_log, y_center_log, display_w_px, display_h_px, alpha=alpha)
         else:
-            place_icon(p, payload, x_center_log, y_center_log, x_span, y_span, width_px, height_px, alpha=alpha)
+            shapes = normalize_icon(payload, row_size**2)
+            place_icon(p, shapes, x_center_log, y_center_log, x_span, y_span, width_px, height_px, alpha=alpha)
     return p
 
 
-def _prepare_icon(icon_dir, name, target_area, size_px, max_source_px):
-    """Load and normalize one icon, dispatching on the file present in icon_dir.
+def _row_scale(row, scale_col):
+    """Per-row icon size multiplier; missing, blank, zero, or NaN -> 1.0."""
+    value = getattr(row, scale_col, 1.0)
+    try:
+        scale = float(value)
+    except (TypeError, ValueError):
+        return 1.0
+    if not scale or scale != scale:  # zero or NaN
+        return 1.0
+    return scale
 
-    A ``{name}.png`` is drawn as a raster image glyph (gradients and soft
-    alpha edges survive), cropped to content and fitted by bounding box;
-    otherwise ``{name}.svg`` is flattened to vector patches and normalized by
-    ink area. PNG is preferred when both exist.
 
-    Returns
-    -------
-    ("raster", (uri, display_w_px, display_h_px)) or ("vector", shapes)
+def _load_icon(icon_dir, name, max_source_px):
+    """Load one icon, dispatching on the file present in icon_dir.
+
+    Returns geometry for per-row sizing (kept separate from sizing so the same
+    icon can be drawn at different sizes across rows):
+    ("raster", (uri, width_px, height_px)) for a ``{name}.png`` (cropped +
+    downscaled), else ("vector", shapes) for ``{name}.svg``. PNG preferred.
     """
     png_path = icon_dir / f"{name}.png"
     if png_path.exists():
-        uri, width_px, height_px = load_raster_icon(png_path, max_source_px)
-        display_w_px, display_h_px = raster_display_size(width_px, height_px, size_px)
-        return "raster", (uri, display_w_px, display_h_px)
-    return "vector", normalize_icon(load_icon(icon_dir / f"{name}.svg"), target_area)
+        return "raster", load_raster_icon(png_path, max_source_px)
+    return "vector", load_icon(icon_dir / f"{name}.svg")
