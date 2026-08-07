@@ -15,3 +15,5 @@ datasets/*
 !datasets/stommel_boyd2015_volumes_hbw.csv
 !datasets/workshop_measurements_feb2025.csv
 !datasets/desert_farm_leverage_points.csv
+!datasets/us_processes_copy.csv
+!datasets/us_measurements_copy.csv
