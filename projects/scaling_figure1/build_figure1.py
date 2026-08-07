@@ -38,6 +38,7 @@ DATA_COLUMNS = [
     "Color",
     "ProcessType",
     "icon",
+    "icon_scale",
     "label_side",
     "x_offset",
     "y_offset",
