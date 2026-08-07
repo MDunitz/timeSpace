@@ -27,7 +27,6 @@ dependencies = [
     "numpy>=1.24,<3",
     "pandas>=1.5,<3",
     "pillow>=9.0",
-    "svgelements>=1.9,<2",
 ]
 
 [project.urls]
