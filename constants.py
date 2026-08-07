@@ -42,6 +42,12 @@ FORM_RESPONSE_HEADER_MAP = {
     "Maximum Spatial Scale": "Space_max",
 }
 
+# Raw measurement-form headers -> ETL schema (default MEASUREMENTS form).
+MEASUREMENT_RESPONSE_HEADER_MAP = {
+    "Initials": "Prefix",
+    "Short Project Name (max 10 char)": "ShortName",
+}
+
 
 PREDEFINED_PROCESSES_URI = "16ENjOsx4j2DD24mz0k-I08zF3R0CkfiujjqyYCGuAxg"
 PROCESSES_URI = "14WirbmkElI-ALP9dBNciObL_nnpNwkGc2cfh_7Wm7YQ"

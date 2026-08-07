@@ -2,7 +2,13 @@ import warnings
 
 import numpy as np
 
-from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST, FORM_RESPONSE_HEADER_MAP
+from timeSpace.constants import (
+    base_space,
+    base_time,
+    POSSIBLE_COL_LIST,
+    FORM_RESPONSE_HEADER_MAP,
+    MEASUREMENT_RESPONSE_HEADER_MAP,
+)
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.plotting_helpers import (
     create_name,
@@ -215,6 +221,9 @@ def transform_measurement_sheet(sheet_df):
     DataFrame
         With columns: Time_value, Space_value, Name, x_offset, y_offset, etc.
     """
+    # Normalize raw measurement-form headers (Initials, Short Project Name...)
+    # to the ETL schema; idempotent for already-schema input.
+    sheet_df = sheet_df.rename(columns=MEASUREMENT_RESPONSE_HEADER_MAP)
     possible_col_list = [
         "Prefix",
         "ShortName",
@@ -230,6 +239,10 @@ def transform_measurement_sheet(sheet_df):
             "Spatial Scale": "Space",
         }
     )
+    # Drop incomplete responses: a plottable measurement needs both scales and,
+    # when present, a name.
+    drop_subset = [c for c in ["Time", "Space", "ShortName"] if c in plottable_responses_df.columns]
+    plottable_responses_df = plottable_responses_df.dropna(subset=drop_subset).reset_index(drop=True)
     for column in ["Time", "Space"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
     plottable_responses_df["Name"] = plottable_responses_df.apply(create_name, axis=1)

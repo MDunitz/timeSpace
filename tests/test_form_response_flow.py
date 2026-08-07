@@ -14,9 +14,10 @@ import pandas as pd
 
 import timeSpace
 from timeSpace import create_space_time_figure, add_processes, set_color_palettes_by_lab
-from timeSpace.etl import transform_process_response_sheet
+from timeSpace.etl import transform_process_response_sheet, transform_measurement_sheet
 
 RAW_FORM_CSV = timeSpace.PROJECT_ROOT / "data" / "datasets" / "us_processes.csv"
+RAW_MEASUREMENT_CSV = timeSpace.PROJECT_ROOT / "data" / "datasets" / "us_measurements.csv"
 
 
 def _raw():
@@ -61,4 +62,23 @@ def test_transform_is_idempotent_on_schema_headers():
         }
     )
     out = transform_process_response_sheet(schema)
+    assert len(out) > 0
+
+
+def test_raw_measurement_headers_are_normalized():
+    raw = pd.read_csv(RAW_MEASUREMENT_CSV)
+    # default measurement export uses Initials / Short Project Name, not schema names
+    assert "Initials" in raw.columns
+    assert "Prefix" not in raw.columns
+    out = transform_measurement_sheet(raw)
+    for col in ("Name", "Time_value", "Space_value"):
+        assert col in out.columns
+    assert len(out) > 0
+
+
+def test_measurement_transform_idempotent_on_schema_headers():
+    schema = pd.read_csv(RAW_MEASUREMENT_CSV).rename(
+        columns={"Initials": "Prefix", "Short Project Name (max 10 char)": "ShortName"}
+    )
+    out = transform_measurement_sheet(schema)
     assert len(out) > 0
