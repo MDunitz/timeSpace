@@ -82,3 +82,20 @@ def test_measurement_transform_idempotent_on_schema_headers():
     )
     out = transform_measurement_sheet(schema)
     assert len(out) > 0
+
+
+def test_process_headers_with_trailing_whitespace_are_handled():
+    # Live Google Forms emit trailing spaces in question titles
+    # ("Minimum Time Scale "); the bundled export has them stripped, so
+    # simulate the live headers to lock whitespace robustness.
+    raw = pd.read_csv(RAW_FORM_CSV).rename(columns=lambda c: str(c) + " ")
+    out = transform_process_response_sheet(raw)
+    assert {"Time_min", "Time_max", "Space_min", "Space_max"} <= set(out.columns)
+    assert len(out) > 0
+
+
+def test_measurement_headers_with_trailing_whitespace_are_handled():
+    raw = pd.read_csv(RAW_MEASUREMENT_CSV).rename(columns=lambda c: str(c) + " ")
+    out = transform_measurement_sheet(raw)
+    assert "Time_value" in out.columns
+    assert len(out) > 0

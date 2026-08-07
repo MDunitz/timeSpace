@@ -78,8 +78,11 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
         Space_max). If label_x or label_y are already present in the input
         (e.g. CSV-provided overrides), they are preserved unchanged.
     """
-    # Normalize raw Google Form headers ("Minimum Time Scale", ...) to the ETL
-    # schema. Idempotent: sheets already in schema pass through unchanged.
+    # Normalize raw Google Form headers to the ETL schema. Strip surrounding
+    # whitespace first: live Google Forms emit trailing spaces in question
+    # titles ("Minimum Time Scale "), which an exact-match rename would miss.
+    # Then map human-readable labels. Idempotent for already-schema input.
+    responses_df = responses_df.rename(columns=lambda c: c.strip() if isinstance(c, str) else c)
     responses_df = responses_df.rename(columns=FORM_RESPONSE_HEADER_MAP)
 
     # Validate required columns
@@ -222,7 +225,9 @@ def transform_measurement_sheet(sheet_df):
         With columns: Time_value, Space_value, Name, x_offset, y_offset, etc.
     """
     # Normalize raw measurement-form headers (Initials, Short Project Name...)
-    # to the ETL schema; idempotent for already-schema input.
+    # to the ETL schema; strip surrounding whitespace first (Forms emit trailing
+    # spaces in titles). Idempotent for already-schema input.
+    sheet_df = sheet_df.rename(columns=lambda c: c.strip() if isinstance(c, str) else c)
     sheet_df = sheet_df.rename(columns=MEASUREMENT_RESPONSE_HEADER_MAP)
     possible_col_list = [
         "Prefix",
