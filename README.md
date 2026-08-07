@@ -97,24 +97,28 @@ timeSpace can pull process and measurement data directly from Google Sheets, whi
 This works the same whether you `pip install`ed the package or cloned the repo —
 pass the sheet ID directly. `transform_process_response_sheet` accepts a **raw**
 form export (human-readable headers like `Minimum Time Scale`) and normalizes it
-to the plotting schema; incomplete responses are dropped. Assign colors before
-plotting (`add_processes` needs a `Color`):
+to the plotting schema; incomplete responses are dropped. Colors are optional —
+`add_processes` auto-assigns one color per `Prefix` if the data has no `Color`
+column, so this is the minimal flow:
 
 ```python
-from timeSpace import (
-    extract_google_sheet,
-    create_space_time_figure,
-    add_processes,
-    set_color_palettes_by_lab,
-)
+from timeSpace import extract_google_sheet, create_space_time_figure, add_processes
 from timeSpace.etl import transform_process_response_sheet
 from bokeh.plotting import show
 
 df = extract_google_sheet(spreadsheet_id="YOUR_SHEET_ID", data_name="processes")
 processed = transform_process_response_sheet(df)   # raw form headers OK
-processed = set_color_palettes_by_lab(processed)   # per-lab colors
-p = add_processes(create_space_time_figure(), processed)
+p = add_processes(create_space_time_figure(), processed)  # Color auto-assigned
 show(p)
+```
+
+To control the colors yourself, add a `Color` column before plotting (it is
+used as-is) — e.g. `set_color_palettes_by_lab` for distinct per-lab palettes:
+
+```python
+from timeSpace import set_color_palettes_by_lab
+processed = set_color_palettes_by_lab(processed)   # explicit per-lab colors
+p = add_processes(create_space_time_figure(), processed)
 ```
 
 ### Setting up a processes form
@@ -158,7 +162,9 @@ from timeSpace.etl import transform_process_response_sheet
 # Fetch sheet data (caches locally as CSV)
 df = extract_google_sheet(spreadsheet_id="YOUR_SHEET_ID", data_name="processes")
 processed = transform_process_response_sheet(df)   # raw form headers OK
-processed = set_color_palettes_by_lab(processed)   # assign colors before add_processes
+# Optional — add a Color column to control colors; add_processes auto-assigns
+# per-Prefix colors if you skip this.
+processed = set_color_palettes_by_lab(processed)   # explicit per-lab colors
 ```
 
 ## Bokeh Output Modes
