@@ -56,7 +56,8 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     space_on_x : bool
         Axis order to bake into ellipse `x_coords`/`y_coords`. Must match the
         `space_on_x` passed to plotting functions (`add_processes`,
-        `create_space_time_figure`). Default True (Stommel: x=space, y=time).
+        `create_space_time_figure`). Default True — the conventional Stommel
+        layout, x=space, y=time (Stommel 1963).
     n_points : int
         Number of x samples per half-ellipse (total vertices = 2 * n_points).
         Default 1000 (smooth curves, ~16 KB per ellipse in serialized HTML).

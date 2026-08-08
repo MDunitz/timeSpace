@@ -91,10 +91,13 @@ def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True,
     Parameters
     ----------
     space_on_x : bool
-        If True (default), x=Space, y=Time (reversed). If False, x=Time, y=Space.
+        If True (default), x=Space, y=Time (time axis reversed, large
+        timescales at the bottom). If False, x=Time, y=Space. The conventional
+        Stommel layout puts spatial scale on x and temporal scale on y
+        (Stommel 1963), i.e. space_on_x=True — the package default.
     x_axis_location : str
-        Where the x axis is drawn: "above" (default) or "below". Use "below"
-        for a conventional time-on-bottom Stommel layout with space_on_x=False.
+        Where the x axis is drawn: "above" (default) or "below". This only
+        moves the x axis; it does not change which quantity is on x.
     """
     if space_on_x:
         xl, yl = "Space (m\u00b3)", "Time (s)"
