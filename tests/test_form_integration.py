@@ -174,3 +174,24 @@ class TestCopyAndRunPath:
 
     def test_time_on_x_orientation(self, processes_raw):
         assert build_form_figure(processes_raw, space_on_x=False) is not None
+
+
+class TestIncompleteResponsesDropped:
+    """Real forms admit partial submissions; the transforms drop them before
+    the unit parse rather than propagating NaN into astropy quantities.
+    Ported from #77."""
+
+    def test_process_row_missing_a_bound_is_dropped(self, processes_raw):
+        normalized = normalize_form_responses(processes_raw)
+        incomplete = normalized.iloc[[0]].copy()
+        incomplete.loc[incomplete.index[0], "Space_max"] = None
+        combined = pd.concat([normalized, incomplete], ignore_index=True)
+        # The complete row survives, the bound-less row is dropped before parse.
+        assert len(transform_process_response_sheet(combined)) == len(normalized)
+
+    def test_measurement_row_missing_a_scale_is_dropped(self, measurements_raw):
+        normalized = normalize_measurement_form_responses(measurements_raw)
+        incomplete = normalized.iloc[[0]].copy()
+        incomplete.loc[incomplete.index[0], "Time Scale"] = None
+        combined = pd.concat([normalized, incomplete], ignore_index=True)
+        assert len(transform_measurement_sheet(combined)) == len(normalized)

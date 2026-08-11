@@ -147,6 +147,14 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     columns_list = list(set(possible_col_list) & set(responses_df.columns))
     plottable_responses_df = responses_df[columns_list].copy()
 
+    # Drop incomplete responses before parsing: a plottable process needs all
+    # four bounds and, when a name column is present, a name. Real forms admit
+    # partial submissions, whose NaN cells would otherwise reach the unit parse.
+    drop_subset = ["Time_min", "Time_max", "Space_min", "Space_max"]
+    if "ShortName" in plottable_responses_df.columns:
+        drop_subset.append("ShortName")
+    plottable_responses_df = plottable_responses_df.dropna(subset=drop_subset).reset_index(drop=True)
+
     for column in ["Time_min", "Time_max", "Space_min", "Space_max"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
     # Drop if min and max is wrong
@@ -283,6 +291,10 @@ def transform_measurement_sheet(sheet_df):
             "Spatial Scale": "Space",
         }
     )
+    # Drop incomplete responses before parsing: a plottable measurement needs
+    # both scales and, when present, a name.
+    drop_subset = [c for c in ["Time", "Space", "ShortName"] if c in plottable_responses_df.columns]
+    plottable_responses_df = plottable_responses_df.dropna(subset=drop_subset).reset_index(drop=True)
     for column in ["Time", "Space"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
     plottable_responses_df["Name"] = plottable_responses_df.apply(create_name, axis=1)
