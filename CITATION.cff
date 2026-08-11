@@ -12,7 +12,7 @@ authors:
 repository-code: "https://github.com/MDunitz/timeSpace"
 license: MIT
 version: 0.2.0
-date-released: "2026-08-010"
+date-released: "2026-08-10"
 abstract: >-
   timeSpace is a Python package for visualizing biogeochemical and physical
   processes on log-log Stommel diagrams. Processes are rendered as ellipses
