@@ -7,7 +7,7 @@ authors:
     family-names: Dunitz
     orcid: "https://orcid.org/0000-0001-7062-7528"
    - type: doi
-     value: "10.5281/zenodo.21882383"
+     value: "10.5281/zenodo.21882384"
      description: "Concept DOI (all versions)"
 repository-code: "https://github.com/MDunitz/timeSpace"
 license: MIT
