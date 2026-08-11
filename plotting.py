@@ -3,7 +3,7 @@ import colorcet as cc
 import pandas as pd
 from bokeh.plotting import figure
 from bokeh.models import Label, Span, CustomJS
-from timeSpace.constants import DIFFUSION_COEFFICIENTS, TIME_MARKERS, SPACE_MARKERS, base_time
+from timeSpace.constants import DIFFUSION_COEFFICIENTS, TIME_MARKERS, SPACE_MARKERS, base_time, COORD_ORIENTATION_COL
 from timeSpace.calculations import calculate_diffusion_length, calculate_sphere_volume
 
 DEFAULT_FONT_SIZE = "14pt"
@@ -91,10 +91,13 @@ def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True,
     Parameters
     ----------
     space_on_x : bool
-        If True (default), x=Space, y=Time (reversed). If False, x=Time, y=Space.
+        If True (default), x=Space, y=Time (time axis reversed, large
+        timescales at the bottom). If False, x=Time, y=Space. The conventional
+        Stommel layout puts spatial scale on x and temporal scale on y
+        (Stommel 1963), i.e. space_on_x=True — the package default.
     x_axis_location : str
-        Where the x axis is drawn: "above" (default) or "below". Use "below"
-        for a conventional time-on-bottom Stommel layout with space_on_x=False.
+        Where the x axis is drawn: "above" (default) or "below". This only
+        moves the x axis; it does not change which quantity is on x.
     """
     if space_on_x:
         xl, yl = "Space (m\u00b3)", "Time (s)"
@@ -316,6 +319,28 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True, time_m
     return p
 
 
+def _check_coord_orientation(process_df, space_on_x):
+    """Raise if ellipse coords were baked with a different space_on_x (#23).
+
+    The ETL transforms stamp COORD_ORIENTATION_COL with the space_on_x used to
+    bake x_coords/y_coords. Ellipse glyphs plot those coords positionally
+    (unlike vline/hline/point, which re-swap at render time), so a plotting
+    space_on_x that disagrees transposes the ellipses silently. When the column
+    is absent (hand-built frame) there is nothing to check.
+    """
+    if COORD_ORIENTATION_COL not in process_df.columns:
+        return
+    stamped = process_df[COORD_ORIENTATION_COL]
+    mismatched = stamped != space_on_x
+    if mismatched.any():
+        baked = stamped[mismatched].iloc[0]
+        raise ValueError(
+            f"space_on_x mismatch: ellipse coords were baked with space_on_x={baked!r} "
+            f"but plotting was called with space_on_x={space_on_x!r}. Pass the same "
+            f"space_on_x to the transform and to add_processes/add_predefined_processes."
+        )
+
+
 def _render_glyph(p, row, color, alpha, visible, legend_label, space_on_x=True):
     """Render a single process glyph based on its geometry classification.
 
@@ -439,6 +464,7 @@ def add_predefined_processes(p, process_df, interactive=True, font_size=DEFAULT_
             f"process_df is missing columns: {missing}. "
             f"Did you forget to call transform_predefined_processes() first?"
         )
+    _check_coord_orientation(process_df, space_on_x)
     visible = not interactive
     for i, row in process_df.iterrows():
         row_visible = _resolve_start_visible(row, default=visible)
@@ -518,6 +544,7 @@ def add_processes(
             f"process_df is missing columns: {missing}. "
             f"Did you forget to call transform_process_response_sheet() first?"
         )
+    _check_coord_orientation(process_df, space_on_x)
     visible = not interactive
     has_col = "label_side" in process_df.columns
 
