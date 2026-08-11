@@ -6,10 +6,8 @@ authors:
   - given-names: Madison
     family-names: Dunitz
     orcid: "https://orcid.org/0000-0001-7062-7528"
-   - type: doi
-     value: "10.5281/zenodo.21882384"
-     description: "Concept DOI (all versions)"
-repository-code: "https://github.com/MDunitz/timeSpace"
+doi: 10.5281/zenodo.21882384
+url: "https://github.com/MDunitz/timeSpace"
 license: MIT
 version: 0.2.0
 date-released: "2026-08-10"
@@ -17,7 +15,7 @@ abstract: >-
   timeSpace is a Python package for visualizing biogeochemical and physical
   processes on log-log Stommel diagrams. Processes are rendered as ellipses
   sized to their characteristic time and space ranges, with diffusion lines
-  and a speed-of-light causality boundary overlaid to show transport regimes.
+  and a speed-of-light boundary overlaid to show transport regimes.
 keywords:
   - stommel-diagram
   - biogeochemistry
