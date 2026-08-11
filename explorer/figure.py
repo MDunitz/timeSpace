@@ -10,8 +10,9 @@ from .config import X_RANGE, Y_RANGE, FONT_SIZE, LABEL_FONT_SIZE
 
 def create_figure():
     p = figure(
-        width=800,
-        height=550,
+        width=1200,
+        height=720,
+        sizing_mode="stretch_width",
         x_axis_type="log",
         y_axis_type="log",
         x_axis_label="Time (s)",
