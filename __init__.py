@@ -36,6 +36,8 @@ __all__ = [
     # Label placement
     "resolve_label_overlaps",
     "count_overlaps",
+    # Color
+    "set_color_palettes_by_lab",
     # ETL
     "transform_process_response_sheet",
     "transform_predefined_processes",
@@ -80,7 +82,11 @@ from timeSpace.measurements import (
 )
 
 # Label collision detection
-from timeSpace.plotting_helpers import resolve_label_overlaps, count_overlaps
+from timeSpace.plotting_helpers import (
+    resolve_label_overlaps,
+    count_overlaps,
+    set_color_palettes_by_lab,
+)
 
 # Icons
 from timeSpace.icons import add_icons

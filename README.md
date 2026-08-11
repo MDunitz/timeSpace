@@ -100,11 +100,18 @@ If you installed via pip (no git clone), you can fetch sheet data directly:
 
 ```python
 from timeSpace import extract_google_sheet
-from timeSpace.etl import transform_process_response_sheet
+from timeSpace.etl import normalize_form_responses, transform_process_response_sheet
 
 df = extract_google_sheet(spreadsheet_id="YOUR_SHEET_ID", data_name="processes")
-processed = transform_process_response_sheet(df)
+processed = transform_process_response_sheet(normalize_form_responses(df))
 ```
+
+A form response sheet's column headers are the form's *question titles*
+("Minimum Time Scale", and so on), which the transforms do not recognize.
+`normalize_form_responses()` maps them to the internal schema and is tolerant
+of the leading/trailing whitespace Google Forms sometimes adds to question
+titles. Skipping it raises `DataFrame missing required columns: {'Time_min',
+...}`. For measurement sheets use `normalize_measurement_form_responses()`.
 
 ### Setting up a processes form
 
@@ -112,8 +119,22 @@ processed = transform_process_response_sheet(df)
 2. After renaming the form / updating the description and questions, go to the Responses tab and click "Link to Sheets"
 3. Update the permissions on the newly created sheet to be viewable by anyone with the link
 4. Copy the sheet URL
-5. In `constants.py`, set `PROCESSES_URI` to the identifying string between `/d/` and `/edit` in the sheet URL.
+5. Take the identifying string between `/d/` and `/edit` in the sheet URL — this is the sheet ID you pass to the CLI or to `extract_google_sheet()`.
    For example: `https://docs.google.com/spreadsheets/d/USE_THIS_PART/edit?gid=0#gid=0`
+6. Render it:
+
+   ```bash
+   timespace --sheet-id YOUR_SHEET_ID --form --output activity.html
+   ```
+
+   `--form` accepts the response sheet exactly as the form emits it: no column
+   renaming, and colors are assigned automatically per Lab (the form has no
+   colour question). Add `--sheet-gid GID` if responses are not on the first
+   tab; the GID is the number after `gid=` in the sheet URL.
+
+> Step 3 is not optional. If the response sheet is not shared, the fetch
+> returns Google's sign-in page rather than CSV and parsing fails with an
+> opaque error, not a permissions message.
 
 > **Editing the Time / Space scale answer options**
 >
@@ -124,7 +145,17 @@ processed = transform_process_response_sheet(df)
 
 ### Setting up a measurement form
 
-Follow the same steps as above, using [the measurement form template](https://docs.google.com/forms/d/1Wgsb8KwUu9fzQxjjUkl0k8FMhjqbjOoqyNEfxLSU7Io/copy), and set `MEASUREMENTS_URI` in `constants.py`.
+Follow the same steps as above, using [the measurement form template](https://docs.google.com/forms/d/1Wgsb8KwUu9fzQxjjUkl0k8FMhjqbjOoqyNEfxLSU7Io/copy) — including making the response sheet viewable by anyone with the link.
+
+Measurement sheets have no `--form` CLI path yet ([#82](https://github.com/MDunitz/timeSpace/issues/82)); use them from Python:
+
+```python
+from timeSpace.data_processing import extract_google_sheet
+from timeSpace.etl import normalize_measurement_form_responses, transform_measurement_sheet
+
+df = extract_google_sheet(spreadsheet_id="YOUR_SHEET_ID", data_name="measurements")
+processed = transform_measurement_sheet(normalize_measurement_form_responses(df))
+```
 
 ### Setting up predefined processes
 
@@ -136,11 +167,15 @@ Follow the same steps as above, using [the measurement form template](https://do
 
 ```python
 from timeSpace.data_processing import extract_google_sheet
-from timeSpace.etl import transform_process_response_sheet
+from timeSpace.etl import normalize_form_responses, transform_process_response_sheet
+from timeSpace.plotting_helpers import set_color_palettes_by_lab
 
 # Fetch sheet data (caches locally as CSV)
 df = extract_google_sheet(spreadsheet_id="YOUR_SHEET_ID", data_name="processes")
-processed = transform_process_response_sheet(df)
+processed = transform_process_response_sheet(normalize_form_responses(df))
+
+# Forms collect no colour; assign one ramp per Lab before plotting
+processed = set_color_palettes_by_lab(processed)
 ```
 
 ## Bokeh Output Modes
@@ -212,6 +247,7 @@ from timeSpace import (
     count_overlaps,          # Count remaining label overlaps after placement
 
     # ETL
+    normalize_form_responses,          # Map form question titles -> ETL schema
     transform_process_response_sheet,  # Clean Google Form responses
     transform_predefined_processes,    # Prepare bundled CSV for plotting
     transform_measurement_sheet,       # Clean measurement form responses

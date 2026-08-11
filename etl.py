@@ -2,7 +2,15 @@ import warnings
 
 import numpy as np
 
-from timeSpace.constants import base_space, base_time, POSSIBLE_COL_LIST, COORD_ORIENTATION_COL
+from timeSpace.constants import (
+    base_space,
+    base_time,
+    POSSIBLE_COL_LIST,
+    COORD_ORIENTATION_COL,
+    PROCESS_FORM_COLUMN_MAP,
+    MEASUREMENT_FORM_COLUMN_MAP,
+)
+
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.plotting_helpers import (
     create_name,
@@ -39,6 +47,59 @@ def process_magnitude_column(row, column):
         return float(new_val) * base_time
     elif column.startswith("Space"):
         return float(new_val) * base_space
+
+
+def normalize_form_responses(responses_df, column_map=PROCESS_FORM_COLUMN_MAP):
+    """Rename raw Google Form question titles to the internal ETL schema.
+
+    Entry point for anyone who copies a template form and collects their own
+    responses: the response sheet's headers are the form's question titles,
+    which the transforms do not recognize. This maps them, tolerating the
+    leading/trailing whitespace Google Forms intermittently emits in question
+    titles (the failure mode behind the #77 ETL breakage), which an exact
+    dict rename silently no-ops on.
+
+    Parameters
+    ----------
+    responses_df : DataFrame
+        Raw form response sheet, headers as form question titles.
+    column_map : dict
+        Question title -> internal column name. Use
+        PROCESS_FORM_COLUMN_MAP (default) or MEASUREMENT_FORM_COLUMN_MAP.
+
+    Returns
+    -------
+    DataFrame
+        Copy with mapped columns renamed. Unmapped columns (Timestamp, the
+        free-text questions) are retained and dropped later by the
+        transforms' column filtering.
+
+    Raises
+    ------
+    ValueError
+        If any mapped question is absent from the sheet, naming the missing
+        questions and listing what the sheet does contain. A renamed or
+        deleted form question surfaces here rather than as a confusing
+        "missing required columns: {Time_min, ...}" further downstream.
+    """
+    stripped = {str(c).strip(): c for c in responses_df.columns}
+    missing = set(column_map) - set(stripped)
+    if missing:
+        raise ValueError(
+            f"Form response sheet is missing expected questions: {sorted(missing)}. "
+            f"Sheet has: {sorted(stripped)}. "
+            f"If the form was edited, update the column map in timeSpace.constants."
+        )
+    rename = {stripped[question]: internal for question, internal in column_map.items()}
+    return responses_df.rename(columns=rename)
+
+
+def normalize_measurement_form_responses(responses_df):
+    """Rename raw measurement-form question titles to the internal ETL schema.
+
+    Thin wrapper over normalize_form_responses with the measurement column map.
+    """
+    return normalize_form_responses(responses_df, column_map=MEASUREMENT_FORM_COLUMN_MAP)
 
 
 def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_COL_LIST, space_on_x=True, n_points=1000):
@@ -85,6 +146,14 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
 
     columns_list = list(set(possible_col_list) & set(responses_df.columns))
     plottable_responses_df = responses_df[columns_list].copy()
+
+    # Drop incomplete responses before parsing: a plottable process needs all
+    # four bounds and, when a name column is present, a name. Real forms admit
+    # partial submissions, whose NaN cells would otherwise reach the unit parse.
+    drop_subset = ["Time_min", "Time_max", "Space_min", "Space_max"]
+    if "ShortName" in plottable_responses_df.columns:
+        drop_subset.append("ShortName")
+    plottable_responses_df = plottable_responses_df.dropna(subset=drop_subset).reset_index(drop=True)
 
     for column in ["Time_min", "Time_max", "Space_min", "Space_max"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
@@ -222,6 +291,10 @@ def transform_measurement_sheet(sheet_df):
             "Spatial Scale": "Space",
         }
     )
+    # Drop incomplete responses before parsing: a plottable measurement needs
+    # both scales and, when present, a name.
+    drop_subset = [c for c in ["Time", "Space", "ShortName"] if c in plottable_responses_df.columns]
+    plottable_responses_df = plottable_responses_df.dropna(subset=drop_subset).reset_index(drop=True)
     for column in ["Time", "Space"]:
         plottable_responses_df[column] = plottable_responses_df.apply(process_magnitude_column, column=column, axis=1)
     plottable_responses_df["Name"] = plottable_responses_df.apply(create_name, axis=1)
