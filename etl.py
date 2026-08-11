@@ -6,7 +6,7 @@ from timeSpace.constants import (
     base_space,
     base_time,
     POSSIBLE_COL_LIST,
-    COORD_ORIENTATION_COL
+    COORD_ORIENTATION_COL,
     PROCESS_FORM_COLUMN_MAP,
     MEASUREMENT_FORM_COLUMN_MAP,
 )
