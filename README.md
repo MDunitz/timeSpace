@@ -4,6 +4,8 @@ Stommel diagrams for visualizing biogeochemical and physical processes across sc
 
 [![tests](https://github.com/MDunitz/timeSpace/actions/workflows/test.yml/badge.svg)](https://github.com/MDunitz/timeSpace/actions/workflows/test.yml)
 
+[![DOI](https://zenodo.org/badge/1220512801.svg)](https://doi.org/10.5281/zenodo.21882383)
+
 ## What it does
 
 timeSpace plots processes and reference objects on log-log Stommel diagrams — a visualization framework where the x-axis represents spatial scale (m³) and the y-axis represents temporal scale (s), as shown in Fig. 1. 
