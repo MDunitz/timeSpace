@@ -45,9 +45,10 @@ timespace = "timeSpace.cli:main"
 
 [tool.setuptools.package-dir]
 timeSpace = "."
+"timeSpace.explorer" = "explorer"
 
 [tool.setuptools]
-packages = ["timeSpace"]
+packages = ["timeSpace", "timeSpace.explorer"]
 
 [tool.setuptools.package-data]
 timeSpace = [
