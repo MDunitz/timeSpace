@@ -6,7 +6,9 @@ Stommel diagrams for visualizing biogeochemical and physical processes across sc
 
 ## What it does
 
-timeSpace plots processes and reference objects on log-log Stommel diagrams — a visualization framework where the x-axis represents spatial scale (m³) and the y-axis represents temporal scale (s), as shown in Boyd et al. (2015) Fig. 1. See [CONVENTIONS.md](https://github.com/MDunitz/timeSpace/blob/main/CONVENTIONS.md) for details on axis orientation and units. Processes are rendered as ellipses sized to their characteristic ranges, with diffusion lines overlaid to show transport regimes. This makes it easy to see which processes dominate at which scales and how they relate to one another.
+timeSpace plots processes and reference objects on log-log Stommel diagrams — a visualization framework where the x-axis represents spatial scale (m³) and the y-axis represents temporal scale (s), as shown in Fig. 1. 
+
+See [CONVENTIONS.md](https://github.com/MDunitz/timeSpace/blob/main/CONVENTIONS.md) for details on axis orientation and units. Processes are rendered as ellipses sized to their characteristic ranges, with diffusion lines overlaid to show transport regimes. This makes it easy to see which processes dominate at which scales and how they relate to one another.
 
 ![Stommel diagram showing biogeochemical processes plotted on log-log time × space axes](https://raw.githubusercontent.com/MDunitz/timeSpace/main/docs/images/stommel_diagram_example.png)
 
@@ -72,7 +74,7 @@ See [CONVENTIONS.md](https://github.com/MDunitz/timeSpace/blob/main/CONVENTIONS.
 
 ## Plotting Functions: add_processes vs add_predefined_processes
 
-Use `add_predefined_processes(p, df)` for the bundled Boyd (2015) dataset — it expects data from `transform_predefined_processes()` with pre-assigned colors and categories.
+Use `add_predefined_processes(p, df)` for a prebundled set of processe spanning time and space —  it expects data processed via  `transform_predefined_processes()` with pre-assigned colors and categories.
 
 Use `add_processes(p, df)` for your own data — it supports grouping, custom colors via `category_col` and `category_colors`, and per-row `label_side` control. Expects data from `transform_process_response_sheet()`.
 
