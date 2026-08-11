@@ -6,9 +6,11 @@ from timeSpace.constants import (
     base_space,
     base_time,
     POSSIBLE_COL_LIST,
+    COORD_ORIENTATION_COL
     PROCESS_FORM_COLUMN_MAP,
     MEASUREMENT_FORM_COLUMN_MAP,
 )
+
 from timeSpace.calculations import create_ellipse_data, classify_process_geometry
 from timeSpace.plotting_helpers import (
     create_name,
@@ -115,7 +117,8 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
     space_on_x : bool
         Axis order to bake into ellipse `x_coords`/`y_coords`. Must match the
         `space_on_x` passed to plotting functions (`add_processes`,
-        `create_space_time_figure`). Default True (Stommel: x=space, y=time).
+        `create_space_time_figure`). Default True — the conventional Stommel
+        layout, x=space, y=time (Stommel 1963).
     n_points : int
         Number of x samples per half-ellipse (total vertices = 2 * n_points).
         Default 1000 (smooth curves, ~16 KB per ellipse in serialized HTML).
@@ -172,6 +175,7 @@ def transform_process_response_sheet(responses_df, possible_col_list=POSSIBLE_CO
             .rename(columns={0: "x_coords", 1: "y_coords"})
         )
         plottable_responses_df.loc[ellipse_mask, ["x_coords", "y_coords"]] = ellipse_coords
+    plottable_responses_df[COORD_ORIENTATION_COL] = space_on_x
     return plottable_responses_df
 
 
@@ -244,6 +248,7 @@ def transform_predefined_processes(plottable_responses_df, space_on_x=True, warn
         plottable_responses_df.loc[ellipse_mask, ["x_coords", "y_coords"]] = ellipse_coords
     plottable_responses_df["FillAlpha"] = plottable_responses_df.apply(set_fill_alpha, axis=1)
     plottable_responses_df["TextAlpha"] = plottable_responses_df.apply(lambda row: min(1, 3 * row["FillAlpha"]), axis=1)
+    plottable_responses_df[COORD_ORIENTATION_COL] = space_on_x
     return plottable_responses_df
 
 

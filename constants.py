@@ -30,6 +30,10 @@ colors = [
 
 POSSIBLE_COL_LIST = ["Prefix", "ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "Color", "Lab", "icon"]
 
+# Column stamped by the ETL transforms with the space_on_x used to bake
+# x_coords/y_coords, so plotting can detect an orientation mismatch (#23).
+COORD_ORIENTATION_COL = "_coord_orientation"
+
 
 PREDEFINED_PROCESSES_URI = "16ENjOsx4j2DD24mz0k-I08zF3R0CkfiujjqyYCGuAxg"
 PROCESSES_URI = "14WirbmkElI-ALP9dBNciObL_nnpNwkGc2cfh_7Wm7YQ"
