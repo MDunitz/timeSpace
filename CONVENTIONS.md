@@ -32,18 +32,22 @@ approximation, treating that length as the sphere **radius** *r*:
 
     V = (4/3) π r³        (calculate_sphere_volume)
 
-**Radius-vs-diameter trap.** For a particle, "characteristic length"
-usually means a *diameter*; feeding a diameter into the formula above (or
-into `calculate_sphere_volume`) over-estimates the volume by 2³ = 8×. If
-your length is a diameter *d*, halve it first, or use
-`calculate_sphere_volume_from_diameter(d)`, which computes V = (π/6) d³.
+**Radius-vs-diameter trap.** The volumes for many of the given
+examples were calculated from length values found in the literature, most 
+are given as a radius and that is assumed default but, characteristic lengths 
+can be a radius or a diameter depending on conventions around the specific 
+example. For a particle, "characteristic length" usually means a 
+*diameter*; but feeding a diameter into the formula above (or
+into `calculate_sphere_volume`) over-estimates the volume by 2³ = 8×. 
+`calculate_sphere_volume_from_diameter(d)`, which computes V = (π/6) d³ 
+is provided as a helper function if your initial values are given as diameters.
 
 Note that the "N cubic X" label ladder below uses a **cube** of side *s*,
 V = s³ — not this sphere. At equal characteristic length read as
 radius = side, the sphere is (4/3)π ≈ 4.19× the cube; read as
 diameter = side, the sphere is (π/6) ≈ 0.52× the cube (i.e. the cube is
-1.91× larger). The ladder is a decade scale, not a particle model, so the
-two conventions are not meant to coincide.
+1.91× larger). The ladder is a log scale representing ~30 orders of magnitude, 
+not a particle model, so the two conventions are not meant to coincide.
 
 This sphere approximation assumes **isotropy**. Ocean processes are famously anisotropic —
 horizontal length scales are often 10²–10⁴× larger than vertical scales.
@@ -186,10 +190,6 @@ so `hecto (h)` is (100 m)³ = 1e6 m³ and `deka (da)` is (10 m)³ = 1e3 m³.
 | 1e15 | 100s of cubic km | 100 km | |
 | 1e18 | cubic Mm | 1 Mm | ≈ global ocean (1.37e18 m³) |
 
-The convention was previously recorded only in a `Notes` cell on one row
-of `data/datasets/models.csv`. Read conventionally, `10 cubic µm` parses
-as 10 µm³ and every rung looks 100× off — it is not, but nothing outside
-that one cell said so.
 
 The anchors are **volumes, not diameters**. A rung's anchor is an object
 whose *volume* lands on that rung, which is not the object whose diameter
