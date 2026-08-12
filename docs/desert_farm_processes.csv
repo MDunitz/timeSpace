@@ -9,15 +9,16 @@ Photoacclimation (Chl:C adjustment),Photoacclimation,3600,86400,1e-16,1e-14,Cell
 Algae cell division,Cell division,21600,172800,1e-16,1e-14,Cellular,Chemical
 Lipid accumulation (N-starved),Lipid accumul.,86400,864000,1e-16,1e-14,Cellular,Chemical
 Biofilm/floc formation,Biofilm/floc,3600,86400,1e-12,1e-9,Cellular,Chemical
-Light penetration and attenuation,Light atten.,10,3600,1e2,4e3,Pond,Radiative
-Paddle wheel mixing,Mixing,300,1800,1e3,1e4,Pond,Mechanical
-Chemical dosing (pH/CO2/nutrients),Dosing,60,86400,1e3,1e4,Pond,Chemical
-Harvest cycle,Harvest,86400,604800,1e3,1e4,Pond,Mechanical
-Evaporation,Evaporation,86400,2592000,1e3,1e4,Pond,Thermal
-Culture crash/restart,Culture crash,604800,2592000,1e3,1e4,Pond,Chemical
-Water and energy systems,Water/energy,43200,2592000,1e6,1e8,Facility,Mechanical
-Growth campaign,Growth campaign,604800,2592000,1e6,1e8,Facility,Chemical
-Seasonal productivity,Seasonal prod.,2592000,31536000,1e6,1e8,Facility,Radiative
-Carbon capture (annual budget),Carbon capture,3.2e7,3.2e8,1e17,5e18,Global,Chemical
+Light penetration and attenuation,Euphotic layer,10,3600,5e2,5e3,Pond,Radiative
+Paddle wheel mixing,Mixing,300,1800,1e4,1e5,Pond,Mechanical
+Chemical dosing (pH/CO2/nutrients),Dosing,60,86400,1e4,1e5,Pond,Chemical
+Harvest cycle,Harvest,86400,604800,1e4,1e5,Pond,Mechanical
+Evaporation,Evaporation,86400,2592000,1e4,1e5,Pond,Thermal
+Culture crash/restart,Culture crash,604800,2592000,1e4,1e5,Pond,Chemical
+Water and energy systems,Water/energy,43200,2592000,1e7,1e9,Facility,Mechanical
+Growth campaign,Growth campaign,604800,2592000,1e7,1e9,Facility,Chemical
+Seasonal productivity,Seasonal prod.,2592000,31536000,1e7,1e9,Facility,Radiative
+Carbon captured as CO2 gas,CO₂ captured (gas),3.2e7,3.2e8,1.7e8,1.7e9,Facility,Chemical
+Carbon fixed as wet biomass,Wet biomass,3.2e7,3.2e8,8.8e5,3.5e7,Facility,Chemical
 Ocean-atmosphere equilibration,Ocean equil.,3.2e7,3.2e10,2.7e16,1.3e18,Global,Chemical
 Atmospheric CO2 and climate,Atmos. CO₂/climate,3.2e9,3.2e12,4e18,5.6e18,Global,Radiative
