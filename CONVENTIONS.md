@@ -8,8 +8,9 @@ choices follow the literature and which are implementation decisions.
 
 The default figure layout (`create_space_time_figure`) places **Space (m³)
 on the x-axis (top)** and **Time (s) on the y-axis (left, reversed)**.
-Small times are at the top, large times at the bottom. This matches the
-layout used in Boyd et al. (2015) Fig. 1.
+Small times are at the top, large times at the bottom. The axes can be switched
+and the x-axis can be set at the top or bottom based on asthetic preferences
+via the exposed plotting functions.
 
 Stommel diagrams appear in the literature with both orientations — the
 original Stommel (1963) paper was a 3D spectral diagram of sea level
@@ -20,8 +21,7 @@ space on x and time on y; `space_on_x=False` swaps them.
 
 ## Spatial scale as volume (m³)
 
-All spatial scales are expressed in **cubic metres** (m³). Boyd et al.
-(2015) used characteristic length on the spatial axis; this package
+All spatial scales are expressed in **cubic metres** (m³). This package
 converts lengths to volumes so that a single axis can represent spatial
 extent consistently across scales. This is a deliberate simplification:
 real processes may be better characterised by length, area, or
@@ -68,9 +68,9 @@ molecule undergoing three-dimensional Brownian motion. Combined with
 `calculate_sphere_volume` (V = 4/3·π·L³), it produces the diffusion
 volume plotted on the Stommel diagram spatial axis.
 
-Note: Boyd et al. (2015) used the 1D mean displacement √(4Dt/π), which
-gives volumes ~11× smaller. We use the 3D formula because the spatial
-axis represents volume — the 3D displacement is the physically correct
+Note the 1D mean displacement √(4Dt/π), gives volumes ~11× smaller. 
+We use the 3D formula because the spatial axis represents volume — 
+the 3D displacement is the physically correct
 radius for "how much space has this molecule explored."
 
 ## Speed-of-light causality boundary
