@@ -119,7 +119,7 @@ def build_explorer(csv_path, output_path, mode="select"):
         clear_btn.js_on_click(clear_toggle_cb)
 
         controls = row(cat_checkbox, obj_select, clear_btn)
-        layout = column(controls, info_div, p)
+        layout = column(controls, info_div, p, sizing_mode="stretch_width")
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
             "<p>102 reference objects across 10 categories. Toggle categories with the "
@@ -201,7 +201,7 @@ def build_explorer(csv_path, output_path, mode="select"):
     # ── Layout ─────────────────────────────────────────────────────
     dropdown_row = row(cat_select, obj_select, clear_btn)
     custom_row = row(custom_name, custom_tmin, custom_tmax, custom_smin, custom_smax, custom_btn)
-    layout = column(dropdown_row, custom_row, info_div, p)
+    layout = column(dropdown_row, custom_row, info_div, p, sizing_mode="stretch_width")
 
     header = (
         "<h2>timeSpace — Reference Object Explorer</h2>"

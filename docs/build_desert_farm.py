@@ -66,11 +66,12 @@ def build_desert_farm_figure(csv_path, output_path):
     df = load_processes(csv_path)
 
     p = create_space_time_figure(
-        width=900,
-        height=650,
+        width=1200,
+        height=720,
         title="Desert Farm — Processes Across Scale",
         space_on_x=False,
     )
+    p.sizing_mode = "stretch_width"
     p.x_range.start, p.x_range.end = X_RANGE
     p.y_range.start, p.y_range.end = Y_RANGE
     p.title.text_font_size = "16pt"
@@ -114,7 +115,7 @@ def build_desert_farm_figure(csv_path, output_path):
                     space_display=[
                         _hover_display(r.Space_min.value, r.Space_max.value, "m³") for _, r in ell.iterrows()
                     ],
-                    label_x=[row.Time_max.value for _, row in ell.iterrows()],
+                    label_x=ell.label_x.tolist(),
                     label_y=ell.label_y.tolist(),
                 )
             )
@@ -134,12 +135,11 @@ def build_desert_farm_figure(csv_path, output_path):
                 "label_y",
                 source=source,
                 text="short_name",
-                text_font_size="7pt",
+                text_font_size="8pt",
                 text_color=color,
-                text_alpha=0.9,
-                text_align="left",
+                text_alpha=0.95,
+                text_align="center",
                 text_baseline="middle",
-                x_offset=5,
             )
             renderers.extend([patch_r, text_r])
 
