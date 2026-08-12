@@ -26,8 +26,8 @@ from timeSpace.plotting import create_space_time_figure, add_magnitude_labels
 from timeSpace.energy import ENERGY_COLORS, assign_energy_colors, energy_types_present
 
 # ── Configuration ──────────────────────────────────────────────────
-X_RANGE = (1e-3, 1e13)
-Y_RANGE = (1e-28, 1e22)
+X_RANGE = (1e-4, 1e13)
+Y_RANGE = (1e-26, 1e20)
 
 EXPLORER_N_POINTS = 100
 
