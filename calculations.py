@@ -175,7 +175,7 @@ def create_ellipse_data(row, n_points=1000, space_on_x=True):
     n_points : int
         Number of x samples per half-ellipse. Total vertices = 2 * n_points.
     space_on_x : bool
-        True (default): x=space, y=time (Boyd et al. 2015 Fig. 1 layout)
+        True (default): x=space, y=time (Boyd et al. 2016 Fig. 1 layout)
         False: x=time, y=space (original Stommel 1963 orientation)
     """
     time_min, time_max = row.Time_min.value, row.Time_max.value
