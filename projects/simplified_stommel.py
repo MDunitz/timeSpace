@@ -7,7 +7,7 @@ Creates a time-space plot with:
 - Labels positioned at the axes
 - Ellipse patches with labels (similar to oceanographic Stommel diagrams)
 
-Based on Boyd et al. (2015), adapted from Dickey (2003).
+Based on Boyd et al. (2016), adapted from Dickey (2003).
 """
 
 import os
@@ -39,7 +39,7 @@ def transform_data(config_data):
     data["Prefix"] = data.apply(lambda x: x["ShortName"][0:3], axis=1)
 
     columns = ["Prefix", "ShortName", "Time_min", "Time_max", "Space_min", "Space_max", "Color"]
-    # Top-level ETL defaults to space_on_x=True (Boyd 2015 orientation: x=space, y=time)
+    # Top-level ETL defaults to space_on_x=True (Boyd 2016 orientation: x=space, y=time)
     transformed_data = transform_process_response_sheet(data, possible_col_list=columns)
     transformed_data = set_color_by_prefix(transformed_data)
 
@@ -58,7 +58,7 @@ def make_simplified_plot(transformed_data, title="Stommel Diagram"):
 
 if __name__ == "__main__":
     config_data = {
-        "title": "Oceanographic Time-Space Scales (Boyd et al. 2015)",
+        "title": "Oceanographic Time-Space Scales (Boyd et al. 2016)",
         "output_file": "stommel-boyd2015",
         "concept_name": "Process",
     }

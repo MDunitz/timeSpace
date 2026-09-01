@@ -4,6 +4,7 @@ Standalone reference data — not coupled to any specific dataset in this repo.
 
 ## Files
 
+- `stommel_references.md` — full citations for the Stommel/Boyd datasets (`stommel_boyd2015*.csv`, `models.csv`), including the BioGeoSCAPES Fig. 3.4 numbered-model references and the Boyd et al. (2016) background-schematic citation.
 - `bionumbers_subset.csv` — curated phototroph-relevant entries from the [BioNumbers database](https://bionumbers.hms.harvard.edu/) (Milo & Phillips, *Cell Biology by the Numbers*) with stable `bion_id` identifiers and direct URLs.
 
 ## `bionumbers_subset.csv` schema
