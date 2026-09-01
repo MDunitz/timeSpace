@@ -119,7 +119,7 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 def demo(show=True):
-    """Build and optionally display the default Stommel diagram with Boyd (2015) data.
+    """Build and optionally display the default Stommel diagram with Boyd et al. (2016) data.
 
     A one-liner to verify your install works and see what timeSpace produces::
 
@@ -135,7 +135,7 @@ def demo(show=True):
     -------
     bokeh.plotting.Figure
         The assembled Stommel diagram figure with magnitude labels,
-        diffusion lines, light cone, Boyd (2015) processes, and legend.
+        diffusion lines, light cone, Boyd et al. (2016) processes, and legend.
     """
     import pandas as pd
 
