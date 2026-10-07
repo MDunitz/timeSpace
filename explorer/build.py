@@ -10,7 +10,7 @@ callbacks with Python callbacks.
 from bokeh.models import CustomJS, Select, TextInput, Button, Div, CheckboxGroup
 from bokeh.layouts import column, row
 
-from .config import CATEGORY_COLORS, DIY_LINKS_HTML
+from .config import CATEGORY_COLORS, DIY_LINKS_HTML, LABEL_MAX_OBJECTS
 from .data import data_ranges, load_reference_objects
 from .figure import create_figure
 from .sources import add_reference_glyphs, add_custom_glyphs
@@ -102,6 +102,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             data=full_data,
             cats=cat_labels,
             label_lone_category=not toggle,
+            label_max_objects=LABEL_MAX_OBJECTS,
             empty_text=empty_text,
         ),
         code=VISIBILITY_JS,
