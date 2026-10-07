@@ -56,3 +56,23 @@ class TestPointMarkersHiddenOnLoad:
         for r in scatters:
             assert r.glyph.line_alpha == r.glyph.fill_alpha
             assert set(r.data_source.data["alpha"]) == {0.0}
+
+
+class TestReferenceInTooltip:
+    def test_every_object_has_source_text_and_tooltip_shows_it(self):
+        from bokeh.models import HoverTool
+
+        from timeSpace.explorer.config import UNSOURCED_LABEL
+        from timeSpace.explorer.data import load_reference_objects
+        from timeSpace.explorer.figure import create_figure
+        from timeSpace.explorer.sources import add_reference_glyphs
+
+        p = create_figure()
+        source, *_ = add_reference_glyphs(p, load_reference_objects(str(CSV)))
+        refs = source.data["reference"]
+        assert len(refs) == len(source.data["name"])
+        assert all(isinstance(r, str) and r for r in refs)
+        assert UNSOURCED_LABEL in refs
+        assert any(r != UNSOURCED_LABEL for r in refs)
+        hover = [t for t in p.tools if isinstance(t, HoverTool)][-1]
+        assert "@reference" in hover.tooltips
