@@ -97,7 +97,7 @@ Stalactite growth (1 m),32000000000.0,320000000000.0,0.001,0.1,Geological,Averag
 Fossil formation (mineralization),3200000000000.0,320000000000000.0,1e-06,0.01,Geological,
 Coal seam formation,320000000000000.0,3200000000000000.0,1000000000.0,1000000000000.0,Geological,
 Earth's rotation (1 day),86400.0,86400.0,1.08e+21,1.08e+21,Planetary,Mean solar day 86400 s by definition. Volume 1.08e21 m3: sphere of the IAU nominal equatorial radius 6378.1 km is 1.087e21 m3 and the polar flattening removes ~0.3 percent
-Earth's orbit (1 year),31500000.0,31500000.0,1.08e+21,1.08e+21,Planetary,One year is 3.156e7 s. The volume is the Earth's own (1.08e21 m3) and not the volume swept by the orbit
+Earth's orbit (1 year),31560000.0,31560000.0,1.08e+21,1.08e+21,Planetary,One year is 3.156e7 s. The volume is the Earth's own (1.08e21 m3) and not the volume swept by the orbit
 Moon formation,3600.0,32000000.0,2.2e+19,2.2e+19,Planetary,Hours: Kegerreis et al. (2022) ApJ Letters arXiv:2210.01814 (satellite placed in orbit immediately). Up to ~1 yr: Ida Canup & Stewart (1997) Nature 25 Sept 1997 (accretion from the impact disk in a year or less). Volume is the present Moon
 Earth's age,1.43e+17,1.43e+17,1.08e+21,1.08e+21,Planetary,USGS Geologic Time: Age of the Earth — 4.54 billion years with an uncertainty of less than 1 percent (1.43e17 s). Volume is the present Earth
 Sun's main sequence lifetime,3.2e+17,3.2e+17,1.4e+27,1.4e+27,Planetary,NASA Sun facts — the Sun is 4.5 billion years old and a little less than halfway through its lifetime with about 5 billion years left (~10 Gyr = 3.2e17 s). Volume 1.41e27 m3 from the IAU nominal solar radius; 1.3 million Earths
