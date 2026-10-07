@@ -12,6 +12,16 @@ All notable changes to timeSpace are recorded here. Format follows
   off by one to two decades), enzyme catalytic cycle time range, yeast and
   liver-cell volumes. "International Space Station orbit" renamed to
   "International Space Station (service life)" to match its time range.
+- Further reference-object corrections: two citations that did not resolve
+  (giant tortoise, blue whale), ranges for E. coli, giant sequoia, Pando,
+  Moon formation, protein folding, DNA replication, red blood cell, ribosome
+  and Greenland shark, and BioNumbers sources for molecular and cellular rows.
+- Explorer point markers no longer show before an object is selected.
+
+### Added
+- The explorer shows each reference object's source on hover and when an
+  object is picked; rows without one read "not yet sourced".
+- CONVENTIONS.md states how reference-object volumes are defined.
 
 ## [0.2.0] — unreleased
 
