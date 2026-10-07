@@ -4,7 +4,11 @@ All notable changes to timeSpace are recorded here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] — 2026-10-06
+
+Reference objects sourced and corrected, and the explorer reworked around
+them. 0.2.0 was tagged and archived on Zenodo but never uploaded to PyPI, so
+this is the first PyPI release since 0.1.0.
 
 ### Fixed
 - Seven reference-object rows corrected against primary sources and given a
@@ -44,7 +48,7 @@ All notable changes to timeSpace are recorded here. Format follows
   object is picked; rows without one read "not yet sourced".
 - CONVENTIONS.md states how reference-object volumes are defined.
 
-## [0.2.0] — unreleased
+## [0.2.0] — 2026-08-10
 
 First release cut from a tagged commit with a Zenodo DOI. Highlights since 0.1.0:
 
