@@ -4,6 +4,15 @@ All notable changes to timeSpace are recorded here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Seven reference-object rows corrected against primary sources and given a
+  `Reference`: Grand Canyon, Great Wall of China and Hoover Dam volumes (each
+  off by one to two decades), enzyme catalytic cycle time range, yeast and
+  liver-cell volumes. "International Space Station orbit" renamed to
+  "International Space Station (service life)" to match its time range.
+
 ## [0.2.0] — unreleased
 
 First release cut from a tagged commit with a Zenodo DOI. Highlights since 0.1.0:

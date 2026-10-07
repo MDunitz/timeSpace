@@ -38,3 +38,21 @@ class TestToggleMode:
     def test_tiered_labels_marker(self, toggle_html):
         # labels revealed only for the pinned individual
         assert "lal[i] = isSel" in toggle_html
+
+
+class TestPointMarkersHiddenOnLoad:
+    def test_scatter_outline_follows_alpha_column(self):
+        from bokeh.models import Scatter
+
+        from timeSpace.explorer.data import load_reference_objects
+        from timeSpace.explorer.figure import create_figure
+        from timeSpace.explorer.sources import add_custom_glyphs, add_reference_glyphs
+
+        p = create_figure()
+        add_reference_glyphs(p, load_reference_objects(str(CSV)))
+        add_custom_glyphs(p)
+        scatters = [r for r in p.renderers if isinstance(r.glyph, Scatter)]
+        assert len(scatters) == 2
+        for r in scatters:
+            assert r.glyph.line_alpha == r.glyph.fill_alpha
+            assert set(r.data_source.data["alpha"]) == {0.0}

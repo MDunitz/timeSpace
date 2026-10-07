@@ -99,6 +99,7 @@ def add_reference_glyphs(p, df):
         fill_color="color",
         fill_alpha="alpha",
         line_color="color",
+        line_alpha="alpha",
         line_width=1.5,
     )
 
@@ -199,6 +200,7 @@ def add_custom_glyphs(p):
         fill_color="#E8336D",
         fill_alpha="alpha",
         line_color="#E8336D",
+        line_alpha="alpha",
         line_width=2,
     )
 
