@@ -17,6 +17,9 @@ All notable changes to timeSpace are recorded here. Format follows
   Moon formation, protein folding, DNA replication, red blood cell, ribosome
   and Greenland shark, and BioNumbers sources for molecular and cellular rows.
 - Explorer point markers no longer show before an object is selected.
+- Explorer no longer shows tooltips for hidden objects on an empty plot.
+- Explorer axes now cover every reference object; 29 objects (including
+  Earth's orbit and rotation) were partly or wholly outside the old view.
 - Reference objects: 93 of 102 rows now cite a source. Ranges moved where the
   source disagreed (for example mycelial network age, mountain building,
   Pacific Ocean age, Amazon and France volumes, mouse and housefly
@@ -24,6 +27,10 @@ All notable changes to timeSpace are recorded here. Format follows
   still unsourced.
 
 ### Added
+- Explorer tooltips and the picked-object panel show time and volume in
+  readable units (for example "273 – 507 yr", "90 – 100 fL") instead of raw
+  seconds and m³; line and point objects now have tooltips too.
+- Explorer header links to the Colab notebook for plotting your own objects.
 - The explorer shows each reference object's source on hover and when an
   object is picked; rows without one read "not yet sourced".
 - CONVENTIONS.md states how reference-object volumes are defined.
