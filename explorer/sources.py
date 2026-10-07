@@ -7,17 +7,32 @@ objects use parallel patch/line/point/label sources; index alignment across
 the reference sources lets the JS callbacks toggle everything by one index.
 """
 
-from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.models import ColumnDataSource, CustomJS, HoverTool
 
 # HTML template (not the tuple form) so long Reference text wraps.
 REFERENCE_TOOLTIP = """
 <div style="max-width: 360px; font-size: 12px; line-height: 1.35;">
   <div><b>@name</b> <span style="color: #666;">(@category)</span></div>
-  <div>Time: @time_min{%0.1e} → @time_max{%0.1e} s</div>
-  <div>Space: @space_min{%0.1e} → @space_max{%0.1e} m³</div>
+  <div>Time: @time_label</div>
+  <div>Space: @space_label</div>
   <div style="color: #444;">Source: @reference</div>
 </div>
 """
+
+# Hidden objects keep their geometry and are switched off through alpha, so
+# without this filter the hover tool still reports them.
+HOVER_ONLY_VISIBLE_JS = "export default (args, tool, {value}) => value > 0"
+
+
+def _hover_columns(df):
+    """Columns every hoverable reference source carries for the tooltip."""
+    return dict(
+        name=df.FullName.tolist(),
+        category=df.Category.tolist(),
+        reference=df.Reference.tolist(),
+        time_label=df.TimeLabel.tolist(),
+        space_label=df.SpaceLabel.tolist(),
+    )
 
 
 def add_reference_glyphs(p, df):
@@ -42,9 +57,7 @@ def add_reference_glyphs(p, df):
             color=df.Color.tolist(),
             alpha=[0.0] * len(df),  # start hidden
             line_alpha=[0.0] * len(df),
-            name=df.FullName.tolist(),
-            category=df.Category.tolist(),
-            reference=df.Reference.tolist(),
+            **_hover_columns(df),
             time_min=[row.Time_min.value for _, row in df.iterrows()],
             time_max=[row.Time_max.value for _, row in df.iterrows()],
             space_min=[row.Space_min.value for _, row in df.iterrows()],
@@ -79,10 +92,11 @@ def add_reference_glyphs(p, df):
             ys=[_line_coords(row)[1] for _, row in df.iterrows()],
             color=df.Color.tolist(),
             alpha=[0.0] * len(df),
+            **_hover_columns(df),
         )
     )
 
-    p.multi_line(
+    lines = p.multi_line(
         "xs",
         "ys",
         source=line_source,
@@ -98,10 +112,11 @@ def add_reference_glyphs(p, df):
             y=[row.Space_min.value if row.geometry == "point" else float("nan") for _, row in df.iterrows()],
             color=df.Color.tolist(),
             alpha=[0.0] * len(df),
+            **_hover_columns(df),
         )
     )
 
-    p.scatter(
+    points = p.scatter(
         "x",
         "y",
         source=point_source,
@@ -114,16 +129,12 @@ def add_reference_glyphs(p, df):
         line_width=1.5,
     )
 
-    # Hover only on patches renderer (not text glyphs or custom source)
+    # Hover on every reference shape (ellipses, lines and points), not on
+    # text glyphs or the custom source, and only while the shape is shown.
     hover = HoverTool(
-        renderers=[patches],
+        renderers=[patches, lines, points],
         tooltips=REFERENCE_TOOLTIP,
-        formatters={
-            "@time_min": "printf",
-            "@time_max": "printf",
-            "@space_min": "printf",
-            "@space_max": "printf",
-        },
+        filters={"@alpha": CustomJS(code=HOVER_ONLY_VISIBLE_JS)},
     )
     p.add_tools(hover)
 
