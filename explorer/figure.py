@@ -8,7 +8,7 @@ from timeSpace.constants import TIME_MARKERS, SPACE_MARKERS
 from .config import X_RANGE, Y_RANGE, FONT_SIZE, LABEL_FONT_SIZE
 
 
-def create_figure():
+def create_figure(x_range=X_RANGE, y_range=Y_RANGE):
     p = figure(
         width=1200,
         height=720,
@@ -17,8 +17,8 @@ def create_figure():
         y_axis_type="log",
         x_axis_label="Time (s)",
         y_axis_label="Space (m³)",
-        x_range=X_RANGE,
-        y_range=Y_RANGE,
+        x_range=x_range,
+        y_range=y_range,
         title="Stommel Diagram — Reference Object Explorer",
         toolbar_location="above",
         tools="pan,wheel_zoom,box_zoom,reset",
@@ -34,7 +34,7 @@ def create_figure():
         p.add_layout(
             Label(
                 x=t,
-                y=Y_RANGE[1],
+                y=y_range[1],
                 text=label_text,
                 text_font_size=LABEL_FONT_SIZE,
                 text_color="#aaaaaa",
@@ -48,7 +48,7 @@ def create_figure():
         p.add_layout(
             Label(
                 y=s,
-                x=X_RANGE[0] * 1.5,
+                x=x_range[0] * 1.5,
                 text=label_text,
                 text_font_size=LABEL_FONT_SIZE,
                 text_color="#aaaaaa",
