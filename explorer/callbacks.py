@@ -131,9 +131,10 @@ CUSTOM_OBJECT_JS = """
 # object) and never writes back to a widget, so the category and object
 # controls cannot reset each other. Categories accumulate.
 #
-# Labels: the pinned object is always labelled. When `label_lone_category`
-# is set and exactly one category is checked, its objects are labelled too;
-# with several categories on, the rest are identified on hover.
+# Labels: the pinned object is always labelled. Category objects are
+# labelled too while the plot is sparse enough to read: when no more than
+# `label_max_objects` are showing, or (with `label_lone_category`) when
+# exactly one category is checked. Beyond that they are identified on hover.
 VISIBILITY_JS = """
     function esc(s) {
         return String(s).replace(/[&<>"']/g, function(c) {
@@ -143,7 +144,6 @@ VISIBILITY_JS = """
     const activeSet = checkbox.active.map(k => cats[k]);
     const sel = obj_select.value;
     const NONE = obj_select.options[0];
-    const labelCategory = label_lone_category && activeSet.length === 1;
     const a = source.data['alpha'];
     const la = source.data['line_alpha'];
     const lal = label_source.data['alpha'];
@@ -160,10 +160,14 @@ VISIBILITY_JS = """
         la[i] = on ? (isSel ? 1.0 : 0.7) : 0.0;
         lna[i] = on ? (isSel ? 1.0 : 0.7) : 0.0;
         pta[i] = on ? (isSel ? 0.8 : 0.6) : 0.0;
-        lal[i] = (isSel || (inCat && labelCategory)) ? 1.0 : 0.0;
         if (on) shown++;
         if (inCat) names.push(data[i].Name);
         if (isSel) pinned = data[i];
+    }
+    const labelCategories = shown <= label_max_objects || (label_lone_category && activeSet.length === 1);
+    for (let i = 0; i < a.length; i++) {
+        const isSel = sel !== NONE && data[i].Name === sel;
+        lal[i] = (isSel || (a[i] > 0 && labelCategories)) ? 1.0 : 0.0;
     }
     source.change.emit();
     label_source.change.emit();
@@ -181,7 +185,8 @@ VISIBILITY_JS = """
         parts.push('<b>' + esc(activeSet[0]) + '</b>: ' + names.length + ' objects — ' + names.map(esc).join(', '));
     } else if (activeSet.length > 1) {
         parts.push('<b>' + shown + '</b> objects shown across ' + activeSet.length +
-            ' categories (' + activeSet.map(esc).join(', ') + '). Hover for names; pick an object to pin its label.');
+            ' categories (' + activeSet.map(esc).join(', ') + '). ' +
+            (labelCategories ? 'Pick an object to pin it.' : 'Hover for names; pick an object to pin its label.'));
     }
     info.text = parts.length ? parts.join('<br>') : empty_text;
 """
