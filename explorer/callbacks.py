@@ -229,8 +229,8 @@ SELECT_OBJ_JS = """
                 pta[i] = 0.8;
                 const d = data[i];
                 info.text = '<b>' + esc(d.Name) + '</b> (' + esc(d.Category) + ')<br>' +
-                    'Time: ' + d.Time_min.toExponential(1) + ' → ' + d.Time_max.toExponential(1) + ' s<br>' +
-                    'Space: ' + d.Space_min.toExponential(1) + ' → ' + d.Space_max.toExponential(1) + ' m³<br>' +
+                    'Time: ' + esc(d.TimeLabel) + '<br>' +
+                    'Space: ' + esc(d.SpaceLabel) + '<br>' +
                     '<span style="color:#444">Source: ' + esc(d.Reference) + '</span>';
             } else {
                 alpha[i] = 0.0;

@@ -10,8 +10,8 @@ callbacks with Python callbacks.
 from bokeh.models import CustomJS, Select, TextInput, Button, Div, CheckboxGroup
 from bokeh.layouts import column, row
 
-from .config import CATEGORY_COLORS
-from .data import load_reference_objects
+from .config import CATEGORY_COLORS, DIY_LINKS_HTML
+from .data import data_ranges, load_reference_objects
 from .figure import create_figure
 from .sources import add_reference_glyphs, add_custom_glyphs
 from .html import write_explorer_html
@@ -40,7 +40,7 @@ def build_explorer(csv_path, output_path, mode="select"):
     """
     df = load_reference_objects(csv_path)
 
-    p = create_figure()
+    p = create_figure(*data_ranges(df))
 
     source, line_source, point_source, label_source, patches = add_reference_glyphs(p, df)
     custom_source, custom_line_source, custom_point_source, custom_label_source = add_custom_glyphs(p)
@@ -81,6 +81,8 @@ def build_explorer(csv_path, output_path, mode="select"):
             "Space_min": r.Space_min.value,
             "Space_max": r.Space_max.value,
             "Reference": r.Reference,
+            "TimeLabel": r.TimeLabel,
+            "SpaceLabel": r.SpaceLabel,
         }
         for _, r in df.iterrows()
     ]
@@ -124,7 +126,7 @@ def build_explorer(csv_path, output_path, mode="select"):
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
             "<p>102 reference objects across 10 categories. Toggle categories with the "
-            "checkboxes; pick an object to pin its label. Hover any glyph for details.</p>"
+            "checkboxes; pick an object to pin its label. Hover any glyph for details. " + DIY_LINKS_HTML + "</p>"
         )
         write_explorer_html(output_path, layout, header)
         return
@@ -207,6 +209,6 @@ def build_explorer(csv_path, output_path, mode="select"):
     header = (
         "<h2>timeSpace — Reference Object Explorer</h2>"
         "<p>102 reference objects spanning molecular to planetary scales. "
-        "Select a category, pick an individual object, or define your own.</p>"
+        "Select a category, pick an individual object, or define your own. " + DIY_LINKS_HTML + "</p>"
     )
     write_explorer_html(output_path, layout, header)

@@ -76,3 +76,46 @@ class TestReferenceInTooltip:
         assert any(r != UNSOURCED_LABEL for r in refs)
         hover = [t for t in p.tools if isinstance(t, HoverTool)][-1]
         assert "@reference" in hover.tooltips
+
+
+@pytest.fixture(scope="module")
+def built():
+    from timeSpace.explorer.data import data_ranges, load_reference_objects
+    from timeSpace.explorer.figure import create_figure
+    from timeSpace.explorer.sources import add_reference_glyphs
+
+    df = load_reference_objects(str(CSV))
+    x_range, y_range = data_ranges(df)
+    p = create_figure(x_range, y_range)
+    return df, x_range, y_range, p, add_reference_glyphs(p, df)
+
+
+class TestHoverAndRanges:
+    def test_every_object_is_inside_the_default_view(self, built):
+        df, x_range, y_range, *_ = built
+        assert x_range[0] < min(q.value for q in df.Time_min) and max(q.value for q in df.Time_max) < x_range[1]
+        assert y_range[0] < min(q.value for q in df.Space_min) and max(q.value for q in df.Space_max) < y_range[1]
+
+    def test_hover_covers_all_shapes_and_skips_hidden_ones(self, built):
+        from bokeh.models import HoverTool
+
+        *_, p, _ = built
+        hover = [t for t in p.tools if isinstance(t, HoverTool)][-1]
+        assert len(hover.renderers) == 3
+        assert "@alpha" in hover.filters
+        for r in hover.renderers:
+            assert {"alpha", "name", "time_label", "space_label", "reference"} <= set(r.data_source.data)
+
+    def test_tooltip_uses_unit_labels(self, built):
+        *_, (source, *_rest) = built
+        i = source.data["name"].index("Human lifespan")
+        assert source.data["time_label"][i].endswith("yr")
+        assert source.data["space_label"][i].endswith("L")
+
+    def test_header_links_to_the_colab_notebook(self, tmp_path):
+        out = tmp_path / "explorer.html"
+        build_explorer(str(CSV), str(out))
+        assert (
+            "colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/reference_explorer_colab.ipynb"
+            in out.read_text()
+        )
