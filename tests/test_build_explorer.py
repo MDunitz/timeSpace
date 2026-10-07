@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import pytest
@@ -56,8 +55,11 @@ class TestToggleMode:
     def test_tiered_labels_marker(self, toggle_html):
         # labels revealed only for the pinned individual
         assert "lal[i] = (isSel ||" in toggle_html
-        assert re.search(r"label_max_objects[^0-9]{0,12}15", toggle_html)
-        assert re.search(r"label_lone_category[^a-z]{0,12}false", toggle_html)
+        assert "label_toggle.active.length" in toggle_html
+
+    def test_has_show_labels_box_and_colour_key(self, toggle_html):
+        assert "Show labels" in toggle_html
+        assert "nth-of-type(10) span::before" in toggle_html
 
 
 class TestPointMarkersHiddenOnLoad:
