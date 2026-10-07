@@ -61,6 +61,26 @@ is within the visual resolution of a 30+-order axis. But users should be
 aware that the spatial axis represents "characteristic spatial scale" as
 a volume proxy, not a physical enclosure.
 
+### Reference objects use physical volumes, not the sphere proxy
+
+`data/datasets/time_space_reference_objects.csv` is the exception. Its
+`Space_min`/`Space_max` are estimates of the object's own physical volume,
+built from whichever geometry fits the object, and the `Reference` column
+states the one used where a row has been sourced:
+
+| Kind of object | Volume used | Example |
+|---|---|---|
+| Organisms and cells | body or cell volume, V = m / ρ with ρ ≈ 1000 kg m⁻³ | Giant tortoise, E. coli |
+| Storms and eddies | cylinder, V = π r² h | Hurricane, mesoscale eddy |
+| Drops and grains | sphere from diameter, V = (π/6) d³ | Raindrop |
+| Structures | material or enclosed volume | Hoover Dam (concrete), a house |
+| Water bodies, basins | basin or excavated volume | Lake Tahoe, Grand Canyon |
+| Land regions | area × a nominal thickness | France, Sahara, Manhattan |
+
+The land-region thickness is a framing choice and is not yet stated per
+row. `Time` likewise means different things by row (lifespan, period,
+age, or formation time), as the object's name indicates.
+
 ## Diffusion length equation
 
 `calculate_diffusion_length` uses the **3D RMS displacement**:
