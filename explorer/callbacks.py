@@ -126,18 +126,32 @@ CUSTOM_OBJECT_JS = """
 """
 
 
-# Toggle-mode callback: recompute visibility from checked categories plus
-# the optionally-pinned object. Accumulates (multiple categories at once).
-TOGGLE_JS = """
+# Visibility callback shared by both modes. It recomputes every alpha from
+# the current widget state (checked categories plus the optionally-pinned
+# object) and never writes back to a widget, so the category and object
+# controls cannot reset each other. Categories accumulate.
+#
+# Labels: the pinned object is always labelled. When `label_lone_category`
+# is set and exactly one category is checked, its objects are labelled too;
+# with several categories on, the rest are identified on hover.
+VISIBILITY_JS = """
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, function(c) {
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c];
+        });
+    }
     const activeSet = checkbox.active.map(k => cats[k]);
     const sel = obj_select.value;
     const NONE = obj_select.options[0];
+    const labelCategory = label_lone_category && activeSet.length === 1;
     const a = source.data['alpha'];
     const la = source.data['line_alpha'];
     const lal = label_source.data['alpha'];
     const lna = line_source.data['alpha'];
     const pta = point_source.data['alpha'];
     let shown = 0;
+    let pinned = null;
+    const names = [];
     for (let i = 0; i < a.length; i++) {
         const inCat = activeSet.indexOf(data[i].Category) !== -1;
         const isSel = sel !== NONE && data[i].Name === sel;
@@ -146,16 +160,30 @@ TOGGLE_JS = """
         la[i] = on ? (isSel ? 1.0 : 0.7) : 0.0;
         lna[i] = on ? (isSel ? 1.0 : 0.7) : 0.0;
         pta[i] = on ? (isSel ? 0.8 : 0.6) : 0.0;
-        lal[i] = isSel ? 1.0 : 0.0;
+        lal[i] = (isSel || (inCat && labelCategory)) ? 1.0 : 0.0;
         if (on) shown++;
+        if (inCat) names.push(data[i].Name);
+        if (isSel) pinned = data[i];
     }
     source.change.emit();
     label_source.change.emit();
     line_source.change.emit();
     point_source.change.emit();
-    info.text = '<b>' + shown + '</b> objects shown across ' + activeSet.length +
-        ' categor' + (activeSet.length === 1 ? 'y' : 'ies') +
-        '. Hover for names; pick an object to pin its label.';
+
+    const parts = [];
+    if (pinned) {
+        parts.push('<b>' + esc(pinned.Name) + '</b> (' + esc(pinned.Category) + ')<br>' +
+            'Time: ' + esc(pinned.TimeLabel) + '<br>' +
+            'Space: ' + esc(pinned.SpaceLabel) + '<br>' +
+            '<span style="color:#444">Source: ' + esc(pinned.Reference) + '</span>');
+    }
+    if (activeSet.length === 1) {
+        parts.push('<b>' + esc(activeSet[0]) + '</b>: ' + names.length + ' objects — ' + names.map(esc).join(', '));
+    } else if (activeSet.length > 1) {
+        parts.push('<b>' + shown + '</b> objects shown across ' + activeSet.length +
+            ' categories (' + activeSet.map(esc).join(', ') + '). Hover for names; pick an object to pin its label.');
+    }
+    info.text = parts.length ? parts.join('<br>') : empty_text;
 """
 
 CLEAR_TOGGLE_JS = """
@@ -164,111 +192,19 @@ CLEAR_TOGGLE_JS = """
 """
 
 
-# Select-mode callbacks (formerly inline in build_explorer).
-SELECT_CAT_JS = """
-        function esc(s) {
-        return String(s).replace(/[&<>"']/g, function(c) {
-            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c];
-        });
-    }
-    const cat = cb_obj.value;
-        const alpha = source.data['alpha'];
-        const la = source.data['line_alpha'];
-        const lalpha = label_source.data['alpha'];
-        const lna = line_source.data['alpha'];
-        const pta = point_source.data['alpha'];
-        let count = 0;
-        const names = [];
-        for (let i = 0; i < alpha.length; i++) {
-            if (cat !== '— Select category —' && data[i].Category === cat) {
-                alpha[i] = 0.35;
-                la[i] = 0.8;
-                lalpha[i] = 1.0;
-                lna[i] = 0.8;
-                pta[i] = 0.6;
-                count++;
-                names.push(data[i].Name);
-            } else {
-                alpha[i] = 0.0;
-                la[i] = 0.0;
-                lalpha[i] = 0.0;
-                lna[i] = 0.0;
-                pta[i] = 0.0;
-            }
-        }
-        source.change.emit();
-        label_source.change.emit();
-        line_source.change.emit();
-        point_source.change.emit();
-        obj_select.value = '— Select object —';
-        if (cat === '— Select category —') {
-            info.text = '<i>Select a category, an object, or define your own.</i>';
-        } else {
-            info.text = '<b>' + esc(cat) + '</b>: ' + count + ' objects — ' + names.map(esc).join(', ');
-        }
-    """
-
-SELECT_OBJ_JS = """
-        function esc(s) {
-        return String(s).replace(/[&<>"']/g, function(c) {
-            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c];
-        });
-    }
-    const name = cb_obj.value;
-        const alpha = source.data['alpha'];
-        const la = source.data['line_alpha'];
-        const lalpha = label_source.data['alpha'];
-        const lna = line_source.data['alpha'];
-        const pta = point_source.data['alpha'];
-        for (let i = 0; i < alpha.length; i++) {
-            if (name !== '— Select object —' && data[i].Name === name) {
-                alpha[i] = 0.5;
-                la[i] = 1.0;
-                lalpha[i] = 1.0;
-                lna[i] = 1.0;
-                pta[i] = 0.8;
-                const d = data[i];
-                info.text = '<b>' + esc(d.Name) + '</b> (' + esc(d.Category) + ')<br>' +
-                    'Time: ' + esc(d.TimeLabel) + '<br>' +
-                    'Space: ' + esc(d.SpaceLabel) + '<br>' +
-                    '<span style="color:#444">Source: ' + esc(d.Reference) + '</span>';
-            } else {
-                alpha[i] = 0.0;
-                la[i] = 0.0;
-                lalpha[i] = 0.0;
-                lna[i] = 0.0;
-                pta[i] = 0.0;
-            }
-        }
-        source.change.emit();
-        label_source.change.emit();
-        line_source.change.emit();
-        point_source.change.emit();
-        cat_select.value = '— Select category —';
-    """
-
+# Select-mode clear: also removes the custom object, then resets the widgets
+# (which re-runs VISIBILITY_JS and hides every reference object).
 SELECT_CLEAR_JS = """
-        for (let i = 0; i < source.data['alpha'].length; i++) {
-            source.data['alpha'][i] = 0.0;
-            source.data['line_alpha'][i] = 0.0;
-            label_source.data['alpha'][i] = 0.0;
-            line_source.data['alpha'][i] = 0.0;
-            point_source.data['alpha'][i] = 0.0;
-        }
         csrc.data['alpha'] = [0.0];
         csrc.data['line_alpha'] = [0.0];
         clsrc.data['alpha'] = [0.0];
         clnsrc.data['alpha'] = [0.0];
         cptsrc.data['alpha'] = [0.0];
-        source.change.emit();
-        label_source.change.emit();
-        line_source.change.emit();
-        point_source.change.emit();
         csrc.change.emit();
         clsrc.change.emit();
         clnsrc.change.emit();
         cptsrc.change.emit();
-        cat_select.value = '— Select category —';
-        obj_select.value = '— Select object —';
-        info.text = '<i>Select a category, an object, or define your own.</i>';
+        checkbox.active = [];
+        obj_select.value = obj_select.options[0];
+        info.text = empty_text;
     """
