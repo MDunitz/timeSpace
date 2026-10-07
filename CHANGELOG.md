@@ -18,6 +18,7 @@ All notable changes to timeSpace are recorded here. Format follows
   and Greenland shark, and BioNumbers sources for molecular and cellular rows.
 - Explorer point markers no longer show before an object is selected.
 - Explorer no longer shows tooltips for hidden objects on an empty plot.
+- Explorer no longer blanks when an object is picked after a category.
 - Explorer axes now cover every reference object; 29 objects (including
   Earth's orbit and rotation) were partly or wholly outside the old view.
 - Reference objects: 93 of 102 rows now cite a source. Ranges moved where the
@@ -25,6 +26,10 @@ All notable changes to timeSpace are recorded here. Format follows
   Pacific Ocean age, Amazon and France volumes, mouse and housefly
   lifespans, soil formation), and each Reference names any bound that is
   still unsourced.
+
+### Changed
+- Explorer categories are now checkboxes that layer; picking an object pins
+  it on top of whatever categories are showing.
 
 ### Added
 - Explorer tooltips and the picked-object panel show time and volume in

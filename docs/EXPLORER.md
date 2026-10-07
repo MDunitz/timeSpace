@@ -18,24 +18,28 @@ Running the script directly builds both pages.
 
 The `mode` argument controls how the viewer chooses what to display.
 
+Both modes share one visibility rule: a `CheckboxGroup` of the 10
+categories with **accumulate** semantics (any combination can be on at
+once), plus an object dropdown that **pins** one individual on top (shown
+even if its category is off). Visibility is recomputed from the widget
+state on every change and the callback never writes back to a widget, so
+ticking categories and pinning an object do not reset each other.
+
 ### `mode="select"` (default)
 
-Single-select reveal. Everything starts hidden; the viewer picks **one**
-category **or** **one** object from a dropdown, and picking a new value
-replaces the previous one. Also includes a panel to define and plot a
-custom object. Use this when the goal is to inspect items one at a time
-against the reference grid.
+Starts empty. Tick categories to layer them, pin an object, or define and
+plot a custom object in the panel. Objects are labelled while no more than
+15 are showing (`LABEL_MAX_OBJECTS`), or when exactly one category is
+ticked; beyond that only the pinned object is labelled.
 
 ### `mode="toggle"`
 
-Multi-toggle. A `CheckboxGroup` of the 10 categories drives visibility
-with **accumulate** semantics — any combination of categories can be on
-at once. An object dropdown additionally **pins** one individual (shown
-even if its category is off). Use this to compare whole categories and
-see how groups distribute across time and space.
+Starts with every category on and has no custom-object panel. Use this to
+compare whole categories and see how groups distribute across time and
+space.
 
-Labels are **tiered**: only a pinned object gets a text label; every
-other visible object is identified on hover. Because label density is
+Labels are **tiered**: once more than 15 objects are showing, only a pinned
+object gets a text label; every other visible object is identified on hover. Because label density is
 capped by what the viewer turns on (not by the full 102-object set), the
 toggle view needs no label-collision placement (see issue #6 for why the
 solver is unusable at full density).

@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -15,13 +16,30 @@ def toggle_html(tmp_path_factory):
     return out.read_text()
 
 
+@pytest.fixture(scope="module")
+def select_html(tmp_path_factory):
+    out = tmp_path_factory.mktemp("select") / "explorer.html"
+    build_explorer(str(CSV), str(out))
+    return out.read_text()
+
+
 class TestSelectMode:
-    def test_builds_and_has_no_checkbox(self, tmp_path):
-        out = tmp_path / "explorer.html"
-        build_explorer(str(CSV), str(out))
-        html = out.read_text()
-        assert "<html" in html.lower()
-        assert "CheckboxGroup" not in html  # select mode uses dropdowns
+    def test_builds_with_layered_category_checkboxes(self, select_html):
+        assert "<html" in select_html.lower()
+        assert "CheckboxGroup" in select_html
+        assert "activeSet" in select_html
+
+    def test_callbacks_never_write_back_to_the_other_widget(self):
+        # The old category and object callbacks each reset the other's
+        # dropdown, which blanked the plot when an object was picked after
+        # a category. The shared callback must only read widget state.
+        from timeSpace.explorer.callbacks import VISIBILITY_JS
+
+        assert "obj_select.value =" not in VISIBILITY_JS
+        assert "checkbox.active =" not in VISIBILITY_JS
+
+    def test_starts_empty(self, select_html):
+        assert "Tick one or more categories" in select_html
 
 
 class TestToggleMode:
@@ -37,7 +55,9 @@ class TestToggleMode:
 
     def test_tiered_labels_marker(self, toggle_html):
         # labels revealed only for the pinned individual
-        assert "lal[i] = isSel" in toggle_html
+        assert "lal[i] = (isSel ||" in toggle_html
+        assert re.search(r"label_max_objects[^0-9]{0,12}15", toggle_html)
+        assert re.search(r"label_lone_category[^a-z]{0,12}false", toggle_html)
 
 
 class TestPointMarkersHiddenOnLoad:
