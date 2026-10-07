@@ -17,6 +17,11 @@ All notable changes to timeSpace are recorded here. Format follows
   Moon formation, protein folding, DNA replication, red blood cell, ribosome
   and Greenland shark, and BioNumbers sources for molecular and cellular rows.
 - Explorer point markers no longer show before an object is selected.
+- Reference objects: 93 of 102 rows now cite a source. Ranges moved where the
+  source disagreed (for example mycelial network age, mountain building,
+  Pacific Ocean age, Amazon and France volumes, mouse and housefly
+  lifespans, soil formation), and each Reference names any bound that is
+  still unsourced.
 
 ### Added
 - The explorer shows each reference object's source on hover and when an
