@@ -31,10 +31,6 @@ CATEGORY_COLORS = {
 FONT_SIZE = "11pt"
 LABEL_FONT_SIZE = "9pt"
 
-# Most objects the explorer will label at once across layered categories;
-# above this only the pinned object is labelled and the rest rely on hover.
-LABEL_MAX_OBJECTS = 15
-
 # Hover text for reference objects whose CSV row has no Reference yet.
 UNSOURCED_LABEL = "not yet sourced"
 

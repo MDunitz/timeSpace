@@ -30,6 +30,10 @@ All notable changes to timeSpace are recorded here. Format follows
 ### Changed
 - Explorer categories are now checkboxes that layer; picking an object pins
   it on top of whatever categories are showing.
+- Explorer category checkboxes carry each category's plot colour (the colour
+  key), and a "Show labels" checkbox turns object labels on or off.
+- Earth's orbit now uses the volume of the sphere enclosed by a 1 au orbit
+  (1.41e34 m³) instead of the Earth's own volume.
 
 ### Added
 - Explorer tooltips and the picked-object panel show time and volume in

@@ -7,10 +7,10 @@ Google Sites. To upgrade to a Bokeh server later, replace the CustomJS
 callbacks with Python callbacks.
 """
 
-from bokeh.models import CustomJS, Select, TextInput, Button, Div, CheckboxGroup
+from bokeh.models import CustomJS, Select, TextInput, Button, Div, CheckboxGroup, InlineStyleSheet
 from bokeh.layouts import column, row
 
-from .config import CATEGORY_COLORS, DIY_LINKS_HTML, LABEL_MAX_OBJECTS
+from .config import CATEGORY_COLORS, DIY_LINKS_HTML
 from .data import data_ranges, load_reference_objects
 from .figure import create_figure
 from .sources import add_reference_glyphs, add_custom_glyphs
@@ -21,6 +21,20 @@ from .callbacks import (
     CLEAR_TOGGLE_JS,
     SELECT_CLEAR_JS,
 )
+
+
+def category_key_stylesheet(cat_labels):
+    """Stylesheet that puts each category's plot colour beside its checkbox.
+
+    The checkbox row doubles as the colour key, so the key always matches
+    the order and names of the controls.
+    """
+    rules = [
+        f".bk-input-group label:nth-of-type({i}) span::before "
+        f'{{ content: "■"; color: {CATEGORY_COLORS[cat]}; font-size: 15px; margin-right: 3px; }}'
+        for i, cat in enumerate(cat_labels, start=1)
+    ]
+    return InlineStyleSheet(css="\n".join(rules))
 
 
 def build_explorer(csv_path, output_path, mode="select"):
@@ -50,11 +64,20 @@ def build_explorer(csv_path, output_path, mode="select"):
     obj_select = Select(
         title="Pin an object:" if not toggle else "Or pick an object:", value=objects[0], options=objects, width=280
     )
+    key = category_key_stylesheet(cat_labels)
     if toggle:
-        cat_checkbox = CheckboxGroup(labels=cat_labels, active=list(range(len(cat_labels))), width=240)
+        cat_checkbox = CheckboxGroup(
+            labels=cat_labels, active=list(range(len(cat_labels))), width=240, stylesheets=[key]
+        )
     else:
-        cat_checkbox = CheckboxGroup(labels=cat_labels, active=[], inline=True)
-        cat_title = Div(text="Categories (tick any number to layer them):", styles={"font-size": "13px"})
+        cat_checkbox = CheckboxGroup(labels=cat_labels, active=[], inline=True, stylesheets=[key])
+    # Labels start on in select mode (few objects) and off in toggle mode
+    # (all 10 categories showing); the viewer can flip it either way.
+    label_toggle = CheckboxGroup(labels=["Show labels"], active=[] if toggle else [0], width=120)
+    cat_title = Div(
+        text="Categories (tick any number to layer them; the square is each one's colour on the plot):",
+        styles={"font-size": "13px"},
+    )
 
     # Custom input fields
     custom_name = TextInput(title="Name:", value="My process", width=180)
@@ -101,14 +124,14 @@ def build_explorer(csv_path, output_path, mode="select"):
             info=info_div,
             data=full_data,
             cats=cat_labels,
-            label_lone_category=not toggle,
-            label_max_objects=LABEL_MAX_OBJECTS,
+            label_toggle=label_toggle,
             empty_text=empty_text,
         ),
         code=VISIBILITY_JS,
     )
     cat_checkbox.js_on_change("active", visibility_cb)
     obj_select.js_on_change("value", visibility_cb)
+    label_toggle.js_on_change("active", visibility_cb)
 
     # ── Toggle mode: starts with every category on ─────────────────
     if toggle:
@@ -116,6 +139,10 @@ def build_explorer(csv_path, output_path, mode="select"):
         # the sources (js_on_change does not fire on load). Labels stay
         # hidden — tiered visibility, revealed only on pin/hover.
         n = len(df)
+        info_div.text = (
+            f"<b>{n}</b> objects shown across {len(cat_labels)} categories. "
+            "Hover for names; pick an object to pin its label."
+        )
         source.data["alpha"] = [0.30] * n
         source.data["line_alpha"] = [0.7] * n
         line_source.data["alpha"] = [0.7] * n
@@ -127,7 +154,7 @@ def build_explorer(csv_path, output_path, mode="select"):
         )
         clear_btn.js_on_click(clear_toggle_cb)
 
-        controls = row(cat_checkbox, obj_select, clear_btn)
+        controls = row(cat_checkbox, obj_select, label_toggle, clear_btn)
         layout = column(controls, info_div, p, sizing_mode="stretch_width")
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
@@ -175,7 +202,7 @@ def build_explorer(csv_path, output_path, mode="select"):
     clear_btn.js_on_click(clear_cb)
 
     # ── Layout ─────────────────────────────────────────────────────
-    pin_row = row(obj_select, clear_btn)
+    pin_row = row(obj_select, label_toggle, clear_btn)
     custom_row = row(custom_name, custom_tmin, custom_tmax, custom_smin, custom_smax, custom_btn)
     layout = column(cat_title, cat_checkbox, pin_row, custom_row, info_div, p, sizing_mode="stretch_width")
 

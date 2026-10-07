@@ -131,10 +131,9 @@ CUSTOM_OBJECT_JS = """
 # object) and never writes back to a widget, so the category and object
 # controls cannot reset each other. Categories accumulate.
 #
-# Labels: the pinned object is always labelled. Category objects are
-# labelled too while the plot is sparse enough to read: when no more than
-# `label_max_objects` are showing, or (with `label_lone_category`) when
-# exactly one category is checked. Beyond that they are identified on hover.
+# Labels: the pinned object is always labelled. Every other visible object
+# is labelled while the "Show labels" box is ticked; otherwise it is
+# identified on hover.
 VISIBILITY_JS = """
     function esc(s) {
         return String(s).replace(/[&<>"']/g, function(c) {
@@ -164,7 +163,7 @@ VISIBILITY_JS = """
         if (inCat) names.push(data[i].Name);
         if (isSel) pinned = data[i];
     }
-    const labelCategories = shown <= label_max_objects || (label_lone_category && activeSet.length === 1);
+    const labelCategories = label_toggle.active.length > 0;
     for (let i = 0; i < a.length; i++) {
         const isSel = sel !== NONE && data[i].Name === sel;
         lal[i] = (isSel || (a[i] > 0 && labelCategories)) ? 1.0 : 0.0;
