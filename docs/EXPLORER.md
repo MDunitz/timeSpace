@@ -28,8 +28,9 @@ ticking categories and pinning an object do not reset each other.
 ### `mode="select"` (default)
 
 Starts empty. Tick categories to layer them, pin an object, or define and
-plot a custom object in the panel. When exactly one category is ticked its
-objects are labelled; with several on, only the pinned object is labelled.
+plot a custom object in the panel. Objects are labelled while no more than
+15 are showing (`LABEL_MAX_OBJECTS`), or when exactly one category is
+ticked; beyond that only the pinned object is labelled.
 
 ### `mode="toggle"`
 
@@ -37,8 +38,8 @@ Starts with every category on and has no custom-object panel. Use this to
 compare whole categories and see how groups distribute across time and
 space.
 
-Labels are **tiered**: with more than one category on, only a pinned object
-gets a text label; every other visible object is identified on hover. Because label density is
+Labels are **tiered**: once more than 15 objects are showing, only a pinned
+object gets a text label; every other visible object is identified on hover. Because label density is
 capped by what the viewer turns on (not by the full 102-object set), the
 toggle view needs no label-collision placement (see issue #6 for why the
 solver is unusable at full density).
