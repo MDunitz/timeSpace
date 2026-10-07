@@ -56,6 +56,7 @@ class TestToggleMode:
     def test_tiered_labels_marker(self, toggle_html):
         # labels revealed only for the pinned individual
         assert "lal[i] = (isSel ||" in toggle_html
+        assert re.search(r"label_max_objects[^0-9]{0,12}15", toggle_html)
         assert re.search(r"label_lone_category[^a-z]{0,12}false", toggle_html)
 
 
