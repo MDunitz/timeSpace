@@ -9,6 +9,16 @@ the reference sources lets the JS callbacks toggle everything by one index.
 
 from bokeh.models import ColumnDataSource, HoverTool
 
+# HTML template (not the tuple form) so long Reference text wraps.
+REFERENCE_TOOLTIP = """
+<div style="max-width: 360px; font-size: 12px; line-height: 1.35;">
+  <div><b>@name</b> <span style="color: #666;">(@category)</span></div>
+  <div>Time: @time_min{%0.1e} → @time_max{%0.1e} s</div>
+  <div>Space: @space_min{%0.1e} → @space_max{%0.1e} m³</div>
+  <div style="color: #444;">Source: @reference</div>
+</div>
+"""
+
 
 def add_reference_glyphs(p, df):
     """Build the index-aligned reference-object sources and attach glyphs.
@@ -34,6 +44,7 @@ def add_reference_glyphs(p, df):
             line_alpha=[0.0] * len(df),
             name=df.FullName.tolist(),
             category=df.Category.tolist(),
+            reference=df.Reference.tolist(),
             time_min=[row.Time_min.value for _, row in df.iterrows()],
             time_max=[row.Time_max.value for _, row in df.iterrows()],
             space_min=[row.Space_min.value for _, row in df.iterrows()],
@@ -106,12 +117,7 @@ def add_reference_glyphs(p, df):
     # Hover only on patches renderer (not text glyphs or custom source)
     hover = HoverTool(
         renderers=[patches],
-        tooltips=[
-            ("Name", "@name"),
-            ("Category", "@category"),
-            ("Time", "@time_min{%0.1e} → @time_max{%0.1e} s"),
-            ("Space", "@space_min{%0.1e} → @space_max{%0.1e} m³"),
-        ],
+        tooltips=REFERENCE_TOOLTIP,
         formatters={
             "@time_min": "printf",
             "@time_max": "printf",

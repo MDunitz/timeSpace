@@ -26,3 +26,6 @@ CATEGORY_COLORS = {
 
 FONT_SIZE = "11pt"
 LABEL_FONT_SIZE = "9pt"
+
+# Hover text for reference objects whose CSV row has no Reference yet.
+UNSOURCED_LABEL = "not yet sourced"
