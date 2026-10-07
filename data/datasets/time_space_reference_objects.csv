@@ -1,12 +1,12 @@
 Name,Time_min,Time_max,Space_min,Space_max,Category,Reference
-Protein folding,1e-09,1.0,1e-27,1e-24,Molecular,
-DNA replication (single origin),1.0,1000.0,1e-18,1e-15,Molecular,
-mRNA transcription,10.0,1000.0,1e-18,1e-15,Molecular,
+Protein folding,3e-07,1.0,1e-27,1e-24,Molecular,Kubelka Hofrichter & Eaton (2004) Curr Opin Struct Biol 14:76 (BioNumbers 112314) — folding speed limit ~N/100 us for an N-residue single-domain protein; 0.35 us for N = 35. Upper bound of 1 s is not sourced
+DNA replication (single origin),1.0,2400.0,1e-18,1e-15,Molecular,Fork speed ~1000 nt/s in E. coli: Rocha (2004) Microbiology 150:1609 (BioNumbers 110932); a 4.6 Mb chromosome copied by two forks from one origin takes ~2300 s. Lower bound is not sourced
+mRNA transcription,10.0,1000.0,1e-18,1e-15,Molecular,Elongation 42 nt/s (E. coli rRNA operons; BioNumbers 101904) to 71.6 nt/s (mammalian Pol II maximum; BioNumbers 100662): a 1 kb gene takes ~24 s and a 30 kb gene ~420 s; see data/references/bionumbers_subset.csv
 ATP synthesis (single molecule),0.001,0.1,1e-27,1e-25,Molecular,
 Enzyme catalytic cycle,1e-06,0.01,1e-27,1e-24,Molecular,
 Ribosome translation,10.0,1000.0,1e-24,1e-21,Molecular,
 Virus assembly,100.0,10000.0,1e-24,1e-20,Molecular,
-Bacterial cell division,1200.0,72000.0,1e-18,1e-15,Cellular,
+Bacterial cell division,1200.0,72000.0,1e-18,1e-15,Cellular,Within-range examples: Synechocystis PCC 6803 generation time 5.13 h (BioNumbers 111335) to 12 h (BioNumbers 111252); see data/references/bionumbers_subset.csv. The 20 min lower bound is not sourced here
 Mitochondrial fission/fusion,10.0,1000.0,1e-18,1e-16,Cellular,
 Calcium signaling wave,0.1,10.0,1e-15,1e-12,Cellular,
 Yeast cell cycle,5400.0,7200.0,1e-16,1e-14,Cellular,
