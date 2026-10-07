@@ -80,6 +80,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             "Time_max": r.Time_max.value,
             "Space_min": r.Space_min.value,
             "Space_max": r.Space_max.value,
+            "Reference": r.Reference,
         }
         for _, r in df.iterrows()
     ]

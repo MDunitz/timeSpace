@@ -230,7 +230,8 @@ SELECT_OBJ_JS = """
                 const d = data[i];
                 info.text = '<b>' + esc(d.Name) + '</b> (' + esc(d.Category) + ')<br>' +
                     'Time: ' + d.Time_min.toExponential(1) + ' → ' + d.Time_max.toExponential(1) + ' s<br>' +
-                    'Space: ' + d.Space_min.toExponential(1) + ' → ' + d.Space_max.toExponential(1) + ' m³';
+                    'Space: ' + d.Space_min.toExponential(1) + ' → ' + d.Space_max.toExponential(1) + ' m³<br>' +
+                    '<span style="color:#444">Source: ' + esc(d.Reference) + '</span>';
             } else {
                 alpha[i] = 0.0;
                 la[i] = 0.0;
