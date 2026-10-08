@@ -17,6 +17,13 @@ All notable changes to timeSpace are recorded here. Format follows
   by category (`explorer/key.py`); toggle mode starts in it. Name labels
   sit on a translucent white plate. Replaces the "Show labels" checkbox.
 
+- Reference objects: `Reference_URL` column with 112 checked source pages
+  across 73 rows; the explorer lists them under the pinned object's
+  citation. With the identifier links, 89 of the 93 cited rows now link out.
+
+### Fixed
+- Seasonal algal bloom duration extended to 58 days (Silva et al. 2021).
+
 ## [0.3.0] — 2026-10-06
 
 Reference objects sourced and corrected, and the explorer reworked around
