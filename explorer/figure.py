@@ -5,13 +5,13 @@ from bokeh.models import Span, Label
 
 from timeSpace.constants import TIME_MARKERS, SPACE_MARKERS
 
-from .config import X_RANGE, Y_RANGE, FONT_SIZE, LABEL_FONT_SIZE
+from .config import FIGURE_HEIGHT, X_RANGE, Y_RANGE, FONT_SIZE, LABEL_FONT_SIZE
 
 
 def create_figure(x_range=X_RANGE, y_range=Y_RANGE):
     p = figure(
         width=1200,
-        height=720,
+        height=FIGURE_HEIGHT,
         sizing_mode="stretch_width",
         x_axis_type="log",
         y_axis_type="log",

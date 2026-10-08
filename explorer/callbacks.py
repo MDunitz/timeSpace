@@ -174,8 +174,8 @@ VISIBILITY_JS = """
         const on = a[i] > 0;
         lal[i] = (isSel || (on && mode === NAMES)) ? 1.0 : 0.0;
         nal[i] = (on && !isSel && mode === NUMBERS) ? 1.0 : 0.0;
-        pla[i] = 0.75 * lal[i];
-        npla[i] = 0.9 * nal[i];
+        pla[i] = name_plate_alpha * lal[i];
+        npla[i] = number_plate_alpha * nal[i];
     }
     // Key beside the plot: number -> name for what is showing, by category.
     if (mode === NUMBERS) {

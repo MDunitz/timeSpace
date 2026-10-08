@@ -23,9 +23,9 @@ from bokeh.layouts import column, row
 from .config import CATEGORY_COLORS, DIY_LINKS_HTML
 from .data import data_ranges, load_reference_objects
 from .figure import create_figure
-from .sources import add_reference_glyphs, add_custom_glyphs
+from .sources import NAME_PLATE_ALPHA, NUMBER_PLATE_OPACITY, add_reference_glyphs, add_custom_glyphs
 from .html import write_explorer_html
-from .key import KEY_STYLES, KEY_WIDTH, LABEL_MODES, NAMES, NUMBERS, key_header, key_html
+from .key import KEY_STYLES, KEY_WIDTH, LABEL_MODES, NAMES, key_header
 from .callbacks import (
     CUSTOM_OBJECT_JS,
     VISIBILITY_JS,
@@ -83,9 +83,9 @@ def build_explorer(csv_path, output_path, mode="select"):
         )
     else:
         cat_checkbox = CheckboxGroup(labels=cat_labels, active=[], inline=True, stylesheets=[key])
-    # Label mode: names suit a few objects (select mode starts empty); numbers
-    # plus the side key suit many (toggle mode starts with everything on).
-    label_mode = RadioButtonGroup(labels=LABEL_MODES, active=NUMBERS if toggle else NAMES, width=210)
+    # Both modes start on names; Numbers (with the side key) and None are a
+    # click away when many objects are showing.
+    label_mode = RadioButtonGroup(labels=LABEL_MODES, active=NAMES, width=210)
     label_title = Div(text="Labels:", styles={"font-size": "13px", "padding-top": "6px"})
     key_div = Div(text="", width=KEY_WIDTH, visible=False, styles=KEY_STYLES)
     cat_title = Div(
@@ -146,6 +146,8 @@ def build_explorer(csv_path, output_path, mode="select"):
             label_mode=label_mode,
             key=key_div,
             key_headers={c: key_header(c) for c in cat_labels},
+            name_plate_alpha=NAME_PLATE_ALPHA,
+            number_plate_alpha=NUMBER_PLATE_OPACITY,
             empty_text=empty_text,
         ),
         code=VISIBILITY_JS,
@@ -165,16 +167,14 @@ def build_explorer(csv_path, output_path, mode="select"):
     if toggle:
         # Default: all categories on. Bake the initial visible state into
         # the sources (js_on_change does not fire on load): every object
-        # numbered, with the full key beside the plot.
+        # shown and labelled by name.
         n = len(df)
         info_div.text = (
             f"<b>{n}</b> objects shown across {len(cat_labels)} categories. "
-            "Numbers are listed in the key; click an object to pin it and see its source."
+            "Click an object to pin it and see its source."
         )
-        label_source.data["num_alpha"] = [1.0] * n
-        label_source.data["num_plate_alpha"] = [0.9] * n
-        key_div.text = key_html(df, cat_labels)
-        key_div.visible = True
+        label_source.data["alpha"] = [1.0] * n
+        label_source.data["plate_alpha"] = [NAME_PLATE_ALPHA] * n
         source.data["alpha"] = [0.30] * n
         source.data["line_alpha"] = [0.7] * n
         line_source.data["alpha"] = [0.7] * n
@@ -191,8 +191,8 @@ def build_explorer(csv_path, output_path, mode="select"):
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
             "<p>102 reference objects across 10 categories. Toggle categories with the "
-            "checkboxes. Objects are numbered, with the key beside the plot; switch Labels to "
-            "Names or None as you prefer. Click or pick an object to pin it. " + DIY_LINKS_HTML + "</p>"
+            "checkboxes. Switch Labels to Numbers for a numbered key beside the plot, or to "
+            "None to hide them. Click or pick an object to pin it. " + DIY_LINKS_HTML + "</p>"
         )
         write_explorer_html(output_path, layout, header)
         return
