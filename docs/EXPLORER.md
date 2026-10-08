@@ -28,12 +28,12 @@ ticking categories and pinning an object do not reset each other.
 ### `mode="select"` (default)
 
 Starts empty. Tick categories to layer them, pin an object, or define and
-plot a custom object in the panel. "Show labels" starts ticked.
+plot a custom object in the panel. Labels start on "Names".
 
 ### `mode="toggle"`
 
-Starts with every category on and has no custom-object panel; "Show
-labels" starts unticked. Use this to
+Starts with every category on and has no custom-object panel; labels
+start on "Numbers" with the full key beside the plot. Use this to
 compare whole categories and see how groups distribute across time and
 space.
 
@@ -44,8 +44,16 @@ as links. The hover tooltip shows the same text but follows the cursor, so
 it cannot hold clickable links. Citations without one of those identifiers
 are plain text.
 
-Labels: the pinned object is always labelled. A "Show labels" checkbox
-labels every other visible object; unticked, they are identified on hover.
+Labels: the pinned object is always labelled by name. A three-way
+"Labels" control sets how every other visible object is marked:
+
+- **Names**: the object name, on a translucent white plate.
+- **Numbers**: a short number on a white plate bordered in the category
+  colour, with a key beside the plot listing number and name for whatever
+  is showing, grouped by category. Numbers are fixed (category, then name),
+  so an object keeps its number as categories are toggled.
+- **None**: no labels; objects are identified on hover.
+
 There is no label-collision placement (see issue #6), so labels overlap
 when many objects are showing. The category checkboxes carry each
 category's plot colour, so they double as the colour key.
