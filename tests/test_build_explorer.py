@@ -141,3 +141,21 @@ class TestHoverAndRanges:
             "colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/reference_explorer_colab.ipynb"
             in out.read_text()
         )
+
+
+class TestTapToPinAndSourceLinks:
+    @pytest.mark.parametrize("fixture", ["select_html", "toggle_html"])
+    def test_page_has_tap_tool_and_identifier_links(self, fixture, request):
+        html = request.getfixturevalue(fixture)
+        assert "TapTool" in html
+        assert "obj_select.value = data[hit[0]].Name" in html
+        assert "bionumbers.hms.harvard.edu/bionumber.aspx?id=111975" in html
+
+    def test_tap_does_not_dim_other_shapes(self):
+        from timeSpace.explorer.data import load_reference_objects
+        from timeSpace.explorer.figure import create_figure
+        from timeSpace.explorer.sources import add_reference_glyphs
+
+        *_, shapes = add_reference_glyphs(create_figure(), load_reference_objects(str(CSV)))
+        assert len(shapes) == 3
+        assert all(r.nonselection_glyph is None and r.selection_glyph is None for r in shapes)
