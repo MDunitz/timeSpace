@@ -29,6 +29,8 @@ All notable changes to timeSpace are recorded here. Format follows
   Stephenson (2000), now cited to Madrono 47:61-67 instead of "USGS".
 - Butterfly wing beat citation gains its year and sample sizes; values
   unchanged.
+- Ice age cycle: ocean volume set to the cited paper's 1.332e18 m3 (was
+  1.335e18 m3, a different estimate, credited to the same paper).
 
 ## [0.3.0] — 2026-10-06
 
