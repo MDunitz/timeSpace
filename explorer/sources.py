@@ -22,6 +22,13 @@ REFERENCE_TOOLTIP = """
 
 # Hidden objects keep their geometry and are switched off through alpha, so
 # without this filter the hover tool still reports them.
+# Plate opacity is a field so hidden labels leave no white box behind.
+LABEL_PLATE_ALPHA = "plate_alpha"
+NUMBER_PLATE_ALPHA = "num_plate_alpha"
+# Dark digits on the white plate: several category colours are too light to
+# read as text, so the category colour goes on the plate border instead.
+NUMBER_TEXT_COLOR = "#222222"
+
 HOVER_ONLY_VISIBLE_JS = "export default (args, tool, {value}) => value > 0"
 
 
@@ -152,10 +159,17 @@ def add_reference_glyphs(p, df):
             y=df.label_y.tolist(),
             text=df.FullName.tolist(),
             alpha=[0.0] * len(df),
+            number=df.Number.astype(str).tolist(),
+            num_alpha=[0.0] * len(df),
+            plate_alpha=[0.0] * len(df),
+            num_plate_alpha=[0.0] * len(df),
             color=df.Color.tolist(),
         )
     )
 
+    # Names and numbers share one source; the label mode decides which alpha
+    # column is on. A white plate behind each keeps it readable over shapes
+    # and over other labels.
     p.text(
         "x",
         "y",
@@ -166,6 +180,28 @@ def add_reference_glyphs(p, df):
         text_alpha="alpha",
         text_align="center",
         text_baseline="middle",
+        background_fill_color="white",
+        background_fill_alpha=LABEL_PLATE_ALPHA,
+        padding=1,
+    )
+    p.text(
+        "x",
+        "y",
+        source=label_source,
+        text="number",
+        text_font_size="10pt",
+        text_font_style="bold",
+        text_color=NUMBER_TEXT_COLOR,
+        text_alpha="num_alpha",
+        text_align="center",
+        text_baseline="middle",
+        background_fill_color="white",
+        background_fill_alpha=NUMBER_PLATE_ALPHA,
+        border_line_color="color",
+        border_line_alpha="num_alpha",
+        border_line_width=1.5,
+        border_radius=3,
+        padding=2,
     )
 
     return source, line_source, point_source, label_source, shapes
