@@ -41,8 +41,9 @@ Source links: clicking a shape pins it (where shapes overlap, the one
 spanning the fewest decades is chosen). The info panel then shows the pinned
 object's source, with BioNumbers, DOI, arXiv and PubMed Central identifiers
 as links. The hover tooltip shows the same text but follows the cursor, so
-it cannot hold clickable links. Citations without one of those identifiers
-are plain text.
+it cannot hold clickable links. Below the citation, "Source pages" lists the
+row's `Reference_URL` entries by host name: pages that were fetched and
+checked against the citation (see `CONVENTIONS.md`).
 
 Labels: the pinned object is always labelled by name. A three-way
 "Labels" control sets how every other visible object is marked:

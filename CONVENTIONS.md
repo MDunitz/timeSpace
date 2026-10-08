@@ -81,6 +81,13 @@ The land-region thickness is a framing choice and is not yet stated per
 row. `Time` likewise means different things by row (lifespan, period,
 age, or formation time), as the object's name indicates.
 
+The reference-objects file also carries `Reference_URL`: the pages behind
+the sources named in `Reference`, separated by spaces. A URL goes in only
+after the page has been fetched and found to be the named source; the row
+is quoted if a URL contains a comma. Identifiers that map to a URL by rule
+(BioNumbers, DOI, arXiv, PMC) stay in the `Reference` text and are not
+repeated in `Reference_URL`.
+
 ## Diffusion length equation
 
 `calculate_diffusion_length` uses the **3D RMS displacement**:
