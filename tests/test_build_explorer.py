@@ -52,14 +52,46 @@ class TestToggleMode:
         # accumulate-visibility JS marker (union of checked categories)
         assert "activeSet" in toggle_html
 
-    def test_tiered_labels_marker(self, toggle_html):
-        # labels revealed only for the pinned individual
-        assert "lal[i] = (isSel ||" in toggle_html
-        assert "label_toggle.active.length" in toggle_html
+    def test_label_mode_marker(self, toggle_html):
+        # pinned object always named; the rest follow the label mode
+        assert "mode === NAMES" in toggle_html and "mode === NUMBERS" in toggle_html
+        assert "label_mode.active" in toggle_html
 
-    def test_has_show_labels_box_and_colour_key(self, toggle_html):
-        assert "Show labels" in toggle_html
+    def test_has_label_modes_and_colour_key(self, toggle_html):
+        assert "RadioButtonGroup" in toggle_html
         assert "nth-of-type(10) span::before" in toggle_html
+
+
+@pytest.fixture(scope="module")
+def df():
+    from timeSpace.explorer.data import load_reference_objects
+
+    return load_reference_objects(str(CSV))
+
+
+class TestNumberedLabelsAndKey:
+    def test_numbers_are_unique_and_contiguous_within_category(self, df):
+        assert sorted(df.Number) == list(range(1, len(df) + 1))
+        for _, rows in df.groupby("Category"):
+            nums = sorted(rows.Number)
+            assert nums == list(range(nums[0], nums[0] + len(nums)))
+            assert list(rows.sort_values("Number").FullName) == sorted(rows.FullName)
+
+    def test_key_lists_only_requested_categories_in_number_order(self, df):
+        from timeSpace.explorer.key import key_html
+
+        html = key_html(df, ["Cellular", "Ocean"])
+        assert "Cellular" in html and "Ocean" in html and "Planetary" not in html
+        cellular = df[df.Category == "Cellular"].sort_values("Number")
+        positions = [html.index(line) for line in cellular.KeyLine]
+        assert positions == sorted(positions)
+
+    def test_toggle_page_starts_numbered_with_full_key(self, toggle_html, df):
+        # every object's key entry is baked into the page
+        assert toggle_html.count("min-width:26px") >= 2 * len(df)
+
+    def test_select_page_starts_in_names_mode_with_key_hidden(self, select_html):
+        assert '"labels":["Names","Numbers","None"]' in select_html.replace(" ", "")
 
 
 class TestPointMarkersHiddenOnLoad:
