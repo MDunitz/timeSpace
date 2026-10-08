@@ -14,8 +14,10 @@ All notable changes to timeSpace are recorded here. Format follows
   stay plain text; the CSV holds no URLs.
 - Explorer: "Labels" control with Names, Numbers and None. Numbers mode
   marks each object with a number and shows a key beside the plot grouped
-  by category (`explorer/key.py`); toggle mode starts in it. Name labels
+  by category (`explorer/key.py`). Both pages start on Names. Name labels
   sit on a translucent white plate. Replaces the "Show labels" checkbox.
+- Explorer plot is 900 px tall (was 720) to give the 64-decade volume axis
+  more room.
 
 - Reference objects: `Reference_URL` column with 112 checked source pages
   across 73 rows; the explorer lists them under the pinned object's
