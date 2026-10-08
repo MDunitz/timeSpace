@@ -7,7 +7,7 @@ from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
 
 from .config import CATEGORY_COLORS, EXPLORER_N_POINTS, RANGE_PAD_DECADES, UNSOURCED_LABEL
 from .key import assign_numbers, key_line
-from .links import linkify_reference
+from .links import reference_html
 from .units import format_time_range, format_volume_range
 
 
@@ -24,7 +24,8 @@ def load_reference_objects(csv_path):
       - Set ShortName = FullName since reference objects don't have
         separate short forms; create_name needs ShortName to exist.
       - Carry Reference through for the hover tooltip, labelling rows
-        that have none.
+        that have none, and Reference_URL (space-separated source pages)
+        for the info-panel links.
 
     transform_process_response_sheet handles unit conversion, geometry
     classification, ellipse polygon generation, label_x/label_y, and
@@ -35,16 +36,17 @@ def load_reference_objects(csv_path):
     df["Color"] = df.Category.map(CATEGORY_COLORS)
     df["ShortName"] = df.FullName
     df["Reference"] = df.Reference.fillna(UNSOURCED_LABEL)
+    df["Reference_URL"] = df.Reference_URL.fillna("")
 
     df = transform_process_response_sheet(
         df,
-        possible_col_list=POSSIBLE_COL_LIST + ["FullName", "Category", "Reference"],
+        possible_col_list=POSSIBLE_COL_LIST + ["FullName", "Category", "Reference", "Reference_URL"],
         space_on_x=False,
         n_points=EXPLORER_N_POINTS,
     )
     df["TimeLabel"] = [format_time_range(r.Time_min, r.Time_max) for _, r in df.iterrows()]
     df["SpaceLabel"] = [format_volume_range(r.Space_min, r.Space_max) for _, r in df.iterrows()]
-    df["ReferenceHtml"] = df.Reference.map(linkify_reference)
+    df["ReferenceHtml"] = [reference_html(r.Reference, r.Reference_URL.split()) for _, r in df.iterrows()]
     df["Number"] = assign_numbers(df)
     df["KeyLine"] = [key_line(r.Number, r.FullName) for _, r in df.iterrows()]
     return df
