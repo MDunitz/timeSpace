@@ -7,7 +7,17 @@ Google Sites. To upgrade to a Bokeh server later, replace the CustomJS
 callbacks with Python callbacks.
 """
 
-from bokeh.models import CustomJS, Select, TextInput, Button, Div, CheckboxGroup, InlineStyleSheet, TapTool
+from bokeh.models import (
+    CustomJS,
+    Select,
+    TextInput,
+    Button,
+    Div,
+    CheckboxGroup,
+    InlineStyleSheet,
+    TapTool,
+    RadioButtonGroup,
+)
 from bokeh.layouts import column, row
 
 from .config import CATEGORY_COLORS, DIY_LINKS_HTML
@@ -15,6 +25,7 @@ from .data import data_ranges, load_reference_objects
 from .figure import create_figure
 from .sources import add_reference_glyphs, add_custom_glyphs
 from .html import write_explorer_html
+from .key import KEY_STYLES, KEY_WIDTH, LABEL_MODES, NAMES, NUMBERS, key_header, key_html
 from .callbacks import (
     CUSTOM_OBJECT_JS,
     VISIBILITY_JS,
@@ -72,9 +83,11 @@ def build_explorer(csv_path, output_path, mode="select"):
         )
     else:
         cat_checkbox = CheckboxGroup(labels=cat_labels, active=[], inline=True, stylesheets=[key])
-    # Labels start on in select mode (few objects) and off in toggle mode
-    # (all 10 categories showing); the viewer can flip it either way.
-    label_toggle = CheckboxGroup(labels=["Show labels"], active=[] if toggle else [0], width=120)
+    # Label mode: names suit a few objects (select mode starts empty); numbers
+    # plus the side key suit many (toggle mode starts with everything on).
+    label_mode = RadioButtonGroup(labels=LABEL_MODES, active=NUMBERS if toggle else NAMES, width=210)
+    label_title = Div(text="Labels:", styles={"font-size": "13px", "padding-top": "6px"})
+    key_div = Div(text="", width=KEY_WIDTH, visible=False, styles=KEY_STYLES)
     cat_title = Div(
         text="Categories (tick any number to layer them; the square is each one's colour on the plot):",
         styles={"font-size": "13px"},
@@ -110,6 +123,8 @@ def build_explorer(csv_path, output_path, mode="select"):
             "Space_min": r.Space_min.value,
             "Space_max": r.Space_max.value,
             "ReferenceHtml": r.ReferenceHtml,
+            "Number": int(r.Number),
+            "KeyLine": r.KeyLine,
             "TimeLabel": r.TimeLabel,
             "SpaceLabel": r.SpaceLabel,
         }
@@ -128,14 +143,16 @@ def build_explorer(csv_path, output_path, mode="select"):
             info=info_div,
             data=full_data,
             cats=cat_labels,
-            label_toggle=label_toggle,
+            label_mode=label_mode,
+            key=key_div,
+            key_headers={c: key_header(c) for c in cat_labels},
             empty_text=empty_text,
         ),
         code=VISIBILITY_JS,
     )
     cat_checkbox.js_on_change("active", visibility_cb)
     obj_select.js_on_change("value", visibility_cb)
-    label_toggle.js_on_change("active", visibility_cb)
+    label_mode.js_on_change("active", visibility_cb)
 
     # ── Tap a shape to pin it (source links live in the info panel) ─
     p.add_tools(TapTool(renderers=shapes))
@@ -147,13 +164,17 @@ def build_explorer(csv_path, output_path, mode="select"):
     # ── Toggle mode: starts with every category on ─────────────────
     if toggle:
         # Default: all categories on. Bake the initial visible state into
-        # the sources (js_on_change does not fire on load). Labels stay
-        # hidden — tiered visibility, revealed only on pin/hover.
+        # the sources (js_on_change does not fire on load): every object
+        # numbered, with the full key beside the plot.
         n = len(df)
         info_div.text = (
             f"<b>{n}</b> objects shown across {len(cat_labels)} categories. "
-            "Hover for names; click an object to pin it and see its source."
+            "Numbers are listed in the key; click an object to pin it and see its source."
         )
+        label_source.data["num_alpha"] = [1.0] * n
+        label_source.data["num_plate_alpha"] = [0.9] * n
+        key_div.text = key_html(df, cat_labels)
+        key_div.visible = True
         source.data["alpha"] = [0.30] * n
         source.data["line_alpha"] = [0.7] * n
         line_source.data["alpha"] = [0.7] * n
@@ -165,12 +186,13 @@ def build_explorer(csv_path, output_path, mode="select"):
         )
         clear_btn.js_on_click(clear_toggle_cb)
 
-        controls = row(cat_checkbox, obj_select, label_toggle, clear_btn)
-        layout = column(controls, info_div, p, sizing_mode="stretch_width")
+        controls = row(cat_checkbox, obj_select, label_title, label_mode, clear_btn)
+        layout = column(controls, info_div, row(p, key_div, sizing_mode="stretch_width"), sizing_mode="stretch_width")
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
             "<p>102 reference objects across 10 categories. Toggle categories with the "
-            "checkboxes; pick an object to pin its label. Hover any glyph for details. " + DIY_LINKS_HTML + "</p>"
+            "checkboxes. Objects are numbered, with the key beside the plot; switch Labels to "
+            "Names or None as you prefer. Click or pick an object to pin it. " + DIY_LINKS_HTML + "</p>"
         )
         write_explorer_html(output_path, layout, header)
         return
@@ -213,9 +235,10 @@ def build_explorer(csv_path, output_path, mode="select"):
     clear_btn.js_on_click(clear_cb)
 
     # ── Layout ─────────────────────────────────────────────────────
-    pin_row = row(obj_select, label_toggle, clear_btn)
+    pin_row = row(obj_select, label_title, label_mode, clear_btn)
     custom_row = row(custom_name, custom_tmin, custom_tmax, custom_smin, custom_smax, custom_btn)
-    layout = column(cat_title, cat_checkbox, pin_row, custom_row, info_div, p, sizing_mode="stretch_width")
+    plot_row = row(p, key_div, sizing_mode="stretch_width")
+    layout = column(cat_title, cat_checkbox, pin_row, custom_row, info_div, plot_row, sizing_mode="stretch_width")
 
     header = (
         "<h2>timeSpace — Reference Object Explorer</h2>"
