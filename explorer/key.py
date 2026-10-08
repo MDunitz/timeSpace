@@ -8,13 +8,19 @@ category is a contiguous block.
 
 import html
 
-from .config import CATEGORY_COLORS
+from .config import CATEGORY_COLORS, FIGURE_HEIGHT
 
 LABEL_MODES = ["Names", "Numbers", "None"]
 NAMES, NUMBERS, NO_LABELS = range(3)
 
 KEY_WIDTH = 270
-KEY_STYLES = {"font-size": "12px", "line-height": "1.4", "max-height": "640px", "overflow-y": "auto"}
+# The key scrolls within the height of the plot frame beside it.
+KEY_STYLES = {
+    "font-size": "12px",
+    "line-height": "1.4",
+    "max-height": f"{FIGURE_HEIGHT - 80}px",
+    "overflow-y": "auto",
+}
 
 
 def assign_numbers(df):
