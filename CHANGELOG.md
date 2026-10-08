@@ -12,6 +12,10 @@ All notable changes to timeSpace are recorded here. Format follows
   (`explorer/links.py`). Hover tooltips follow the cursor and cannot be
   clicked, so the links live in the panel. Citations with no such identifier
   stay plain text; the CSV holds no URLs.
+- Explorer: "Labels" control with Names, Numbers and None. Numbers mode
+  marks each object with a number and shows a key beside the plot grouped
+  by category (`explorer/key.py`); toggle mode starts in it. Name labels
+  sit on a translucent white plate. Replaces the "Show labels" checkbox.
 
 ## [0.3.0] — 2026-10-06
 
