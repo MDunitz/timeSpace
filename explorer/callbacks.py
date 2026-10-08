@@ -131,9 +131,9 @@ CUSTOM_OBJECT_JS = """
 # object) and never writes back to a widget, so the category and object
 # controls cannot reset each other. Categories accumulate.
 #
-# Labels: the pinned object is always labelled. Every other visible object
-# is labelled while the "Show labels" box is ticked; otherwise it is
-# identified on hover.
+# Labels: the pinned object is always labelled by name. Every other visible
+# object follows the label mode: its name, a number that the key beside the
+# plot resolves, or nothing (identified on hover).
 VISIBILITY_JS = """
     function esc(s) {
         return String(s).replace(/[&<>"']/g, function(c) {
@@ -163,11 +163,30 @@ VISIBILITY_JS = """
         if (inCat) names.push(data[i].Name);
         if (isSel) pinned = data[i];
     }
-    const labelCategories = label_toggle.active.length > 0;
+    const NAMES = 0, NUMBERS = 1;
+    const mode = label_mode.active;
+    const nal = label_source.data['num_alpha'];
+    const pla = label_source.data['plate_alpha'];
+    const npla = label_source.data['num_plate_alpha'];
+    const keyParts = [];
     for (let i = 0; i < a.length; i++) {
         const isSel = sel !== NONE && data[i].Name === sel;
-        lal[i] = (isSel || (a[i] > 0 && labelCategories)) ? 1.0 : 0.0;
+        const on = a[i] > 0;
+        lal[i] = (isSel || (on && mode === NAMES)) ? 1.0 : 0.0;
+        nal[i] = (on && !isSel && mode === NUMBERS) ? 1.0 : 0.0;
+        pla[i] = 0.75 * lal[i];
+        npla[i] = 0.9 * nal[i];
     }
+    // Key beside the plot: number -> name for what is showing, by category.
+    if (mode === NUMBERS) {
+        for (const cat of cats) {
+            const lines = data.filter((d, i) => d.Category === cat && a[i] > 0)
+                              .sort((x, y) => x.Number - y.Number).map(d => d.KeyLine);
+            if (lines.length) keyParts.push(key_headers[cat] + lines.join(''));
+        }
+    }
+    key.text = keyParts.join('');
+    key.visible = keyParts.length > 0;
     source.change.emit();
     label_source.change.emit();
     line_source.change.emit();
@@ -185,7 +204,8 @@ VISIBILITY_JS = """
     } else if (activeSet.length > 1) {
         parts.push('<b>' + shown + '</b> objects shown across ' + activeSet.length +
             ' categories (' + activeSet.map(esc).join(', ') + '). ' +
-            (labelCategories ? 'Click' : 'Hover for names; click') +
+            (mode === NAMES ? 'Click' :
+             mode === NUMBERS ? 'Numbers are listed in the key; click' : 'Hover for names; click') +
             ' an object to pin it and see its source.');
     }
     info.text = parts.length ? parts.join('<br>') : empty_text;
