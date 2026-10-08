@@ -33,7 +33,7 @@ plot a custom object in the panel. Labels start on "Names".
 ### `mode="toggle"`
 
 Starts with every category on and has no custom-object panel; labels
-start on "Numbers" with the full key beside the plot. Use this to
+start on "Names", as in select mode. Use this to
 compare whole categories and see how groups distribute across time and
 space.
 
