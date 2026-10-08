@@ -55,7 +55,7 @@ from bokeh.plotting import show
 show(p)
 ```
 
-For a worked example, see the [desert farm Stommel diagram notebook](https://github.com/MDunitz/timeSpace/blob/main/docs/desert_farm_colab.ipynb).
+To see it in action, open the [reference-object explorer](https://mdunitz.github.io/timeSpace/) (102 everyday and scientific objects, each with its source), or plot your own objects alongside them in the [explorer notebook](https://colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/reference_explorer_colab.ipynb).
 
 ## Conventions
 
