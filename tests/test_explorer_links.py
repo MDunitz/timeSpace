@@ -35,3 +35,25 @@ def test_csv_identifiers_all_link():
     """Every identifier present in the shipped CSV is picked up."""
     refs = pd.read_csv(CSV).Reference.dropna()
     assert refs.str.count(r"BioNumbers \d+|doi:10\.|arXiv:\d|PMC\d").sum() == sum(len(identifier_urls(r)) for r in refs)
+
+
+class TestReferenceUrlColumn:
+    def test_urls_are_http_unique_per_row_and_whitespace_separated(self):
+        urls = pd.read_csv(CSV).Reference_URL.dropna().str.split()
+        assert len(urls) >= 70
+        for row in urls:
+            assert all(u.startswith(("https://", "http://")) for u in row)
+            assert len(row) == len(set(row))
+
+    def test_only_cited_rows_carry_urls(self):
+        df = pd.read_csv(CSV)
+        assert df[df.Reference.isna()].Reference_URL.isna().all()
+
+    def test_source_pages_render_after_the_citation_by_host(self):
+        from timeSpace.explorer.links import host_label, reference_html
+
+        out = reference_html("NOAA tides tutorial (BioNumbers 1)", ["https://www.example.org/a?b=1&c=2"])
+        assert host_label("https://www.example.org/a") == "example.org"
+        assert out.index("bionumber.aspx?id=1") < out.index("Source pages:")
+        assert 'href="https://www.example.org/a?b=1&amp;c=2"' in out and ">example.org</a>" in out
+        assert "Source pages" not in reference_html("no links here", [])
