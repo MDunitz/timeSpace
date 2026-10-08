@@ -23,6 +23,12 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ### Fixed
 - Seasonal algal bloom duration extended to 58 days (Silva et al. 2021).
+- Pando aspen clone age set to 12,000-37,000 yr (revised Pineau et al.
+  preprint; was 16,000-80,000 yr from its first version).
+- Giant sequoia: ages 1,650 to 3,266 yr and bole volumes 790-1,487 m3 from
+  Stephenson (2000), now cited to Madrono 47:61-67 instead of "USGS".
+- Butterfly wing beat citation gains its year and sample sizes; values
+  unchanged.
 
 ## [0.3.0] — 2026-10-06
 
