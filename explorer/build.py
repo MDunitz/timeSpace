@@ -7,7 +7,7 @@ Google Sites. To upgrade to a Bokeh server later, replace the CustomJS
 callbacks with Python callbacks.
 """
 
-from bokeh.models import CustomJS, Select, TextInput, Button, Div, CheckboxGroup, InlineStyleSheet
+from bokeh.models import CustomJS, Select, TextInput, Button, Div, CheckboxGroup, InlineStyleSheet, TapTool
 from bokeh.layouts import column, row
 
 from .config import CATEGORY_COLORS, DIY_LINKS_HTML
@@ -20,6 +20,7 @@ from .callbacks import (
     VISIBILITY_JS,
     CLEAR_TOGGLE_JS,
     SELECT_CLEAR_JS,
+    TAP_PIN_JS,
 )
 
 
@@ -54,7 +55,7 @@ def build_explorer(csv_path, output_path, mode="select"):
 
     p = create_figure(*data_ranges(df))
 
-    source, line_source, point_source, label_source, patches = add_reference_glyphs(p, df)
+    source, line_source, point_source, label_source, shapes = add_reference_glyphs(p, df)
     custom_source, custom_line_source, custom_point_source, custom_label_source = add_custom_glyphs(p)
 
     # ── Widgets ────────────────────────────────────────────────────
@@ -88,7 +89,10 @@ def build_explorer(csv_path, output_path, mode="select"):
     custom_btn = Button(label="Plot custom object", button_type="primary", width=160)
     clear_btn = Button(label="Clear all", button_type="warning", width=100)
 
-    empty_text = "<i>Tick one or more categories, pin an object, or define your own.</i>"
+    empty_text = (
+        "<i>Tick one or more categories, pin an object, or define your own. "
+        "Click any shape to pin it and see its source.</i>"
+    )
     info_div = Div(
         text=empty_text,
         width=700,
@@ -105,7 +109,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             "Time_max": r.Time_max.value,
             "Space_min": r.Space_min.value,
             "Space_max": r.Space_max.value,
-            "Reference": r.Reference,
+            "ReferenceHtml": r.ReferenceHtml,
             "TimeLabel": r.TimeLabel,
             "SpaceLabel": r.SpaceLabel,
         }
@@ -133,6 +137,13 @@ def build_explorer(csv_path, output_path, mode="select"):
     obj_select.js_on_change("value", visibility_cb)
     label_toggle.js_on_change("active", visibility_cb)
 
+    # ── Tap a shape to pin it (source links live in the info panel) ─
+    p.add_tools(TapTool(renderers=shapes))
+    for src in (source, line_source, point_source):
+        src.selected.js_on_change(
+            "indices", CustomJS(args=dict(src=src, obj_select=obj_select, data=full_data), code=TAP_PIN_JS)
+        )
+
     # ── Toggle mode: starts with every category on ─────────────────
     if toggle:
         # Default: all categories on. Bake the initial visible state into
@@ -141,7 +152,7 @@ def build_explorer(csv_path, output_path, mode="select"):
         n = len(df)
         info_div.text = (
             f"<b>{n}</b> objects shown across {len(cat_labels)} categories. "
-            "Hover for names; pick an object to pin its label."
+            "Hover for names; click an object to pin it and see its source."
         )
         source.data["alpha"] = [0.30] * n
         source.data["line_alpha"] = [0.7] * n

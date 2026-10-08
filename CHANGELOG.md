@@ -4,6 +4,15 @@ All notable changes to timeSpace are recorded here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Explorer: clicking a shape pins that object, and the info panel shows its
+  source with BioNumbers, DOI, arXiv and PubMed Central identifiers as links
+  (`explorer/links.py`). Hover tooltips follow the cursor and cannot be
+  clicked, so the links live in the panel. Citations with no such identifier
+  stay plain text; the CSV holds no URLs.
+
 ## [0.3.0] — 2026-10-06
 
 Reference objects sourced and corrected, and the explorer reworked around

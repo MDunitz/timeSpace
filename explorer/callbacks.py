@@ -178,16 +178,32 @@ VISIBILITY_JS = """
         parts.push('<b>' + esc(pinned.Name) + '</b> (' + esc(pinned.Category) + ')<br>' +
             'Time: ' + esc(pinned.TimeLabel) + '<br>' +
             'Space: ' + esc(pinned.SpaceLabel) + '<br>' +
-            '<span style="color:#444">Source: ' + esc(pinned.Reference) + '</span>');
+            '<span style="color:#444">Source: ' + pinned.ReferenceHtml + '</span>');
     }
     if (activeSet.length === 1) {
         parts.push('<b>' + esc(activeSet[0]) + '</b>: ' + names.length + ' objects — ' + names.map(esc).join(', '));
     } else if (activeSet.length > 1) {
         parts.push('<b>' + shown + '</b> objects shown across ' + activeSet.length +
             ' categories (' + activeSet.map(esc).join(', ') + '). ' +
-            (labelCategories ? 'Pick an object to pin it.' : 'Hover for names; pick an object to pin its label.'));
+            (labelCategories ? 'Click' : 'Hover for names; click') +
+            ' an object to pin it and see its source.');
     }
     info.text = parts.length ? parts.join('<br>') : empty_text;
+"""
+
+# Tap-to-pin: a tooltip follows the cursor and cannot be clicked, so a tap on
+# a shape pins that object, which puts its source (with links) in the info
+# panel. Hidden shapes are ignored; where shapes overlap, the one covering
+# the fewest decades (log time span x log volume span) wins. The selection
+# is cleared again so the tap leaves no selection state behind.
+TAP_PIN_JS = """
+    const hit = cb_obj.indices.filter(i => src.data['alpha'][i] > 0);
+    if (cb_obj.indices.length) cb_obj.indices = [];
+    if (!hit.length) return;
+    const decades = i => Math.log10(data[i].Time_max / data[i].Time_min) *
+                         Math.log10(data[i].Space_max / data[i].Space_min);
+    hit.sort((i, j) => decades(i) - decades(j));
+    obj_select.value = data[hit[0]].Name;
 """
 
 CLEAR_TOGGLE_JS = """

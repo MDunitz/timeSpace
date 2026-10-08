@@ -16,6 +16,7 @@ REFERENCE_TOOLTIP = """
   <div>Time: @time_label</div>
   <div>Space: @space_label</div>
   <div style="color: #444;">Source: @reference</div>
+  <div style="color: #888; font-style: italic;">Click to pin; source links then open from the info panel.</div>
 </div>
 """
 
@@ -38,8 +39,9 @@ def _hover_columns(df):
 def add_reference_glyphs(p, df):
     """Build the index-aligned reference-object sources and attach glyphs.
 
-    Returns (source, line_source, point_source, label_source, patches),
-    where `patches` is the renderer the hover tool is bound to.
+    Returns (source, line_source, point_source, label_source, shapes),
+    where `shapes` are the patch, line and point renderers that the hover
+    and tap tools are bound to (index-aligned with their sources).
     """
 
     # Main reference object patches (ellipses only). Non-ellipse objects get
@@ -131,8 +133,13 @@ def add_reference_glyphs(p, df):
 
     # Hover on every reference shape (ellipses, lines and points), not on
     # text glyphs or the custom source, and only while the shape is shown.
+    shapes = [patches, lines, points]
+    for r in shapes:
+        # A tap pins the object instead of selecting it, so no dimming.
+        r.selection_glyph = None
+        r.nonselection_glyph = None
     hover = HoverTool(
-        renderers=[patches, lines, points],
+        renderers=shapes,
         tooltips=REFERENCE_TOOLTIP,
         filters={"@alpha": CustomJS(code=HOVER_ONLY_VISIBLE_JS)},
     )
@@ -161,7 +168,7 @@ def add_reference_glyphs(p, df):
         text_baseline="middle",
     )
 
-    return source, line_source, point_source, label_source, patches
+    return source, line_source, point_source, label_source, shapes
 
 
 def add_custom_glyphs(p):

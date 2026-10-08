@@ -6,6 +6,7 @@ import pandas as pd
 from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
 
 from .config import CATEGORY_COLORS, EXPLORER_N_POINTS, RANGE_PAD_DECADES, UNSOURCED_LABEL
+from .links import linkify_reference
 from .units import format_time_range, format_volume_range
 
 
@@ -42,6 +43,7 @@ def load_reference_objects(csv_path):
     )
     df["TimeLabel"] = [format_time_range(r.Time_min, r.Time_max) for _, r in df.iterrows()]
     df["SpaceLabel"] = [format_volume_range(r.Space_min, r.Space_max) for _, r in df.iterrows()]
+    df["ReferenceHtml"] = df.Reference.map(linkify_reference)
     return df
 
 
