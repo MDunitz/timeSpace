@@ -185,7 +185,8 @@ VISIBILITY_JS = """
     } else if (activeSet.length > 1) {
         parts.push('<b>' + shown + '</b> objects shown across ' + activeSet.length +
             ' categories (' + activeSet.map(esc).join(', ') + '). ' +
-            (labelCategories ? 'Click an object to pin it and see its source.' : 'Hover for names; click an object to pin it and see its source.'));
+            (labelCategories ? '' : 'Hover for names; ') +
+            'click an object to pin it and see its source.');
     }
     info.text = parts.length ? parts.join('<br>') : empty_text;
 """
