@@ -33,6 +33,9 @@ All notable changes to timeSpace are recorded here. Format follows
   unchanged.
 - Ice age cycle: ocean volume set to the cited paper's 1.332e18 m3 (was
   1.335e18 m3, a different estimate, credited to the same paper).
+- Earth's orbit uses the volume the Earth sweeps in one year, 1.20e26 m3
+  (cross-section x orbit circumference), instead of the 1 au sphere
+  (1.4e34 m3). The volume axis now tops out at 1e29 m3 instead of 1e36.
 
 ## [0.3.0] — 2026-10-06
 
