@@ -86,9 +86,17 @@ class TestNumberedLabelsAndKey:
         positions = [html.index(line) for line in cellular.KeyLine]
         assert positions == sorted(positions)
 
-    def test_toggle_page_starts_numbered_with_full_key(self, toggle_html, df):
-        # every object's key entry is baked into the page
-        assert toggle_html.count("min-width:26px") >= 2 * len(df)
+    def test_both_pages_start_in_names_mode(self, toggle_html, select_html):
+        for html in (toggle_html, select_html):
+            compact = html.replace(" ", "")
+            i = compact.index('"labels":["Names","Numbers","None"]')
+            group = compact[compact.rindex("{", 0, i) : compact.index("}", i)]
+            assert '"active":0' in group or '"active"' not in group
+
+    def test_toggle_page_starts_without_a_baked_key(self, toggle_html):
+        # category headings appear once each (callback argument), not a second
+        # time inside a pre-filled key
+        assert toggle_html.count("margin-top:6px;font-weight:bold") == 10
 
     def test_select_page_starts_in_names_mode_with_key_hidden(self, select_html):
         assert '"labels":["Names","Numbers","None"]' in select_html.replace(" ", "")
