@@ -25,6 +25,9 @@ REFERENCE_TOOLTIP = """
 # Plate opacity is a field so hidden labels leave no white box behind.
 LABEL_PLATE_ALPHA = "plate_alpha"
 NUMBER_PLATE_ALPHA = "num_plate_alpha"
+# Opacity of the white plate behind a visible name / number label.
+NAME_PLATE_ALPHA = 0.75
+NUMBER_PLATE_OPACITY = 0.9
 # Dark digits on the white plate: several category colours are too light to
 # read as text, so the category colour goes on the plate border instead.
 NUMBER_TEXT_COLOR = "#222222"
