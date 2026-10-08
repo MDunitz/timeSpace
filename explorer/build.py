@@ -89,7 +89,10 @@ def build_explorer(csv_path, output_path, mode="select"):
     custom_btn = Button(label="Plot custom object", button_type="primary", width=160)
     clear_btn = Button(label="Clear all", button_type="warning", width=100)
 
-    empty_text = "<i>Tick one or more categories, pin an object, or define your own. Click any shape to pin it and see its source.</i>"
+    empty_text = (
+        "<i>Tick one or more categories, pin an object, or define your own. "
+        "Click any shape to pin it and see its source.</i>"
+    )
     info_div = Div(
         text=empty_text,
         width=700,
