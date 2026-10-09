@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "timeSpace"
-version = "0.3.0"
+version = "0.3.1"
 description = "Stommel diagrams for biogeochemical process visualization"
 requires-python = ">=3.10"
 license = {text = "MIT"}
