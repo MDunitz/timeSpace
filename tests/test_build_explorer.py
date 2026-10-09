@@ -34,7 +34,7 @@ class TestSelectMode:
         # a category. The shared callback must only read widget state.
         from timeSpace.explorer.callbacks import VISIBILITY_JS
 
-        assert "obj_select.value =" not in VISIBILITY_JS
+        assert "pin_choice.value =" not in VISIBILITY_JS
         assert "checkbox.active =" not in VISIBILITY_JS
 
     def test_starts_empty(self, select_html):
@@ -188,7 +188,8 @@ class TestTapToPinAndSourceLinks:
     def test_page_has_tap_tool_and_identifier_links(self, fixture, request):
         html = request.getfixturevalue(fixture)
         assert "TapTool" in html
-        assert "obj_select.value = data[hit[0]].Name" in html
+        assert "pin_choice.value = pins.concat([name])" in html
+        assert "MultiChoice" in html
         assert "bionumbers.hms.harvard.edu/bionumber.aspx?id=111975" in html
 
     def test_tap_does_not_dim_other_shapes(self):
@@ -199,3 +200,23 @@ class TestTapToPinAndSourceLinks:
         *_, shapes = add_reference_glyphs(create_figure(), load_reference_objects(str(CSV)))
         assert len(shapes) == 3
         assert all(r.nonselection_glyph is None and r.selection_glyph is None for r in shapes)
+
+
+class TestPinsAccumulate:
+    def test_tap_adds_to_pins_and_never_replaces_them(self):
+        from timeSpace.explorer.callbacks import TAP_PIN_JS
+
+        assert "pin_choice.value = pins.concat([name])" in TAP_PIN_JS
+        assert "pin_choice.value = data" not in TAP_PIN_JS
+
+    def test_only_clear_empties_the_pins(self):
+        from timeSpace.explorer import callbacks
+
+        assert "pin_choice.value = [];" in callbacks.CLEAR_TOGGLE_JS
+        assert "pin_choice.value = [];" in callbacks.SELECT_CLEAR_JS
+        assert "pin_choice.value = [];" not in callbacks.VISIBILITY_JS
+
+    def test_panel_lists_every_pinned_object(self):
+        from timeSpace.explorer.callbacks import VISIBILITY_JS
+
+        assert "Also pinned:" in VISIBILITY_JS
