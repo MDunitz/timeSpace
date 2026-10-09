@@ -6,6 +6,11 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-10-08
+
+Source links in the explorer, label modes, and a second round of
+reference-object corrections.
+
 ### Added
 - Explorer: clicking a shape pins that object, and the info panel shows its
   source with BioNumbers, DOI, arXiv and PubMed Central identifiers as links
@@ -16,9 +21,7 @@ All notable changes to timeSpace are recorded here. Format follows
   marks each object with a number and shows a key beside the plot grouped
   by category (`explorer/key.py`). Both pages start on Names. Name labels
   sit on a translucent white plate. Replaces the "Show labels" checkbox.
-- Explorer plot is 900 px tall (was 720) to give the 64-decade volume axis
-  more room.
-
+- Explorer plot is 765 px tall (was 720).
 - Reference objects: `Reference_URL` column with 112 checked source pages
   across 73 rows; the explorer lists them under the pinned object's
   citation. With the identifier links, 89 of the 93 cited rows now link out.
