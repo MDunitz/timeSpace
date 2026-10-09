@@ -165,11 +165,14 @@ VISIBILITY_JS = """
     const nal = label_source.data['num_alpha'];
     const pla = label_source.data['plate_alpha'];
     const npla = label_source.data['num_plate_alpha'];
+    const yoff = label_source.data['y_off'];
     const keyParts = [];
     for (let i = 0; i < a.length; i++) {
         const isSel = pins.indexOf(data[i].Name) !== -1;
         const on = a[i] > 0;
         lal[i] = (isSel || (on && mode === NAMES)) ? 1.0 : 0.0;
+        // A pinned name floats just above its shape so small shapes stay visible.
+        yoff[i] = isSel ? -pinned_label_lift : 0;
         nal[i] = (on && !isSel && mode === NUMBERS) ? 1.0 : 0.0;
         pla[i] = name_plate_alpha * lal[i];
         npla[i] = number_plate_alpha * nal[i];
@@ -220,8 +223,9 @@ VISIBILITY_JS = """
 
 # Tap-to-pin: a tooltip follows the cursor and cannot be clicked, so a tap on
 # a shape adds that object to the pins (it stays until removed or cleared),
-# which puts its source (with links) in the info panel. Hidden shapes are ignored; where shapes overlap, the one covering
-# the fewest decades (log time span x log volume span) wins. The selection
+# which puts its source (with links) in the info panel. Hidden shapes are
+# ignored; where shapes overlap, the one covering the fewest decades (log
+# time span x log volume span) wins. The selection
 # is cleared again so the tap leaves no selection state behind.
 TAP_PIN_JS = """
     const hit = cb_obj.indices.filter(i => src.data['alpha'][i] > 0);
