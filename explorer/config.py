@@ -2,9 +2,10 @@
 
 # Match main figure axis ranges (from plotting.py's create_space_time_figure)
 # TODO: move to constants.py so plotting.py and the explorer share a single source
-# Figure height in px. The volume axis spans about 64 decades against 31 for
-# time, so the plot is taller than a typical chart to give labels room.
-FIGURE_HEIGHT = 900
+# Figure height in px. The volume axis spans about 57 decades against 31 for
+# time, so the plot is a little taller than the 720 px it started at; 900 px
+# was tried and did not fit a laptop screen.
+FIGURE_HEIGHT = 765
 
 X_RANGE = (1e-3, 1e12)
 Y_RANGE = (1e-22, 1e20)
