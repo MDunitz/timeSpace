@@ -6,6 +6,15 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+### Changed
+- Explorer: pins accumulate. Clicking shapes or picking from the pin control
+  adds objects, and they stay until their chip is removed or "Clear all" is
+  pressed. The panel shows full details for the latest pin and one line for
+  each of the others. Replaces the single-object dropdown.
+
+### Fixed
+- Domestic cat lifespan lower bound 12 yr -> 13 yr to match its cited source.
+
 ## [0.3.1] — 2026-10-08
 
 Source links in the explorer, label modes, and a second round of
