@@ -27,6 +27,8 @@ LABEL_PLATE_ALPHA = "plate_alpha"
 NUMBER_PLATE_ALPHA = "num_plate_alpha"
 # Opacity of the white plate behind a visible name / number label.
 NAME_PLATE_ALPHA = 0.75
+# Pixels a pinned object's name is lifted above its anchor.
+PINNED_LABEL_LIFT = 14
 NUMBER_PLATE_OPACITY = 0.9
 # Dark digits on the white plate: several category colours are too light to
 # read as text, so the category colour goes on the plate border instead.
@@ -162,6 +164,7 @@ def add_reference_glyphs(p, df):
             y=df.label_y.tolist(),
             text=df.FullName.tolist(),
             alpha=[0.0] * len(df),
+            y_off=[0] * len(df),
             number=df.Number.astype(str).tolist(),
             num_alpha=[0.0] * len(df),
             plate_alpha=[0.0] * len(df),
@@ -178,6 +181,7 @@ def add_reference_glyphs(p, df):
         "y",
         source=label_source,
         text="text",
+        y_offset="y_off",
         text_font_size="8pt",
         text_color="color",
         text_alpha="alpha",
