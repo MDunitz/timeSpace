@@ -23,7 +23,7 @@ from bokeh.layouts import column, row
 from .config import CATEGORY_COLORS, DIY_LINKS_HTML
 from .data import data_ranges, load_reference_objects
 from .figure import create_figure
-from .sources import NAME_PLATE_ALPHA, NUMBER_PLATE_OPACITY, add_reference_glyphs, add_custom_glyphs
+from .sources import NAME_PLATE_ALPHA, NUMBER_PLATE_OPACITY, PINNED_LABEL_LIFT, add_reference_glyphs, add_custom_glyphs
 from .html import write_explorer_html
 from .key import KEY_STYLES, KEY_WIDTH, LABEL_MODES, NAMES, key_header
 from .callbacks import (
@@ -151,6 +151,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             key=key_div,
             key_headers={c: key_header(c) for c in cat_labels},
             name_plate_alpha=NAME_PLATE_ALPHA,
+            pinned_label_lift=PINNED_LABEL_LIFT,
             number_plate_alpha=NUMBER_PLATE_OPACITY,
             empty_text=empty_text,
         ),
