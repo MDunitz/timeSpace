@@ -220,3 +220,20 @@ class TestPinsAccumulate:
         from timeSpace.explorer.callbacks import VISIBILITY_JS
 
         assert "Also pinned:" in VISIBILITY_JS
+
+
+class TestMarkerAxes:
+    def test_marker_names_live_on_axes_outside_the_frame(self):
+        from bokeh.models import Label, LogAxis
+
+        from timeSpace.constants import SPACE_MARKERS, TIME_MARKERS
+        from timeSpace.explorer.figure import create_figure
+
+        p = create_figure()
+        assert not [r for r in p.center if isinstance(r, Label)]
+        (top,) = [a for a in p.above if isinstance(a, LogAxis)]
+        (right,) = [a for a in p.right if isinstance(a, LogAxis)]
+        assert sorted(top.ticker.ticks) == sorted(TIME_MARKERS)
+        assert sorted(right.ticker.ticks) == sorted(SPACE_MARKERS)
+        assert top.major_label_overrides[8.64e4] == "Day"
+        assert set(right.major_label_overrides.values()) == set(SPACE_MARKERS.values())
