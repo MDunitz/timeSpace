@@ -14,6 +14,10 @@ All notable changes to timeSpace are recorded here. Format follows
 - Explorer: a pinned object's name sits just above its shape instead of on
   top of it, so small shapes are no longer hidden by their own label.
 
+- Explorer: the time and volume marker names (Second, Day, km3 and so on)
+  moved from inside the plot to a top and a right axis. They follow pan and
+  zoom and show only while their magnitude is in view.
+
 ### Fixed
 - Domestic cat lifespan lower bound 12 yr -> 13 yr to match its cited source.
 
