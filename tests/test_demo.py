@@ -1,6 +1,6 @@
 """Tests for the demo() convenience function."""
 
-from bokeh.models import GlyphRenderer, Label
+from bokeh.models import GlyphRenderer
 
 from timeSpace import demo
 
@@ -21,10 +21,10 @@ def test_demo_has_processes():
 
 
 def test_demo_has_labels():
-    """demo figure should have Label annotations (magnitude labels)."""
+    """demo figure should name its magnitude markers on extra axes."""
     p = demo(show=False)
-    labels = [obj for obj in p.center if isinstance(obj, Label)]
-    assert len(labels) >= 1
+    named = [a for a in p.below + p.right if getattr(a, "major_label_overrides", None)]
+    assert len(named) == 2
 
 
 def test_demo_has_legend():

@@ -54,7 +54,7 @@ class TestAddMagnitudeLabels:
         before = len(p.center)
         add_magnitude_labels(p)
         after = len(p.center)
-        # Each marker adds a Label + a Span → at least 2 per marker
+        # Each marker adds a dashed guide line (Span)
         assert after > before
 
     def test_returns_figure(self):
@@ -210,16 +210,39 @@ def test_x_axis_location_param():
     assert below.xaxis[0].axis_label == "Time (s)"
 
 
+def _marker_axes(p):
+    """{side: marker axis} for the extra FixedTicker axes on a figure."""
+    return {
+        side: a
+        for side in ("above", "below", "left", "right")
+        for a in getattr(p, side)
+        if type(a).__name__ == "LogAxis" and type(a.ticker).__name__ == "FixedTicker"
+    }
+
+
 def test_add_magnitude_labels_custom_markers_and_bottom_axis():
-    """time_markers overrides the defaults; labels hug the bottom when x is below."""
+    """time_markers overrides the defaults; names sit opposite the x axis."""
     p = create_space_time_figure(space_on_x=False, x_axis_location="below")
     p = add_magnitude_labels(p, space_on_x=False, time_markers={1.0: "Second", 3.156e10: "Millennia"})
-    labels = [a for a in p.center if type(a).__name__ == "Label"]
-    texts = {la.text for la in labels}
-    assert "Second" in texts and "Millennia" in texts
-    assert "Day" not in texts and "Protein Folding" not in texts
-    sec = next(la for la in labels if la.text == "Second")
-    assert sec.text_baseline == "bottom"
+    axes = _marker_axes(p)
+    assert set(axes) == {"above", "right"}
+    assert set(axes["above"].major_label_overrides.values()) == {"Second", "Millennia"}
+    assert sorted(axes["above"].ticker.ticks) == [1.0, 3.156e10]
+    assert not [a for a in p.center if type(a).__name__ == "Label"]
+
+
+def test_marker_axes_follow_orientation_and_avoid_the_main_axes():
+    """Default figure: space on x (axis above), time on y (axis left)."""
+    from timeSpace.constants import SPACE_MARKERS, TIME_MARKERS
+
+    p = add_magnitude_labels(create_space_time_figure())
+    axes = _marker_axes(p)
+    assert set(axes) == {"below", "right"}
+    assert sorted(axes["below"].ticker.ticks) == sorted(SPACE_MARKERS)
+    assert sorted(axes["right"].ticker.ticks) == sorted(TIME_MARKERS)
+    # one dashed guide line per marker, none inside-plot labels
+    spans = [a for a in p.center if type(a).__name__ == "Span"]
+    assert len(spans) == len(SPACE_MARKERS) + len(TIME_MARKERS)
 
 
 def test_label_side_above_below_center_aligned():
