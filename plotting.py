@@ -2,9 +2,9 @@ import numpy as np
 import colorcet as cc
 import pandas as pd
 from bokeh.plotting import figure
-from bokeh.models import Label, Span, CustomJS
 from timeSpace.constants import DIFFUSION_COEFFICIENTS, TIME_MARKERS, SPACE_MARKERS, base_time, COORD_ORIENTATION_COL
 from timeSpace.calculations import calculate_diffusion_length, calculate_sphere_volume
+from timeSpace.marker_axes import add_marker_axes
 
 DEFAULT_FONT_SIZE = "14pt"
 
@@ -213,7 +213,11 @@ def add_light_cone(p, color="#8B8000", line_dash="solid", line_width=1.5, line_a
 
 
 def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True, time_markers=None, space_markers=None):
-    """Add axis reference lines and labels.
+    """Add reference guide lines and their names on axes outside the plot.
+
+    The names are tick labels on two extra axes placed opposite the figure's
+    own axes, so they follow pan and zoom and show only while in view (see
+    `marker_axes`).
 
     Parameters
     ----------
@@ -227,96 +231,7 @@ def add_magnitude_labels(p, font_size=DEFAULT_FONT_SIZE, space_on_x=True, time_m
     """
     time_markers = TIME_MARKERS if time_markers is None else time_markers
     space_markers = SPACE_MARKERS if space_markers is None else space_markers
-
-    # When TIME is on x, place its labels at whichever edge the x axis sits on.
-    x_on_bottom = any(a in list(p.xaxis) for a in p.below)
-
-    # Orientation: which markers go on which axis
-    if space_on_x:
-        time_dim, space_dim = "width", "height"
-    else:
-        time_dim, space_dim = "height", "width"
-
-    time_labels = []
-    edge = p.x_range.start if hasattr(p.x_range, "start") else 10**-27
-    y_end = p.y_range.end if hasattr(p.y_range, "end") else 1e21
-    y_start = p.y_range.start if hasattr(p.y_range, "start") else 1e-21
-    for time_val, label_text in time_markers.items():
-        time_span = Span(location=time_val, dimension=time_dim, line_color="#cccccc", line_dash="dashed", line_width=1)
-        if space_on_x:
-            lbl_kwargs = dict(x=edge, y=time_val, text_align="left", text_baseline="middle")
-        else:
-            lbl_kwargs = dict(
-                x=time_val,
-                y=y_start if x_on_bottom else y_end,
-                text_align="center",
-                text_baseline="bottom" if x_on_bottom else "top",
-            )
-        label = Label(
-            **lbl_kwargs,
-            text=label_text,
-            text_font_size=font_size,
-            text_color="#aaaaaa",
-        )
-        p.add_layout(label)
-        p.add_layout(time_span)
-        time_labels.append(label)
-
-    space_labels = []
-    for space_val, label_text in space_markers.items():
-        space_span = Span(
-            location=space_val, dimension=space_dim, line_color="#dddddd", line_dash="dashed", line_width=1
-        )
-        if space_on_x:
-            y_top = (p.y_range.end if hasattr(p.y_range, "end") else 10**-1) * 3
-            lbl_kwargs = dict(x=space_val, y=y_top, text_align="center", text_baseline="top")
-        else:
-            lbl_kwargs = dict(
-                y=space_val,
-                x=p.x_range.start if hasattr(p.x_range, "start") else 10**-3,
-                text_align="left",
-                text_baseline="middle",
-            )
-        label = Label(
-            **lbl_kwargs,
-            text=label_text,
-            text_font_size=font_size,
-            text_color="#aaaaaa",
-        )
-        p.add_layout(label)
-        p.add_layout(space_span)
-        space_labels.append(label)
-
-    # Sticky callbacks: labels follow visible range edges on pan/zoom.
-    if space_on_x:
-        time_cb = CustomJS(
-            args=dict(labels=time_labels, x_range=p.x_range),
-            code="const left = Math.min(x_range.start, x_range.end); for (const l of labels) { l.x = left; }",
-        )
-        p.x_range.js_on_change("start", time_cb)
-        p.x_range.js_on_change("end", time_cb)
-        space_cb = CustomJS(
-            args=dict(labels=space_labels, y_range=p.y_range),
-            code="const top = Math.min(y_range.start, y_range.end) * 3; for (const l of labels) { l.y = top; }",
-        )
-        p.y_range.js_on_change("start", space_cb)
-        p.y_range.js_on_change("end", space_cb)
-    else:
-        edge_js = "Math.min" if x_on_bottom else "Math.max"
-        time_cb = CustomJS(
-            args=dict(labels=time_labels, y_range=p.y_range),
-            code=f"const edge = {edge_js}(y_range.start, y_range.end); for (const l of labels) {{ l.y = edge; }}",
-        )
-        p.y_range.js_on_change("start", time_cb)
-        p.y_range.js_on_change("end", time_cb)
-        space_cb = CustomJS(
-            args=dict(labels=space_labels, x_range=p.x_range),
-            code="const left = Math.min(x_range.start, x_range.end); for (const l of labels) { l.x = left; }",
-        )
-        p.x_range.js_on_change("start", space_cb)
-        p.x_range.js_on_change("end", space_cb)
-
-    return p
+    return add_marker_axes(p, time_markers, space_markers, font_size, space_on_x=space_on_x)
 
 
 def _check_coord_orientation(process_df, space_on_x):
