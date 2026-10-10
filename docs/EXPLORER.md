@@ -38,6 +38,11 @@ start on "Names", as in select mode. Use this to
 compare whole categories and see how groups distribute across time and
 space.
 
+Markers: dashed guide lines mark named magnitudes (Second, Day, Year; mm³, m³,
+km³). Their names sit on a top axis (time) and a right axis (volume), outside
+the plot frame, so they follow pan and zoom and appear only while that
+magnitude is in view.
+
 Source links: clicking a shape pins it (where shapes overlap, the one
 spanning the fewest decades is chosen). The info panel then shows the most
 recently pinned object's source (other pins are listed on one line each), with BioNumbers, DOI, arXiv and PubMed Central identifiers
