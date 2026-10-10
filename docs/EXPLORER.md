@@ -20,8 +20,9 @@ The `mode` argument controls how the viewer chooses what to display.
 
 Both modes share one visibility rule: a `CheckboxGroup` of the 10
 categories with **accumulate** semantics (any combination can be on at
-once), plus an object dropdown that **pins** one individual on top (shown
-even if its category is off). Visibility is recomputed from the widget
+once), plus a **pin** control: objects picked there, or clicked on the plot,
+are shown on top even if their category is off, and stay pinned until their
+chip is removed or "Clear all" is pressed. Visibility is recomputed from the widget
 state on every change and the callback never writes back to a widget, so
 ticking categories and pinning an object do not reset each other.
 
@@ -38,8 +39,8 @@ compare whole categories and see how groups distribute across time and
 space.
 
 Source links: clicking a shape pins it (where shapes overlap, the one
-spanning the fewest decades is chosen). The info panel then shows the pinned
-object's source, with BioNumbers, DOI, arXiv and PubMed Central identifiers
+spanning the fewest decades is chosen). The info panel then shows the most
+recently pinned object's source (other pins are listed on one line each), with BioNumbers, DOI, arXiv and PubMed Central identifiers
 as links. The hover tooltip shows the same text but follows the cursor, so
 it cannot hold clickable links. Below the citation, "Source pages" lists the
 row's `Reference_URL` entries by host name: pages that were fetched and

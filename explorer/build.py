@@ -9,7 +9,7 @@ callbacks with Python callbacks.
 
 from bokeh.models import (
     CustomJS,
-    Select,
+    MultiChoice,
     TextInput,
     Button,
     Div,
@@ -23,7 +23,7 @@ from bokeh.layouts import column, row
 from .config import CATEGORY_COLORS, DIY_LINKS_HTML
 from .data import data_ranges, load_reference_objects
 from .figure import create_figure
-from .sources import NAME_PLATE_ALPHA, NUMBER_PLATE_OPACITY, add_reference_glyphs, add_custom_glyphs
+from .sources import NAME_PLATE_ALPHA, NUMBER_PLATE_OPACITY, PINNED_LABEL_LIFT, add_reference_glyphs, add_custom_glyphs
 from .html import write_explorer_html
 from .key import KEY_STYLES, KEY_WIDTH, LABEL_MODES, NAMES, key_header
 from .callbacks import (
@@ -71,10 +71,14 @@ def build_explorer(csv_path, output_path, mode="select"):
 
     # ── Widgets ────────────────────────────────────────────────────
     cat_labels = sorted(CATEGORY_COLORS.keys())
-    objects = ["— Select object —"] + sorted(df.FullName.tolist())
     toggle = mode == "toggle"
-    obj_select = Select(
-        title="Pin an object:" if not toggle else "Or pick an object:", value=objects[0], options=objects, width=280
+    # Pins accumulate: each stays until its chip is removed or "Clear all".
+    pin_choice = MultiChoice(
+        title="Pinned objects (click shapes or pick here; they stay until removed):",
+        value=[],
+        options=sorted(df.FullName.tolist()),
+        placeholder="Pick objects to pin",
+        width=420,
     )
     key = category_key_stylesheet(cat_labels)
     if toggle:
@@ -103,7 +107,7 @@ def build_explorer(csv_path, output_path, mode="select"):
     clear_btn = Button(label="Clear all", button_type="warning", width=100)
 
     empty_text = (
-        "<i>Tick one or more categories, pin an object, or define your own. "
+        "<i>Tick one or more categories, pin objects, or define your own. "
         "Click any shape to pin it and see its source.</i>"
     )
     info_div = Div(
@@ -139,7 +143,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             line_source=line_source,
             point_source=point_source,
             checkbox=cat_checkbox,
-            obj_select=obj_select,
+            pin_choice=pin_choice,
             info=info_div,
             data=full_data,
             cats=cat_labels,
@@ -147,20 +151,21 @@ def build_explorer(csv_path, output_path, mode="select"):
             key=key_div,
             key_headers={c: key_header(c) for c in cat_labels},
             name_plate_alpha=NAME_PLATE_ALPHA,
+            pinned_label_lift=PINNED_LABEL_LIFT,
             number_plate_alpha=NUMBER_PLATE_OPACITY,
             empty_text=empty_text,
         ),
         code=VISIBILITY_JS,
     )
     cat_checkbox.js_on_change("active", visibility_cb)
-    obj_select.js_on_change("value", visibility_cb)
+    pin_choice.js_on_change("value", visibility_cb)
     label_mode.js_on_change("active", visibility_cb)
 
     # ── Tap a shape to pin it (source links live in the info panel) ─
     p.add_tools(TapTool(renderers=shapes))
     for src in (source, line_source, point_source):
         src.selected.js_on_change(
-            "indices", CustomJS(args=dict(src=src, obj_select=obj_select, data=full_data), code=TAP_PIN_JS)
+            "indices", CustomJS(args=dict(src=src, pin_choice=pin_choice, data=full_data), code=TAP_PIN_JS)
         )
 
     # ── Toggle mode: starts with every category on ─────────────────
@@ -181,18 +186,18 @@ def build_explorer(csv_path, output_path, mode="select"):
         point_source.data["alpha"] = [0.6] * n
 
         clear_toggle_cb = CustomJS(
-            args=dict(checkbox=cat_checkbox, obj_select=obj_select),
+            args=dict(checkbox=cat_checkbox, pin_choice=pin_choice),
             code=CLEAR_TOGGLE_JS,
         )
         clear_btn.js_on_click(clear_toggle_cb)
 
-        controls = row(cat_checkbox, obj_select, label_title, label_mode, clear_btn)
+        controls = row(cat_checkbox, pin_choice, label_title, label_mode, clear_btn)
         layout = column(controls, info_div, row(p, key_div, sizing_mode="stretch_width"), sizing_mode="stretch_width")
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
             "<p>102 reference objects across 10 categories. Toggle categories with the "
             "checkboxes. Switch Labels to Numbers for a numbered key beside the plot, or to "
-            "None to hide them. Click or pick an object to pin it. " + DIY_LINKS_HTML + "</p>"
+            "None to hide them. Click or pick objects to pin them; pins stay until removed. " + DIY_LINKS_HTML + "</p>"
         )
         write_explorer_html(output_path, layout, header)
         return
@@ -226,7 +231,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             clnsrc=custom_line_source,
             cptsrc=custom_point_source,
             checkbox=cat_checkbox,
-            obj_select=obj_select,
+            pin_choice=pin_choice,
             info=info_div,
             empty_text=empty_text,
         ),
@@ -235,7 +240,7 @@ def build_explorer(csv_path, output_path, mode="select"):
     clear_btn.js_on_click(clear_cb)
 
     # ── Layout ─────────────────────────────────────────────────────
-    pin_row = row(obj_select, label_title, label_mode, clear_btn)
+    pin_row = row(pin_choice, label_title, label_mode, clear_btn)
     custom_row = row(custom_name, custom_tmin, custom_tmax, custom_smin, custom_smax, custom_btn)
     plot_row = row(p, key_div, sizing_mode="stretch_width")
     layout = column(cat_title, cat_checkbox, pin_row, custom_row, info_div, plot_row, sizing_mode="stretch_width")
@@ -243,6 +248,6 @@ def build_explorer(csv_path, output_path, mode="select"):
     header = (
         "<h2>timeSpace — Reference Object Explorer</h2>"
         "<p>102 reference objects spanning molecular to planetary scales. "
-        "Tick categories to layer them, pin an individual object, or define your own. " + DIY_LINKS_HTML + "</p>"
+        "Tick categories to layer them, pin individual objects, or define your own. " + DIY_LINKS_HTML + "</p>"
     )
     write_explorer_html(output_path, layout, header)

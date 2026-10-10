@@ -127,11 +127,11 @@ CUSTOM_OBJECT_JS = """
 
 
 # Visibility callback shared by both modes. It recomputes every alpha from
-# the current widget state (checked categories plus the optionally-pinned
-# object) and never writes back to a widget, so the category and object
-# controls cannot reset each other. Categories accumulate.
+# the current widget state (checked categories plus any pinned objects) and
+# never writes back to a widget, so the category and pin controls cannot
+# reset each other. Categories and pins both accumulate.
 #
-# Labels: the pinned object is always labelled by name. Every other visible
+# Labels: pinned objects are always labelled by name. Every other visible
 # object follows the label mode: its name, a number that the key beside the
 # plot resolves, or nothing (identified on hover).
 VISIBILITY_JS = """
@@ -141,19 +141,17 @@ VISIBILITY_JS = """
         });
     }
     const activeSet = checkbox.active.map(k => cats[k]);
-    const sel = obj_select.value;
-    const NONE = obj_select.options[0];
+    const pins = pin_choice.value;
     const a = source.data['alpha'];
     const la = source.data['line_alpha'];
     const lal = label_source.data['alpha'];
     const lna = line_source.data['alpha'];
     const pta = point_source.data['alpha'];
     let shown = 0;
-    let pinned = null;
     const names = [];
     for (let i = 0; i < a.length; i++) {
         const inCat = activeSet.indexOf(data[i].Category) !== -1;
-        const isSel = sel !== NONE && data[i].Name === sel;
+        const isSel = pins.indexOf(data[i].Name) !== -1;
         const on = inCat || isSel;
         a[i] = on ? (isSel ? 0.5 : 0.30) : 0.0;
         la[i] = on ? (isSel ? 1.0 : 0.7) : 0.0;
@@ -161,18 +159,20 @@ VISIBILITY_JS = """
         pta[i] = on ? (isSel ? 0.8 : 0.6) : 0.0;
         if (on) shown++;
         if (inCat) names.push(data[i].Name);
-        if (isSel) pinned = data[i];
     }
     const NAMES = 0, NUMBERS = 1;
     const mode = label_mode.active;
     const nal = label_source.data['num_alpha'];
     const pla = label_source.data['plate_alpha'];
     const npla = label_source.data['num_plate_alpha'];
+    const yoff = label_source.data['y_off'];
     const keyParts = [];
     for (let i = 0; i < a.length; i++) {
-        const isSel = sel !== NONE && data[i].Name === sel;
+        const isSel = pins.indexOf(data[i].Name) !== -1;
         const on = a[i] > 0;
         lal[i] = (isSel || (on && mode === NAMES)) ? 1.0 : 0.0;
+        // A pinned name floats just above its shape so small shapes stay visible.
+        yoff[i] = isSel ? -pinned_label_lift : 0;
         nal[i] = (on && !isSel && mode === NUMBERS) ? 1.0 : 0.0;
         pla[i] = name_plate_alpha * lal[i];
         npla[i] = number_plate_alpha * nal[i];
@@ -192,12 +192,22 @@ VISIBILITY_JS = """
     line_source.change.emit();
     point_source.change.emit();
 
+    // Pinned objects, newest first: full details for the latest, one line
+    // each for the rest.
+    const byName = {};
+    for (const d of data) byName[d.Name] = d;
+    const pinned = pins.map(n => byName[n]).reverse();
     const parts = [];
-    if (pinned) {
-        parts.push('<b>' + esc(pinned.Name) + '</b> (' + esc(pinned.Category) + ')<br>' +
-            'Time: ' + esc(pinned.TimeLabel) + '<br>' +
-            'Space: ' + esc(pinned.SpaceLabel) + '<br>' +
-            '<span style="color:#444">Source: ' + pinned.ReferenceHtml + '</span>');
+    if (pinned.length) {
+        const d = pinned[0];
+        parts.push('<b>' + esc(d.Name) + '</b> (' + esc(d.Category) + ')<br>' +
+            'Time: ' + esc(d.TimeLabel) + '<br>' +
+            'Space: ' + esc(d.SpaceLabel) + '<br>' +
+            '<span style="color:#444">Source: ' + d.ReferenceHtml + '</span>');
+    }
+    if (pinned.length > 1) {
+        parts.push('<b>Also pinned:</b> ' + pinned.slice(1).map(d =>
+            esc(d.Name) + ' (' + esc(d.TimeLabel) + '; ' + esc(d.SpaceLabel) + ')').join(' · '));
     }
     if (activeSet.length === 1) {
         parts.push('<b>' + esc(activeSet[0]) + '</b>: ' + names.length + ' objects — ' + names.map(esc).join(', '));
@@ -212,9 +222,10 @@ VISIBILITY_JS = """
 """
 
 # Tap-to-pin: a tooltip follows the cursor and cannot be clicked, so a tap on
-# a shape pins that object, which puts its source (with links) in the info
-# panel. Hidden shapes are ignored; where shapes overlap, the one covering
-# the fewest decades (log time span x log volume span) wins. The selection
+# a shape adds that object to the pins (it stays until removed or cleared),
+# which puts its source (with links) in the info panel. Hidden shapes are
+# ignored; where shapes overlap, the one covering the fewest decades (log
+# time span x log volume span) wins. The selection
 # is cleared again so the tap leaves no selection state behind.
 TAP_PIN_JS = """
     const hit = cb_obj.indices.filter(i => src.data['alpha'][i] > 0);
@@ -223,12 +234,14 @@ TAP_PIN_JS = """
     const decades = i => Math.log10(data[i].Time_max / data[i].Time_min) *
                          Math.log10(data[i].Space_max / data[i].Space_min);
     hit.sort((i, j) => decades(i) - decades(j));
-    obj_select.value = data[hit[0]].Name;
+    const name = data[hit[0]].Name;
+    const pins = pin_choice.value;
+    if (pins.indexOf(name) === -1) pin_choice.value = pins.concat([name]);
 """
 
 CLEAR_TOGGLE_JS = """
     checkbox.active = [];
-    obj_select.value = obj_select.options[0];
+    pin_choice.value = [];
 """
 
 
@@ -245,6 +258,6 @@ SELECT_CLEAR_JS = """
         clnsrc.change.emit();
         cptsrc.change.emit();
         checkbox.active = [];
-        obj_select.value = obj_select.options[0];
+        pin_choice.value = [];
         info.text = empty_text;
     """
