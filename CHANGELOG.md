@@ -17,6 +17,11 @@ All notable changes to timeSpace are recorded here. Format follows
 - Explorer: the time and volume marker names (Second, Day, km3 and so on)
   moved from inside the plot to a top and a right axis. They follow pan and
   zoom and show only while their magnitude is in view.
+- `add_magnitude_labels` does the same for every figure: marker names are tick
+  labels on two extra axes placed opposite the figure's own axes, in either
+  orientation (new `marker_axes` module, shared with the explorer). The
+  in-plot `Label` annotations and their pan/zoom callbacks are gone; the
+  function's signature is unchanged.
 
 ### Fixed
 - Domestic cat lifespan lower bound 12 yr -> 13 yr to match its cited source.
