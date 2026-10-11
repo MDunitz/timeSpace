@@ -187,6 +187,11 @@ VISIBILITY_JS = """
     }
     key.text = keyParts.join('');
     key.visible = keyParts.length > 0;
+    // Canvas legend (the part the save tool captures): one swatch per
+    // category with anything showing, pinned objects included.
+    const showing = new Set(data.filter((d, i) => a[i] > 0).map(d => d.Category));
+    cats.forEach((cat, k) => { legend.items[k].visible = showing.has(cat); });
+    legend.visible = showing.size > 0;
     source.change.emit();
     label_source.change.emit();
     line_source.change.emit();

@@ -25,6 +25,7 @@ from .data import data_ranges, load_reference_objects
 from .figure import create_figure
 from .sources import NAME_PLATE_ALPHA, NUMBER_PLATE_OPACITY, PINNED_LABEL_LIFT, add_reference_glyphs, add_custom_glyphs
 from .html import write_explorer_html
+from .legend import add_category_legend
 from .key import KEY_STYLES, KEY_WIDTH, LABEL_MODES, NAMES, key_header
 from .callbacks import (
     CUSTOM_OBJECT_JS,
@@ -72,6 +73,7 @@ def build_explorer(csv_path, output_path, mode="select"):
     # ── Widgets ────────────────────────────────────────────────────
     cat_labels = sorted(CATEGORY_COLORS.keys())
     toggle = mode == "toggle"
+    legend = add_category_legend(p, cat_labels, shown=toggle)
     # Pins accumulate: each stays until its chip is removed or "Clear all".
     pin_choice = MultiChoice(
         title="Pinned objects (click shapes or pick here; they stay until removed):",
@@ -149,6 +151,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             cats=cat_labels,
             label_mode=label_mode,
             key=key_div,
+            legend=legend,
             key_headers={c: key_header(c) for c in cat_labels},
             name_plate_alpha=NAME_PLATE_ALPHA,
             pinned_label_lift=PINNED_LABEL_LIFT,
