@@ -1,3 +1,4 @@
+import pytest
 import astropy.units as u
 
 import numpy as np
@@ -77,6 +78,14 @@ class TestMarkerKeys:
         keys = sorted(TIME_MARKERS.keys())
         assert keys[0] < 1e-10  # sub-nanosecond
         assert keys[-1] > 1e15  # geologic
+
+    def test_calendar_markers_match_astropy(self):
+        names = {name: seconds for seconds, name in TIME_MARKERS.items()}
+        assert names["Hour"] == (1 * u.h).to_value(u.s)
+        assert names["Day"] == (1 * u.day).to_value(u.s)
+        year = (1 * u.yr).to_value(u.s)
+        for name, years in [("Year", 1), ("Century", 100), ("Millennium", 1000)]:
+            assert names[name] == pytest.approx(years * year, rel=1e-3)
 
 
 class TestVolumeConstantDerivations:
