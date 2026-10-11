@@ -33,6 +33,9 @@ CATEGORY_COLORS = {
     "Planetary": "#996600",
 }
 
+# Name of the PNG written by the toolbar's save tool.
+SAVE_FILENAME = "timespace_explorer"
+
 FONT_SIZE = "11pt"
 LABEL_FONT_SIZE = "9pt"
 
