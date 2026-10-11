@@ -6,6 +6,14 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+### Added
+- Time markers "Hour" (3.6e3 s) and "Millennium" (3.156e10 s) on every figure
+  that draws the named magnitudes.
+- Explorer: a save tool in the toolbar (`timespace_explorer.png`) and a colour
+  legend on the plot canvas, right of the volume axis, so a downloaded image
+  says which colour is which category. It lists only the categories showing
+  (`explorer/legend.py`).
+
 ### Changed
 - Explorer: pins accumulate. Clicking shapes or picking from the pin control
   adds objects, and they stay until their chip is removed or "Clear all" is
