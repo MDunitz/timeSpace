@@ -237,3 +237,38 @@ class TestMarkerAxes:
         assert sorted(right.ticker.ticks) == sorted(SPACE_MARKERS)
         assert top.major_label_overrides[8.64e4] == "Day"
         assert set(right.major_label_overrides.values()) == set(SPACE_MARKERS.values())
+
+
+class TestSavedImageCarriesColourLegend:
+    def figure_and_legend(self, shown):
+        from timeSpace.explorer.config import CATEGORY_COLORS
+        from timeSpace.explorer.figure import create_figure
+        from timeSpace.explorer.legend import add_category_legend
+
+        p = create_figure()
+        return p, add_category_legend(p, sorted(CATEGORY_COLORS), shown=shown), CATEGORY_COLORS
+
+    def test_toolbar_has_a_save_tool(self):
+        from bokeh.models import SaveTool
+
+        p, _, _ = self.figure_and_legend(shown=False)
+        assert [t for t in p.toolbar.tools if isinstance(t, SaveTool)]
+
+    def test_legend_is_on_the_canvas_with_one_swatch_per_category(self):
+        p, legend, colors = self.figure_and_legend(shown=True)
+        assert legend in p.right
+        assert [item.label.value for item in legend.items] == sorted(colors)
+        for item in legend.items:
+            assert item.renderers[0].glyph.fill_color == colors[item.label.value]
+
+    @pytest.mark.parametrize("shown", [True, False])
+    def test_legend_starts_in_step_with_the_page(self, shown):
+        _, legend, _ = self.figure_and_legend(shown=shown)
+        assert legend.visible is shown
+        assert all(item.visible is shown for item in legend.items)
+
+    def test_visibility_callback_drives_the_legend(self, select_html):
+        from timeSpace.explorer.callbacks import VISIBILITY_JS
+
+        assert "legend.items[k].visible" in VISIBILITY_JS
+        assert "SaveTool" in select_html and "Legend" in select_html
