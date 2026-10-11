@@ -38,7 +38,7 @@ start on "Names", as in select mode. Use this to
 compare whole categories and see how groups distribute across time and
 space.
 
-Markers: dashed guide lines mark named magnitudes (Second, Day, Year; mm³, m³,
+Markers: dashed guide lines mark named magnitudes (Second, Hour, Day, Year, Century, Millennium; mm³, m³,
 km³). Their names sit on a top axis (time) and a right axis (volume), outside
 the plot frame, so they follow pan and zoom and appear only while that
 magnitude is in view.
@@ -64,3 +64,10 @@ Labels: the pinned object is always labelled by name. A three-way
 There is no label-collision placement (see issue #6), so labels overlap
 when many objects are showing. The category checkboxes carry each
 category's plot colour, so they double as the colour key.
+
+Download: the toolbar's save tool writes the plot as `timespace_explorer.png`.
+The checkbox key is HTML and is not part of that image, so the plot also
+carries a colour legend to the right of the volume axis. It lists only the
+categories with something showing (pinned objects included), is hidden while
+the plot is empty, and is included in the download. The custom object, the
+numbered key and the info panel are not on the canvas and are not saved.
