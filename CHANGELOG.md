@@ -7,6 +7,12 @@ All notable changes to timeSpace are recorded here. Format follows
 ## [Unreleased]
 
 ### Added
+- Source-link checker (`.github/workflows/links.yml`): weekly, on demand, and
+  on PRs that change the sources, it checks every link the explorer shows for
+  the reference objects and reports dead ones in a "Broken source links"
+  issue. `docs/list_source_urls.py` lists the links.
+
+### Added
 - Time markers "Hour" (3.6e3 s) and "Millennium" (3.156e10 s) on every figure
   that draws the named magnitudes.
 - Explorer: a save tool in the toolbar (`timespace_explorer.png`) and a colour
