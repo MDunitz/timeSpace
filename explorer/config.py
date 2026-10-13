@@ -36,6 +36,9 @@ CATEGORY_COLORS = {
 # Name of the PNG written by the toolbar's save tool.
 SAVE_FILENAME = "timespace_explorer"
 
+# Colour of the user-defined object.
+CUSTOM_COLOR = "#E8336D"
+
 FONT_SIZE = "11pt"
 LABEL_FONT_SIZE = "9pt"
 

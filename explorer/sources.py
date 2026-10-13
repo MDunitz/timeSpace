@@ -9,6 +9,8 @@ the reference sources lets the JS callbacks toggle everything by one index.
 
 from bokeh.models import ColumnDataSource, CustomJS, HoverTool
 
+from .config import CUSTOM_COLOR
+
 # HTML template (not the tuple form) so long Reference text wraps.
 REFERENCE_TOOLTIP = """
 <div style="max-width: 360px; font-size: 12px; line-height: 1.35;">
@@ -233,9 +235,9 @@ def add_custom_glyphs(p):
         "xs",
         "ys",
         source=custom_source,
-        fill_color="#E8336D",
+        fill_color=CUSTOM_COLOR,
         fill_alpha="alpha",
-        line_color="#E8336D",
+        line_color=CUSTOM_COLOR,
         line_alpha="line_alpha",
         line_width=3,
     )
@@ -248,7 +250,7 @@ def add_custom_glyphs(p):
         )
     )
 
-    p.multi_line("xs", "ys", source=custom_line_source, line_color="#E8336D", line_alpha="alpha", line_width=3)
+    p.multi_line("xs", "ys", source=custom_line_source, line_color=CUSTOM_COLOR, line_alpha="alpha", line_width=3)
 
     custom_point_source = ColumnDataSource(
         data=dict(
@@ -264,9 +266,9 @@ def add_custom_glyphs(p):
         source=custom_point_source,
         marker="diamond",
         size=14,
-        fill_color="#E8336D",
+        fill_color=CUSTOM_COLOR,
         fill_alpha="alpha",
-        line_color="#E8336D",
+        line_color=CUSTOM_COLOR,
         line_alpha="alpha",
         line_width=2,
     )
@@ -286,7 +288,7 @@ def add_custom_glyphs(p):
         source=custom_label_source,
         text="text",
         text_font_size="9pt",
-        text_color="#E8336D",
+        text_color=CUSTOM_COLOR,
         text_alpha="alpha",
         text_align="center",
         text_baseline="middle",
