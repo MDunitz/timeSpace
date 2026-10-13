@@ -77,14 +77,18 @@ class TestNumberedLabelsAndKey:
             assert nums == list(range(nums[0], nums[0] + len(nums)))
             assert list(rows.sort_values("Number").FullName) == sorted(rows.FullName)
 
-    def test_key_lists_only_requested_categories_in_number_order(self, df):
-        from timeSpace.explorer.key import key_html
+    def test_number_key_is_on_the_canvas_in_number_order(self, df):
+        from timeSpace.explorer.figure import create_figure
+        from timeSpace.explorer.legend import add_number_key, key_label
 
-        html = key_html(df, ["Cellular", "Ocean"])
-        assert "Cellular" in html and "Ocean" in html and "Planetary" not in html
-        cellular = df[df.Category == "Cellular"].sort_values("Number")
-        positions = [html.index(line) for line in cellular.KeyLine]
-        assert positions == sorted(positions)
+        p = create_figure()
+        key, rows = add_number_key(p, df)
+        assert key in p.right and not key.visible
+        assert not any(item.visible for item in key.items)
+        positions = df.reset_index(drop=True)
+        expected = [key_label(positions.Number[i], positions.FullName[i]) for i in rows]
+        assert [item.label.value for item in key.items] == expected
+        assert list(positions.Number[rows]) == list(range(1, len(df) + 1))
 
     def test_both_pages_start_in_names_mode(self, toggle_html, select_html):
         for html in (toggle_html, select_html):
@@ -93,10 +97,11 @@ class TestNumberedLabelsAndKey:
             group = compact[compact.rindex("{", 0, i) : compact.index("}", i)]
             assert '"active":0' in group or '"active"' not in group
 
-    def test_toggle_page_starts_without_a_baked_key(self, toggle_html):
-        # category headings appear once each (callback argument), not a second
-        # time inside a pre-filled key
-        assert toggle_html.count("margin-top:6px;font-weight:bold") == 10
+    def test_number_key_follows_the_label_mode(self):
+        from timeSpace.explorer.callbacks import VISIBILITY_JS
+
+        assert "mode === NUMBERS && a[i] > 0" in VISIBILITY_JS
+        assert "number_key.nrows" in VISIBILITY_JS
 
     def test_select_page_starts_in_names_mode_with_key_hidden(self, select_html):
         assert '"labels":["Names","Numbers","None"]' in select_html.replace(" ", "")
@@ -272,3 +277,16 @@ class TestSavedImageCarriesColourLegend:
 
         assert "legend.items[k].visible" in VISIBILITY_JS
         assert "SaveTool" in select_html and "Legend" in select_html
+
+    def test_custom_object_gets_the_last_colour_legend_item(self):
+        from timeSpace.explorer.callbacks import CUSTOM_OBJECT_JS, SELECT_CLEAR_JS
+        from timeSpace.explorer.config import CATEGORY_COLORS, CUSTOM_COLOR
+        from timeSpace.explorer.figure import create_figure
+        from timeSpace.explorer.legend import add_category_legend
+
+        legend = add_category_legend(create_figure(), sorted(CATEGORY_COLORS), custom=True)
+        custom = legend.items[-1]
+        assert len(legend.items) == len(CATEGORY_COLORS) + 1 and not custom.visible
+        assert custom.renderers[0].glyph.fill_color == CUSTOM_COLOR
+        assert "customItem.visible = true" in CUSTOM_OBJECT_JS
+        assert "legend.items[legend.items.length - 1].visible = false" in SELECT_CLEAR_JS
