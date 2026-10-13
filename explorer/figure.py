@@ -1,11 +1,12 @@
 """Figure scaffold: log-log Bokeh figure plus time/space reference markers."""
 
+from bokeh.models import SaveTool
 from bokeh.plotting import figure
 
 from timeSpace.constants import TIME_MARKERS, SPACE_MARKERS
 from timeSpace.marker_axes import add_marker_axes
 
-from .config import FIGURE_HEIGHT, X_RANGE, Y_RANGE, FONT_SIZE, LABEL_FONT_SIZE
+from .config import FIGURE_HEIGHT, X_RANGE, Y_RANGE, FONT_SIZE, LABEL_FONT_SIZE, SAVE_FILENAME
 
 
 def create_figure(x_range=X_RANGE, y_range=Y_RANGE):
@@ -20,9 +21,11 @@ def create_figure(x_range=X_RANGE, y_range=Y_RANGE):
         x_range=x_range,
         y_range=y_range,
         title="Stommel Diagram — Reference Object Explorer",
-        toolbar_location="above",
+        toolbar_location="below",
         tools="pan,wheel_zoom,box_zoom,reset",
     )
+    p.add_tools(SaveTool(filename=SAVE_FILENAME))
+    p.toolbar.logo = None
     p.axis.axis_label_text_font_size = FONT_SIZE
     p.axis.major_label_text_font_size = "10pt"
     p.title.text_font_size = "14pt"

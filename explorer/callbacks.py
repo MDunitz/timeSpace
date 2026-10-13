@@ -107,6 +107,12 @@ CUSTOM_OBJECT_JS = """
     clsrc.data['alpha'] = [1.0];
     clsrc.change.emit();
 
+    // Last colour-legend item is the custom object.
+    const customItem = legend.items[legend.items.length - 1];
+    customItem.label = {value: cname.value};
+    customItem.visible = true;
+    legend.visible = true;
+
     // Build display text — show exact value on degenerate axes
     let time_str, space_str;
     if (t_degen) {
@@ -166,7 +172,6 @@ VISIBILITY_JS = """
     const pla = label_source.data['plate_alpha'];
     const npla = label_source.data['num_plate_alpha'];
     const yoff = label_source.data['y_off'];
-    const keyParts = [];
     for (let i = 0; i < a.length; i++) {
         const isSel = pins.indexOf(data[i].Name) !== -1;
         const on = a[i] > 0;
@@ -177,16 +182,21 @@ VISIBILITY_JS = """
         pla[i] = name_plate_alpha * lal[i];
         npla[i] = number_plate_alpha * nal[i];
     }
-    // Key beside the plot: number -> name for what is showing, by category.
-    if (mode === NUMBERS) {
-        for (const cat of cats) {
-            const lines = data.filter((d, i) => d.Category === cat && a[i] > 0)
-                              .sort((x, y) => x.Number - y.Number).map(d => d.KeyLine);
-            if (lines.length) keyParts.push(key_headers[cat] + lines.join(''));
-        }
-    }
-    key.text = keyParts.join('');
-    key.visible = keyParts.length > 0;
+    // Canvas legends (the save tool captures these): a colour swatch per
+    // category with anything showing, pinned objects included; in Numbers
+    // mode, the number key for every object showing, wrapped into columns.
+    const showing = new Set(data.filter((d, i) => a[i] > 0).map(d => d.Category));
+    cats.forEach((cat, k) => { legend.items[k].visible = showing.has(cat); });
+    legend.visible = legend.items.some(it => it.visible);
+    let keyed = 0;
+    key_rows.forEach((i, j) => {
+        const on = mode === NUMBERS && a[i] > 0;
+        number_key.items[j].visible = on;
+        if (on) keyed++;
+    });
+    const columns = Math.max(1, Math.ceil(keyed / key_max_rows));
+    number_key.nrows = Math.max(1, Math.ceil(keyed / columns));
+    number_key.visible = keyed > 0;
     source.change.emit();
     label_source.change.emit();
     line_source.change.emit();
@@ -257,6 +267,8 @@ SELECT_CLEAR_JS = """
         clsrc.change.emit();
         clnsrc.change.emit();
         cptsrc.change.emit();
+        legend.items[legend.items.length - 1].visible = false;
+        legend.visible = legend.items.some(it => it.visible);
         checkbox.active = [];
         pin_choice.value = [];
         info.text = empty_text;

@@ -25,7 +25,8 @@ from .data import data_ranges, load_reference_objects
 from .figure import create_figure
 from .sources import NAME_PLATE_ALPHA, NUMBER_PLATE_OPACITY, PINNED_LABEL_LIFT, add_reference_glyphs, add_custom_glyphs
 from .html import write_explorer_html
-from .key import KEY_STYLES, KEY_WIDTH, LABEL_MODES, NAMES, key_header
+from .legend import KEY_MAX_ROWS, add_category_legend, add_number_key
+from .key import LABEL_MODES, NAMES
 from .callbacks import (
     CUSTOM_OBJECT_JS,
     VISIBILITY_JS,
@@ -72,6 +73,8 @@ def build_explorer(csv_path, output_path, mode="select"):
     # ── Widgets ────────────────────────────────────────────────────
     cat_labels = sorted(CATEGORY_COLORS.keys())
     toggle = mode == "toggle"
+    legend = add_category_legend(p, cat_labels, shown=toggle, custom=not toggle)
+    number_key, key_rows = add_number_key(p, df)
     # Pins accumulate: each stays until its chip is removed or "Clear all".
     pin_choice = MultiChoice(
         title="Pinned objects (click shapes or pick here; they stay until removed):",
@@ -91,7 +94,6 @@ def build_explorer(csv_path, output_path, mode="select"):
     # click away when many objects are showing.
     label_mode = RadioButtonGroup(labels=LABEL_MODES, active=NAMES, width=210)
     label_title = Div(text="Labels:", styles={"font-size": "13px", "padding-top": "6px"})
-    key_div = Div(text="", width=KEY_WIDTH, visible=False, styles=KEY_STYLES)
     cat_title = Div(
         text="Categories (tick any number to layer them; the square is each one's colour on the plot):",
         styles={"font-size": "13px"},
@@ -128,7 +130,6 @@ def build_explorer(csv_path, output_path, mode="select"):
             "Space_max": r.Space_max.value,
             "ReferenceHtml": r.ReferenceHtml,
             "Number": int(r.Number),
-            "KeyLine": r.KeyLine,
             "TimeLabel": r.TimeLabel,
             "SpaceLabel": r.SpaceLabel,
         }
@@ -148,8 +149,10 @@ def build_explorer(csv_path, output_path, mode="select"):
             data=full_data,
             cats=cat_labels,
             label_mode=label_mode,
-            key=key_div,
-            key_headers={c: key_header(c) for c in cat_labels},
+            legend=legend,
+            number_key=number_key,
+            key_rows=key_rows,
+            key_max_rows=KEY_MAX_ROWS,
             name_plate_alpha=NAME_PLATE_ALPHA,
             pinned_label_lift=PINNED_LABEL_LIFT,
             number_plate_alpha=NUMBER_PLATE_OPACITY,
@@ -192,7 +195,7 @@ def build_explorer(csv_path, output_path, mode="select"):
         clear_btn.js_on_click(clear_toggle_cb)
 
         controls = row(cat_checkbox, pin_choice, label_title, label_mode, clear_btn)
-        layout = column(controls, info_div, row(p, key_div, sizing_mode="stretch_width"), sizing_mode="stretch_width")
+        layout = column(controls, info_div, p, sizing_mode="stretch_width")
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
             "<p>102 reference objects across 10 categories. Toggle categories with the "
@@ -218,6 +221,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             smax=custom_smax,
             cname=custom_name,
             info=info_div,
+            legend=legend,
         ),
         code=CUSTOM_OBJECT_JS,
     )
@@ -234,6 +238,7 @@ def build_explorer(csv_path, output_path, mode="select"):
             pin_choice=pin_choice,
             info=info_div,
             empty_text=empty_text,
+            legend=legend,
         ),
         code=SELECT_CLEAR_JS,
     )
@@ -242,8 +247,7 @@ def build_explorer(csv_path, output_path, mode="select"):
     # ── Layout ─────────────────────────────────────────────────────
     pin_row = row(pin_choice, label_title, label_mode, clear_btn)
     custom_row = row(custom_name, custom_tmin, custom_tmax, custom_smin, custom_smax, custom_btn)
-    plot_row = row(p, key_div, sizing_mode="stretch_width")
-    layout = column(cat_title, cat_checkbox, pin_row, custom_row, info_div, plot_row, sizing_mode="stretch_width")
+    layout = column(cat_title, cat_checkbox, pin_row, custom_row, info_div, p, sizing_mode="stretch_width")
 
     header = (
         "<h2>timeSpace — Reference Object Explorer</h2>"

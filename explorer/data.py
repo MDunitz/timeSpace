@@ -6,7 +6,7 @@ import pandas as pd
 from timeSpace.etl import transform_process_response_sheet, POSSIBLE_COL_LIST
 
 from .config import CATEGORY_COLORS, EXPLORER_N_POINTS, RANGE_PAD_DECADES, UNSOURCED_LABEL
-from .key import assign_numbers, key_line
+from .key import assign_numbers
 from .links import reference_html
 from .units import format_time_range, format_volume_range
 
@@ -48,7 +48,6 @@ def load_reference_objects(csv_path):
     df["SpaceLabel"] = [format_volume_range(r.Space_min, r.Space_max) for _, r in df.iterrows()]
     df["ReferenceHtml"] = [reference_html(r.Reference, r.Reference_URL.split()) for _, r in df.iterrows()]
     df["Number"] = assign_numbers(df)
-    df["KeyLine"] = [key_line(r.Number, r.FullName) for _, r in df.iterrows()]
     return df
 
 

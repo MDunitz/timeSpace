@@ -116,9 +116,11 @@ TIME_MARKERS = {
     1e-6: "Protein Folding",  # https://en.wikipedia.org/wiki/Microsecond
     1e-3: "Neuron Firing",  # https://en.wikipedia.org/wiki/Millisecond
     1e0: "Second",
+    3.6e3: "Hour",
     8.64e4: "Day",
     3.156e7: "Year",  # 365.25 days
     3.156e9: "Century",  # 100 years
+    3.156e10: "Millennium",  # 1000 years
     3.156e12: "Glacial-interglacial",  # 100 kyr eccentricity cycle
     1e15: "Geologic",
     1.43e17: "Deep Time",  # age of Earth, 4.54 Gyr
