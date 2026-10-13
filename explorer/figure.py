@@ -21,10 +21,11 @@ def create_figure(x_range=X_RANGE, y_range=Y_RANGE):
         x_range=x_range,
         y_range=y_range,
         title="Stommel Diagram — Reference Object Explorer",
-        toolbar_location="above",
+        toolbar_location="below",
         tools="pan,wheel_zoom,box_zoom,reset",
     )
     p.add_tools(SaveTool(filename=SAVE_FILENAME))
+    p.toolbar.logo = None
     p.axis.axis_label_text_font_size = FONT_SIZE
     p.axis.major_label_text_font_size = "10pt"
     p.title.text_font_size = "14pt"
