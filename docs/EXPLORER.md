@@ -56,18 +56,23 @@ Labels: the pinned object is always labelled by name. A three-way
 
 - **Names**: the object name, on a translucent white plate.
 - **Numbers**: a short number on a white plate bordered in the category
-  colour, with a key beside the plot listing number and name for whatever
-  is showing, grouped by category. Numbers are fixed (category, then name),
-  so an object keeps its number as categories are toggled.
+  colour, with a key on the plot canvas, right of the colour legend,
+  listing number and name for whatever is showing, each with its category
+  swatch. The key wraps into extra columns past 42 rows, which narrows the
+  plot when many objects are showing. Numbers are fixed (category, then
+  name), so an object keeps its number as categories are toggled.
 - **None**: no labels; objects are identified on hover.
 
 There is no label-collision placement (see issue #6), so labels overlap
 when many objects are showing. The category checkboxes carry each
 category's plot colour, so they double as the colour key.
 
-Download: the toolbar's save tool writes the plot as `timespace_explorer.png`.
-The checkbox key is HTML and is not part of that image, so the plot also
-carries a colour legend to the right of the volume axis. It lists only the
-categories with something showing (pinned objects included), is hidden while
-the plot is empty, and is included in the download. The custom object, the
-numbered key and the info panel are not on the canvas and are not saved.
+Download: the save tool in the toolbar below the plot writes
+`timespace_explorer.png`. The checkbox key is HTML and is not part of that
+image, so the plot carries its own colour legend right of the volume axis:
+one swatch per category with something showing (pinned objects included),
+plus the custom object under its name while one is plotted. The legend and
+the number key are hidden while empty and are both in the download; the
+info panel is not. The toolbar sits below the plot because above it, beside
+the title, Bokeh moved the save icon into the overflow menu whenever a
+legend appeared.
