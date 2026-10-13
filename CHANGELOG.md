@@ -7,6 +7,17 @@ All notable changes to timeSpace are recorded here. Format follows
 ## [Unreleased]
 
 ### Added
+- Release workflow (`.github/workflows/release.yml`): publishing a GitHub
+  release tests, builds and uploads the package to PyPI by trusted
+  publishing, after checking the tag matches the `pyproject.toml` version.
+  One-time PyPI setup in `RELEASING.md`.
+
+### Fixed
+- `tests/test_local_install.py` expected at least 11 bundled CSVs; the
+  package ships the 9 listed in `pyproject.toml`, so the smoke test failed on
+  every correct build.
+
+### Added
 - Time markers "Hour" (3.6e3 s) and "Millennium" (3.156e10 s) on every figure
   that draws the named magnitudes.
 - Explorer: a save tool in the toolbar (`timespace_explorer.png`) and a colour
