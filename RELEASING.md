@@ -12,6 +12,20 @@ mints no DOI.
 3. Flip the toggle **ON** for `MDunitz/timeSpace`. This installs the webhook.
    Nothing is archived retroactively.
 
+## 0b. One-time: let GitHub publish to PyPI
+
+`.github/workflows/release.yml` uploads to PyPI through trusted publishing,
+so no token is stored anywhere. PyPI has to be told to trust this workflow:
+
+1. On PyPI, open the `timeSpace` project → **Manage** → **Publishing** →
+   **Add a new publisher** → **GitHub**.
+2. Owner `MDunitz`, repository `timeSpace`, workflow `release.yml`,
+   environment `pypi`.
+3. On GitHub, **Settings → Environments → New environment** named `pypi`.
+   Adding yourself as a required reviewer there makes every upload wait for
+   one click of approval; leave it empty to publish as soon as the build
+   passes.
+
 ## 1. Prepare the version (a PR, merged before tagging)
 
 1. Bump `[project].version` in `pyproject.toml`.
@@ -33,15 +47,26 @@ mints no DOI.
    `identifiers:` block in `CITATION.cff` (currently commented out), then into
    `paper.md` once it exists. Commit via a follow-up PR.
 
-## 3. Publish to PyPI (independent of the DOI)
+## 3. Publish to PyPI (automatic)
+
+Publishing the release in step 2 runs `.github/workflows/release.yml`. It
+stops before building unless the tag is exactly `v` + the `pyproject.toml`
+version, so step 1 must be merged first. It then runs the test suite, builds
+the sdist and wheel, checks them with `twine check --strict`, installs the
+wheel in a clean environment and runs `tests/test_local_install.py`, and
+uploads to PyPI. Watch it under **Actions → release**.
+
+PyPI versions are permanent: a version cannot be re-uploaded, even after a
+deletion. If the tag and version disagree, fix the version in a PR, then
+delete and re-create the GitHub release and tag rather than uploading by
+hand.
+
+Manual fallback (needs a PyPI API token):
 
 ```
 python -m build
 python -m twine upload dist/timespace-X.Y.Z*
 ```
-
-Keeping PyPI in step with the tagged release is preferred but not a JOSS
-requirement.
 
 ## Notes
 
