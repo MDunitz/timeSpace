@@ -7,7 +7,8 @@ name: source links
 #
 # Weekly and on demand: broken links go into one open issue titled
 # "Broken source links" (created, or commented on if already open).
-# On a PR that touches the sources: the check fails instead.
+# On a PR that touches the sources: the check fails and the list of broken
+# links is posted as a PR comment.
 #
 # 403 and 429 count as reachable: publishers behind DOIs often refuse
 # automated requests or rate-limit them, and treating that as broken would
@@ -29,6 +30,7 @@ on:
 permissions:
   contents: read
   issues: write
+  pull-requests: write
 
 jobs:
   links:
@@ -68,6 +70,13 @@ jobs:
           else
             gh issue create --title "$TITLE" --body-file lychee/out.md
           fi
+      - name: Report broken links on the PR
+        if: >-
+          steps.lychee.outputs.exit_code != 0 && github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment "${{ github.event.pull_request.number }}" --body-file lychee/out.md
       - name: Fail on broken links
         if: steps.lychee.outputs.exit_code != 0
         run: exit 1
