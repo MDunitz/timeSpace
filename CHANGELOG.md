@@ -11,8 +11,12 @@ All notable changes to timeSpace are recorded here. Format follows
   that draws the named magnitudes.
 - Explorer: a save tool in the toolbar (`timespace_explorer.png`) and a colour
   legend on the plot canvas, right of the volume axis, so a downloaded image
-  says which colour is which category. It lists only the categories showing
-  (`explorer/legend.py`).
+  says which colour is which category. It lists only the categories showing,
+  plus the custom object under its name (`explorer/legend.py`).
+- Explorer: the Numbers-mode key is drawn on the plot canvas, so it is in the
+  download too. It replaces the HTML key beside the plot and wraps into
+  columns past 42 rows. The toolbar moved below the plot and lost the Bokeh
+  logo.
 
 ### Changed
 - Explorer: pins accumulate. Clicking shapes or picking from the pin control
