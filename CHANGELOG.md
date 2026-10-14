@@ -6,6 +6,13 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+## [0.3.3] — 2026-10-14
+
+Hour and Millennium time markers, explorer downloads that carry their own
+legends, and a corrected source link. The `v0.3.2` tag was cut on a commit
+still versioned 0.3.1 and was never published to PyPI; 0.3.3 follows 0.3.1
+there.
+
 ### Added
 - Time markers "Hour" (3.6e3 s) and "Millennium" (3.156e10 s) on every figure
   that draws the named magnitudes.
@@ -37,6 +44,10 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ### Fixed
 - Domestic cat lifespan lower bound 12 yr -> 13 yr to match its cited source.
+- Earthquake rupture: the USGS FAQ source link pointed at the bare `usgs.gov`
+  host and did not open; it now uses `www.usgs.gov`.
+- `timeSpace.__version__` reported 0.2.0; it is now read from the installed
+  package metadata, so it always matches `pyproject.toml` (#134).
 
 ## [0.3.1] — 2026-10-08
 
