@@ -88,6 +88,12 @@ is quoted if a URL contains a comma. Identifiers that map to a URL by rule
 (BioNumbers, DOI, arXiv, PMC) stay in the `Reference` text and are not
 repeated in `Reference_URL`.
 
+Links rot after they are added, so `.github/workflows/links.yml` re-checks
+every link the explorer shows (both kinds above) each week and on any PR that
+changes the sources, and lists dead ones in a "Broken source links" issue. It
+catches dead pages and hosts, not a page that still loads but no longer
+supports the cited value.
+
 ## Diffusion length equation
 
 `calculate_diffusion_length` uses the **3D RMS displacement**:
