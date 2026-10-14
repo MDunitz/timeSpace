@@ -55,7 +55,7 @@ from bokeh.plotting import show
 show(p)
 ```
 
-To see it in action, open the [reference-object explorer](https://mdunitz.github.io/timeSpace/) (102 everyday and scientific objects, each with its source), or plot your own objects alongside them in the [explorer notebook](https://colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/reference_explorer_colab.ipynb).
+To see it in action, open the [reference-object explorer](https://mdunitz.github.io/timeSpace/) (about 100 everyday and scientific objects, each with its source), or plot your own objects alongside them in the [explorer notebook](https://colab.research.google.com/github/MDunitz/timeSpace/blob/main/docs/reference_explorer_colab.ipynb).
 
 ## Conventions
 
@@ -208,7 +208,7 @@ script, div = components(p)
 Bundled CSV data in `data/datasets/`:
 
 - `stommel_boyd2015_volumes.csv` — process definitions (time/space ranges, categories) used for the default Stommel diagram
-- `time_space_reference_objects.csv` — 102 reference objects across 10 categories for scale context
+- `time_space_reference_objects.csv` — about 100 reference objects across 10 categories for scale context
 
 ## Development
 

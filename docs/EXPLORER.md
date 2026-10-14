@@ -1,6 +1,6 @@
 # Reference-object explorer
 
-The `timeSpace.explorer` subpackage renders the 102 reference objects
+The `timeSpace.explorer` subpackage renders the reference objects
 (`data/datasets/time_space_reference_objects.csv`, 10 categories) as a
 self-contained HTML page for GitHub Pages / iframe embedding.
 `docs/build_explorer.py` is a thin CLI shim over it.
