@@ -31,3 +31,9 @@ def test_pyproject_and_citation_versions_match():
     assert _pyproject_version() == _citation_version(), (
         f"version drift: pyproject={_pyproject_version()!r} " f"CITATION.cff={_citation_version()!r}"
     )
+
+
+def test_runtime_version_is_the_package_version():
+    import timeSpace
+
+    assert timeSpace.__version__ == _pyproject_version()

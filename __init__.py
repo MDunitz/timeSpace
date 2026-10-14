@@ -1,8 +1,9 @@
+from importlib.metadata import version
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent
 
-__version__ = "0.2.0"
+__version__ = version("timeSpace")
 
 __all__ = [
     "Finding",
