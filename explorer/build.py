@@ -198,7 +198,7 @@ def build_explorer(csv_path, output_path, mode="select"):
         layout = column(controls, info_div, p, sizing_mode="stretch_width")
         header = (
             "<h2>timeSpace — Reference Object Explorer (toggle)</h2>"
-            "<p>102 reference objects across 10 categories. Toggle categories with the "
+            f"<p>{len(df)} reference objects across {len(cat_labels)} categories. Toggle categories with the "
             "checkboxes. Switch Labels to Numbers for a numbered key beside the plot, or to "
             "None to hide them. Click or pick objects to pin them; pins stay until removed. " + DIY_LINKS_HTML + "</p>"
         )
@@ -251,7 +251,7 @@ def build_explorer(csv_path, output_path, mode="select"):
 
     header = (
         "<h2>timeSpace — Reference Object Explorer</h2>"
-        "<p>102 reference objects spanning molecular to planetary scales. "
+        f"<p>{len(df)} reference objects spanning molecular to planetary scales. "
         "Tick categories to layer them, pin individual objects, or define your own. " + DIY_LINKS_HTML + "</p>"
     )
     write_explorer_html(output_path, layout, header)
