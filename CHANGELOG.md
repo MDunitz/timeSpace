@@ -6,6 +6,12 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+### Fixed
+- Replaced three dead source links: Housefly lifespan (UF/IFAS IN205 moved to
+  Ask IFAS), Highway bridge (FHWA LRFD presentation for the 75-year design
+  life), and LED light pulse (Schubert's book cited by DOI instead of the
+  removed RPI chapter page).
+
 ## [0.3.3] — 2026-10-14
 
 Hour and Millennium time markers, explorer downloads that carry their own
