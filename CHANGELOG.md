@@ -6,6 +6,12 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+### Added
+- Source-link checker (`.github/workflows/links.yml`): weekly, on demand, and
+  on PRs that change the sources, it checks every link the explorer shows for
+  the reference objects and reports dead ones in a "Broken source links"
+  issue. `docs/list_source_urls.py` lists the links.
+
 ## [0.3.3] — 2026-10-14
 
 Hour and Millennium time markers, explorer downloads that carry their own
@@ -24,12 +30,6 @@ there.
 - `tests/test_local_install.py` expected at least 11 bundled CSVs; the
   package ships the 9 listed in `pyproject.toml`, so the smoke test failed on
   every correct build.
-
-### Added
-- Source-link checker (`.github/workflows/links.yml`): weekly, on demand, and
-  on PRs that change the sources, it checks every link the explorer shows for
-  the reference objects and reports dead ones in a "Broken source links"
-  issue. `docs/list_source_urls.py` lists the links.
 
 ### Added
 - Time markers "Hour" (3.6e3 s) and "Millennium" (3.156e10 s) on every figure
