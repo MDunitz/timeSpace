@@ -11,6 +11,8 @@ import html
 import re
 from urllib.parse import urlsplit
 
+import pandas as pd
+
 # (pattern, URL template). Group "id" is substituted into the template; the
 # whole match becomes the link text.
 IDENTIFIER_LINKS = [
@@ -59,3 +61,16 @@ def reference_html(text, urls):
     if urls:
         out += "<br>Source pages: " + source_links_html(urls)
     return out
+
+
+def reader_urls(text, urls):
+    """Every link a reader can follow for one object: the identifier links in
+    its citation, then its source pages."""
+    return identifier_urls(text) + list(urls)
+
+
+def source_urls(csv_path):
+    """Every distinct link the explorer shows for a reference-objects CSV."""
+    df = pd.read_csv(csv_path).fillna({"Reference": "", "Reference_URL": ""})
+    links = (url for r in df.itertuples() for url in reader_urls(r.Reference, r.Reference_URL.split()))
+    return list(dict.fromkeys(links))

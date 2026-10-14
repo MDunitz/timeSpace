@@ -1,0 +1,94 @@
+name: source links
+
+# Checks every link the explorer shows for the reference objects: the
+# Reference_URL pages plus the BioNumbers, DOI, arXiv and PMC links built
+# from the citation text (docs/list_source_urls.py). Runs on GitHub's
+# runners, so each link is fetched live rather than from a cache.
+#
+# Weekly and on demand: broken links go into one open issue titled
+# "Broken source links" (created, or commented on if already open).
+# On a PR that touches the sources: the check fails and the list of broken
+# links is posted as a PR comment.
+#
+# 403 and 429 count as reachable: publishers behind DOIs often refuse
+# automated requests or rate-limit them, and treating that as broken would
+# bury the real 404s. A soft 404 (an error page served with status 200) or a
+# page that no longer supports the cited value is not caught here.
+#
+# The 90 s timeout covers large scanned PDFs (archive.org). Timeouts are
+# listed in the report but do not fail the check: slow hosts time out from
+# the runner (the archive.org PDF loads in a browser), and a dead host fails
+# with a connection or DNS error instead. The NRCS Illinois
+# soils page is excluded: its server breaks the checker's HTTP/2 connection
+# but loads in a browser (checked by hand 2026-10-14).
+# The LSU AgCenter housefly page is excluded for the same reason: it resets
+# the runner's connection but loads in a browser (checked by hand 2026-10-14).
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"  # weekly Mon 07:00 UTC
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - data/datasets/time_space_reference_objects.csv
+      - explorer/links.py
+      - docs/list_source_urls.py
+      - .github/workflows/links.yml
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: List source links
+        run: python docs/list_source_urls.py > source_urls.txt
+      - name: Check links
+        id: lychee
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
+        with:
+          args: >-
+            --no-progress
+            --max-retries 3
+            --retry-wait-time 5
+            --timeout 90
+            --accept-timeouts
+            --host-request-interval 1s
+            --accept "200..=299,403,429"
+            --exclude "^https://www\.nrcs\.usda\.gov/state-offices/illinois/soils-illinois$"
+            --exclude "^https://www\.lsuagcenter\.com/articles/page1669656019180$"
+            --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+            source_urls.txt
+          fail: false
+      - name: Report broken links in an issue
+        if: steps.lychee.outputs.exit_code != 0 && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Broken source links
+        run: |
+          number=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number,title \
+            --jq "map(select(.title == \"$TITLE\"))[0].number // empty")
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body-file lychee/out.md
+          else
+            gh issue create --title "$TITLE" --body-file lychee/out.md
+          fi
+      - name: Report broken links on the PR
+        if: >-
+          steps.lychee.outputs.exit_code != 0 && github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment "${{ github.event.pull_request.number }}" --body-file lychee/out.md
+      - name: Fail on broken links
+        if: steps.lychee.outputs.exit_code != 0
+        run: exit 1

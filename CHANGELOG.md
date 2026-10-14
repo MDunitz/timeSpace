@@ -7,6 +7,33 @@ All notable changes to timeSpace are recorded here. Format follows
 ## [Unreleased]
 
 ### Added
+- Source-link checker (`.github/workflows/links.yml`): weekly, on demand, and
+  on PRs that change the sources, it checks every link the explorer shows for
+  the reference objects and reports dead ones in a "Broken source links"
+  issue. `docs/list_source_urls.py` lists the links.
+
+### Fixed
+- Replaced three dead source links: Housefly lifespan (UF/IFAS IN205 was
+  withdrawn; now Bugwood NPIPM and LSU AgCenter), Highway bridge (FHWA LRFD
+  presentation for the 75-year design life), and LED light pulse (Schubert's
+  book cited by DOI instead of the removed RPI chapter page).
+- Highway bridge spans 50-75 yr (1.58e9-2.37e9 s), the range its sources give;
+  the upper bound was about 101 yr. Earthquake rupture tops out at 240 s, the
+  "3 to 4 minutes" of its USGS source, instead of 300 s.
+
+## [0.3.3] — 2026-10-14
+
+Hour and Millennium time markers, explorer downloads that carry their own
+legends, and a corrected source link. The `v0.3.2` tag was cut on a commit
+still versioned 0.3.1 and was never published to PyPI; 0.3.3 follows 0.3.1
+there.
+
+### Added
+- Release workflow (`.github/workflows/release.yml`): a push to the `prod`
+  branch whose `pyproject.toml` version is not yet tagged tests, builds and
+  uploads the package to PyPI by trusted publishing, then tags it and
+  publishes the GitHub release from its CHANGELOG section. One-time setup in
+  `RELEASING.md`.
 - Time markers "Hour" (3.6e3 s) and "Millennium" (3.156e10 s) on every figure
   that draws the named magnitudes.
 - Explorer: a save tool in the toolbar (`timespace_explorer.png`) and a colour
@@ -36,7 +63,14 @@ All notable changes to timeSpace are recorded here. Format follows
   function's signature is unchanged.
 
 ### Fixed
+- `tests/test_local_install.py` expected at least 11 bundled CSVs; the
+  package ships the 9 listed in `pyproject.toml`, so the smoke test failed on
+  every correct build.
 - Domestic cat lifespan lower bound 12 yr -> 13 yr to match its cited source.
+- Earthquake rupture: the USGS FAQ source link pointed at the bare `usgs.gov`
+  host and did not open; it now uses `www.usgs.gov`.
+- `timeSpace.__version__` reported 0.2.0; it is now read from the installed
+  package metadata, so it always matches `pyproject.toml` (#134).
 
 ## [0.3.1] — 2026-10-08
 

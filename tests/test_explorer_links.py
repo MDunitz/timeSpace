@@ -57,3 +57,16 @@ class TestReferenceUrlColumn:
         assert out.index("bionumber.aspx?id=1") < out.index("Source pages:")
         assert 'href="https://www.example.org/a?b=1&amp;c=2"' in out and ">example.org</a>" in out
         assert "Source pages" not in reference_html("no links here", [])
+
+
+class TestSourceUrlsForTheLinkChecker:
+    def test_every_link_the_explorer_shows_is_listed_once(self):
+        from timeSpace.explorer.links import source_urls
+
+        urls = source_urls(CSV)
+        df = pd.read_csv(CSV).fillna({"Reference": "", "Reference_URL": ""})
+        assert len(urls) == len(set(urls))
+        for r in df.itertuples():
+            assert set(r.Reference_URL.split()) <= set(urls)
+            assert set(identifier_urls(r.Reference)) <= set(urls)
+        assert all(u.startswith("https://") for u in urls)

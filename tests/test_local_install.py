@@ -57,8 +57,9 @@ def main():
     csv_dir = timeSpace.PROJECT_ROOT / "data" / "datasets"
     csvs = sorted(csv_dir.glob("*.csv"))
     print(f"CSV files: {len(csvs)}")
-    if len(csvs) < 11:
-        errors.append(f"Expected at least 11 CSVs, got {len(csvs)}")
+    # The nine CSVs listed under [tool.setuptools.package-data] in pyproject.toml.
+    if len(csvs) < 9:
+        errors.append(f"Expected at least 9 CSVs, got {len(csvs)}")
 
     # ── No SyntaxWarning on import ───────────────────────────────────
     with warnings.catch_warnings(record=True) as w:
