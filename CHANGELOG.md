@@ -6,6 +6,12 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+### Added
+- Source-link checker (`.github/workflows/links.yml`): weekly, on demand, and
+  on PRs that change the sources, it checks every link the explorer shows for
+  the reference objects and reports dead ones in a "Broken source links"
+  issue. `docs/list_source_urls.py` lists the links.
+
 ### Fixed
 - Replaced three dead source links: Housefly lifespan (UF/IFAS IN205 moved to
   Ask IFAS), Highway bridge (FHWA LRFD presentation for the 75-year design
