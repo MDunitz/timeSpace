@@ -15,7 +15,10 @@ name: source links
 # bury the real 404s. A soft 404 (an error page served with status 200) or a
 # page that no longer supports the cited value is not caught here.
 #
-# The 90 s timeout covers large scanned PDFs (archive.org). The NRCS Illinois
+# The 90 s timeout covers large scanned PDFs (archive.org). Timeouts are
+# listed in the report but do not fail the check: slow hosts (archive.org,
+# sealifebase.se) time out from the runner while loading in a browser, and a
+# dead host fails with a connection or DNS error instead. The NRCS Illinois
 # soils page is excluded: its server breaks the checker's HTTP/2 connection
 # but loads in a browser (checked by hand 2026-10-14).
 
@@ -56,6 +59,7 @@ jobs:
             --max-retries 3
             --retry-wait-time 5
             --timeout 90
+            --accept-timeouts
             --host-request-interval 1s
             --accept "200..=299,403,429"
             --exclude "^https://www\.nrcs\.usda\.gov/state-offices/illinois/soils-illinois$"
