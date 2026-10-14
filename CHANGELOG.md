@@ -6,6 +6,25 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ## [Unreleased]
 
+## [0.3.3] — 2026-10-14
+
+Hour and Millennium time markers, explorer downloads that carry their own
+legends, and a corrected source link. The `v0.3.2` tag was cut on a commit
+still versioned 0.3.1 and was never published to PyPI; 0.3.3 follows 0.3.1
+there.
+
+### Added
+- Release workflow (`.github/workflows/release.yml`): a push to the `prod`
+  branch whose `pyproject.toml` version is not yet tagged tests, builds and
+  uploads the package to PyPI by trusted publishing, then tags it and
+  publishes the GitHub release from its CHANGELOG section. One-time setup in
+  `RELEASING.md`.
+
+### Fixed
+- `tests/test_local_install.py` expected at least 11 bundled CSVs; the
+  package ships the 9 listed in `pyproject.toml`, so the smoke test failed on
+  every correct build.
+
 ### Added
 - Source-link checker (`.github/workflows/links.yml`): weekly, on demand, and
   on PRs that change the sources, it checks every link the explorer shows for
@@ -43,6 +62,10 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ### Fixed
 - Domestic cat lifespan lower bound 12 yr -> 13 yr to match its cited source.
+- Earthquake rupture: the USGS FAQ source link pointed at the bare `usgs.gov`
+  host and did not open; it now uses `www.usgs.gov`.
+- `timeSpace.__version__` reported 0.2.0; it is now read from the installed
+  package metadata, so it always matches `pyproject.toml` (#134).
 
 ## [0.3.1] — 2026-10-08
 
