@@ -14,9 +14,12 @@ All notable changes to timeSpace are recorded here. Format follows
 
 ### Fixed
 - Replaced three dead source links: Housefly lifespan (UF/IFAS IN205 was
-  withdrawn; now Bugwood NPIPM and LSU AgCenter), Highway bridge (FHWA LRFD presentation for the 75-year design
-  life), and LED light pulse (Schubert's book cited by DOI instead of the
-  removed RPI chapter page).
+  withdrawn; now Bugwood NPIPM and LSU AgCenter), Highway bridge (FHWA LRFD
+  presentation for the 75-year design life), and LED light pulse (Schubert's
+  book cited by DOI instead of the removed RPI chapter page).
+- Highway bridge spans 50-75 yr (1.58e9-2.37e9 s), the range its sources give;
+  the upper bound was about 101 yr. Earthquake rupture tops out at 240 s, the
+  "3 to 4 minutes" of its USGS source, instead of 300 s.
 
 ## [0.3.3] — 2026-10-14
 
