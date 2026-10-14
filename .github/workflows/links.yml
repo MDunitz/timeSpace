@@ -16,9 +16,9 @@ name: source links
 # page that no longer supports the cited value is not caught here.
 #
 # The 90 s timeout covers large scanned PDFs (archive.org). Timeouts are
-# listed in the report but do not fail the check: slow hosts (archive.org,
-# sealifebase.se) time out from the runner while loading in a browser, and a
-# dead host fails with a connection or DNS error instead. The NRCS Illinois
+# listed in the report but do not fail the check: slow hosts time out from
+# the runner (the archive.org PDF loads in a browser), and a dead host fails
+# with a connection or DNS error instead. The NRCS Illinois
 # soils page is excluded: its server breaks the checker's HTTP/2 connection
 # but loads in a browser (checked by hand 2026-10-14).
 
