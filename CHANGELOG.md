@@ -13,8 +13,8 @@ All notable changes to timeSpace are recorded here. Format follows
   issue. `docs/list_source_urls.py` lists the links.
 
 ### Fixed
-- Replaced three dead source links: Housefly lifespan (UF/IFAS IN205 moved to
-  Ask IFAS), Highway bridge (FHWA LRFD presentation for the 75-year design
+- Replaced three dead source links: Housefly lifespan (UF/IFAS IN205 was
+  withdrawn; now Bugwood NPIPM and LSU AgCenter), Highway bridge (FHWA LRFD presentation for the 75-year design
   life), and LED light pulse (Schubert's book cited by DOI instead of the
   removed RPI chapter page).
 

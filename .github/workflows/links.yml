@@ -21,6 +21,8 @@ name: source links
 # with a connection or DNS error instead. The NRCS Illinois
 # soils page is excluded: its server breaks the checker's HTTP/2 connection
 # but loads in a browser (checked by hand 2026-10-14).
+# The LSU AgCenter housefly page is excluded for the same reason: it resets
+# the runner's connection but loads in a browser (checked by hand 2026-10-14).
 
 on:
   schedule:
@@ -63,6 +65,7 @@ jobs:
             --host-request-interval 1s
             --accept "200..=299,403,429"
             --exclude "^https://www\.nrcs\.usda\.gov/state-offices/illinois/soils-illinois$"
+            --exclude "^https://www\.lsuagcenter\.com/articles/page1669656019180$"
             --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
             source_urls.txt
           fail: false
