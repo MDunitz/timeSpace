@@ -20,6 +20,13 @@ All notable changes to timeSpace are recorded here. Format follows
 - Highway bridge spans 50-75 yr (1.58e9-2.37e9 s), the range its sources give;
   the upper bound was about 101 yr. Earthquake rupture tops out at 240 s, the
   "3 to 4 minutes" of its USGS source, instead of 300 s.
+- Reference objects (#104): Sahara Desert time is now its age, 2 to 7 Myr;
+  Amazon rainforest time is its age, at least 55 Myr; Mangrove forest
+  succession spans 6 to 50 yr around a 25-yr time to maturity; "Continental
+  drift (1 cm/yr)" is renamed "(2.5-15 cm/yr)" to match the USGS rates; and
+  "Bacterial cell division" becomes "Microbial cell division", spanning
+  15 min (Vibrio natriegens) to about 1000 yr (deep sub-seafloor biomass
+  turnover).
 
 ## [0.3.3] — 2026-10-14
 
