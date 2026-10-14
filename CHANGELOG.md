@@ -7,10 +7,11 @@ All notable changes to timeSpace are recorded here. Format follows
 ## [Unreleased]
 
 ### Added
-- Release workflow (`.github/workflows/release.yml`): publishing a GitHub
-  release tests, builds and uploads the package to PyPI by trusted
-  publishing, after checking the tag matches the `pyproject.toml` version.
-  One-time PyPI setup in `RELEASING.md`.
+- Release workflow (`.github/workflows/release.yml`): a push to the `prod`
+  branch whose `pyproject.toml` version is not yet tagged tests, builds and
+  uploads the package to PyPI by trusted publishing, then tags it and
+  publishes the GitHub release from its CHANGELOG section. One-time setup in
+  `RELEASING.md`.
 
 ### Fixed
 - `tests/test_local_install.py` expected at least 11 bundled CSVs; the
