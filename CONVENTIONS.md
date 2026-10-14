@@ -75,10 +75,9 @@ states the one used where a row has been sourced:
 | Drops and grains | sphere from diameter, V = (π/6) d³ | Raindrop |
 | Structures | material or enclosed volume | Hoover Dam (concrete), a house |
 | Water bodies, basins | basin or excavated volume | Lake Tahoe, Grand Canyon |
-| Land regions | area × a stated thickness | France (mean elevation), Sahara (sand depth) |
+| Land regions | area × a stated thickness | France (mean elevation), Sahara (sand depth), Manhattan (tallest tower to deepest tunnel) |
 
-Each land-region row states its thickness in `Reference`. Manhattan's is
-not yet sourced.
+Each land-region row states its thickness in `Reference`.
 
 For land regions, `Time` is the age of the feature. Where people set its
 extent, that is the age of the country or city (France, Manhattan);
