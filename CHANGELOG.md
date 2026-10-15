@@ -32,7 +32,8 @@ All notable changes to timeSpace are recorded here. Format follows
   (New Amsterdam, 1625), since people set their extent. Sahara volume is
   its sand, 4.5e13 to 9.2e13 m3, instead of area x 1 km. Manhattan volume
   is its built envelope, from the top of One World Trade Center (541 m) to
-  the deepest public tunnel (53 to 150 m below street): 3.5e10 to 4.1e10 m3. "Lake turnover
+  the deepest public tunnel (55 to 152 m below street): 3.5e10 to 4.1e10 m3,
+  from the Census, CTBUH, MTA and NYC DEP. "Lake turnover
   (seasonal mixing)" becomes "(mixing event)", 1 day to 2 months.
 
 ## [0.3.3] — 2026-10-14
