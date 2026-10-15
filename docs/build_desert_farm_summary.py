@@ -24,6 +24,12 @@ from timeSpace.plotting import (
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "datasets"
 DEFAULT_CSV = DATA_DIR / "desert_farm_leverage_points.csv"
 
+# Half a decade of margin beyond the data extent on each side; every row
+# in the CSV (MD models at 1e-30 m3, fossil-fuel formation at 3e15 s) stays
+# inside the fixed view.
+X_RANGE = (1e-16, 1e18)
+Y_RANGE = (1e-31, 1e15)
+
 
 def load_and_transform(csv_path):
     """Load CSV and run the standard ETL pipeline.
@@ -48,11 +54,14 @@ def build_summary_figure(csv_path=None, output_path=None):
     process_df = load_and_transform(csv_path)
 
     p = create_space_time_figure(
-        width=950,
-        height=700,
+        width=1200,
+        height=720,
         title="Desert Algae Carbon Capture — Leverage Points",
         space_on_x=False,
     )
+    p.sizing_mode = "stretch_width"
+    p.x_range.start, p.x_range.end = X_RANGE
+    p.y_range.start, p.y_range.end = Y_RANGE
     p.title.text_font_size = "16pt"
     p.title.text_font_style = "bold"
 
@@ -82,10 +91,10 @@ def build_summary_figure(csv_path=None, output_path=None):
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0; padding: 16px; background: #fff;
         }}
-        .header {{ max-width: 970px; margin: 0 auto 12px auto; }}
+        .header {{ max-width: 1220px; margin: 0 auto 12px auto; }}
         .header h2 {{ margin: 0 0 6px 0; font-size: 20px; color: #333; }}
         .header p {{ margin: 0 0 4px 0; font-size: 13px; color: #666; line-height: 1.5; }}
-        .footer {{ max-width: 970px; margin: 12px auto 0 auto; font-size: 12px; color: #888; }}
+        .footer {{ max-width: 1220px; margin: 12px auto 0 auto; font-size: 12px; color: #888; }}
         .footer a {{ color: #006666; }}
     </style>
 </head>
@@ -102,7 +111,7 @@ def build_summary_figure(csv_path=None, output_path=None):
     {script}
     <div class="footer">
         <p>Built with <a href="https://github.com/MDunitz/timeSpace">timeSpace</a>.
-           Explore the full 24-process diagram:
+           Explore the full 23-process diagram:
            <a href="desert_farm_stommel.html">Desert Farm &mdash; Processes Across Scale</a>.</p>
     </div>
 </body>
