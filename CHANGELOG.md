@@ -27,6 +27,14 @@ All notable changes to timeSpace are recorded here. Format follows
   "Bacterial cell division" becomes "Microbial cell division", spanning
   15 min (Vibrio natriegens) to about 1000 yr (deep sub-seafloor biomass
   turnover).
+- Reference objects (#104), land regions: time is the age of the feature.
+  France is 1183 yr (Treaty of Verdun, 843) and Manhattan about 400 yr
+  (New Amsterdam, 1625), since people set their extent. Sahara volume is
+  its sand, 4.5e13 to 9.2e13 m3, instead of area x 1 km. Manhattan volume
+  is its built envelope, from the top of One World Trade Center (541 m) to
+  the deepest public tunnel (55 to 152 m below street): 3.5e10 to 4.1e10 m3,
+  from the Census, CTBUH, MTA and NYC DEP. "Lake turnover
+  (seasonal mixing)" becomes "(mixing event)", 1 day to 2 months.
 
 ## [0.3.3] — 2026-10-14
 

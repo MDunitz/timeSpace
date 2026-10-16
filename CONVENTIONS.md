@@ -75,11 +75,15 @@ states the one used where a row has been sourced:
 | Drops and grains | sphere from diameter, V = (π/6) d³ | Raindrop |
 | Structures | material or enclosed volume | Hoover Dam (concrete), a house |
 | Water bodies, basins | basin or excavated volume | Lake Tahoe, Grand Canyon |
-| Land regions | area × a nominal thickness | France, Sahara, Manhattan |
+| Land regions | area × a stated thickness | France (mean elevation), Sahara (sand depth), Manhattan (tallest tower to deepest tunnel) |
 
-The land-region thickness is a framing choice and is not yet stated per
-row. `Time` likewise means different things by row (lifespan, period,
-age, or formation time), as the object's name indicates.
+Each land-region row states its thickness in `Reference`.
+
+For land regions, `Time` is the age of the feature. Where people set its
+extent, that is the age of the country or city (France, Manhattan);
+otherwise it is the natural age (Sahara Desert, Amazon rainforest). For
+other rows `Time` means what the object's name says (lifespan, period, age
+or formation time).
 
 The reference-objects file also carries `Reference_URL`: the pages behind
 the sources named in `Reference`, separated by spaces. A URL goes in only
