@@ -33,6 +33,7 @@ Y_RANGE = (1e-31, 1e17)
 # Per-row label overrides: ShortName -> (label text, x px, y px, side).
 # Offsets are Bokeh screen pixels (positive y is down); "\n" splits lines;
 # side is "left", "right", "above" or "below" (None keeps the default).
+LABEL_HALO = {"background_fill_color": "white", "background_fill_alpha": 0.75, "padding": 2}
 FONT_SCALE = 1.3  # all text sizes relative to the package defaults used before 2026-10-16
 
 
@@ -48,7 +49,7 @@ LABEL_OVERRIDES = {
         round(-28 * FONT_SCALE),
         None,
     ),
-    "Sequestration": (None, 6, round(4 * FONT_SCALE), "below"),
+    "Sequestration": (None, 18, round(4 * FONT_SCALE), "below"),
     "Nutrient transport": (None, 0, round(8 * FONT_SCALE), None),
     "Photoautotroph cell growth": (None, 0, round(10 * FONT_SCALE), None),
     "Fossil-fuel formation": ("Fossil-fuel\nformation", 45, round(2 * FONT_SCALE), "below"),
@@ -110,6 +111,7 @@ def build_summary_figure(csv_path=None, output_path=None):
         interactive=False,
         font_size=pt(8),
         space_on_x=False,
+        label_halo=LABEL_HALO,
     )
     add_legend(p, font_size=pt(12))
 
