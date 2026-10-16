@@ -12,7 +12,6 @@ from pathlib import Path
 from bokeh.resources import CDN
 from bokeh.embed import components
 
-from timeSpace.constants import DIFFUSION_COEFFICIENTS
 from timeSpace.etl import transform_process_response_sheet
 from timeSpace.plotting import (
     create_space_time_figure,
@@ -30,8 +29,6 @@ DEFAULT_CSV = DATA_DIR / "desert_farm_leverage_points.csv"
 # inside the fixed view.
 X_RANGE = (1e-16, 1e18)
 Y_RANGE = (1e-31, 1e15)
-
-DIFFUSION_LINES = {"CO₂": DIFFUSION_COEFFICIENTS["CO2"]}
 
 # Per-row label overrides: ShortName -> (label text, x px, y px).
 # Offsets are Bokeh screen pixels (positive y is down); "\n" splits lines.
@@ -84,7 +81,7 @@ def build_summary_figure(csv_path=None, output_path=None):
     p.title.text_font_style = "bold"
 
     add_magnitude_labels(p, font_size="10pt", space_on_x=False)
-    add_diffusion_lines(p, diffusion_coefficients=DIFFUSION_LINES, space_on_x=False)
+    add_diffusion_lines(p, space_on_x=False)
     add_processes(
         p,
         process_df,
