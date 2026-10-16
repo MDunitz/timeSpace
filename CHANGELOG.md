@@ -27,6 +27,10 @@ All notable changes to timeSpace are recorded here. Format follows
   "Bacterial cell division" becomes "Microbial cell division", spanning
   15 min (Vibrio natriegens) to about 1000 yr (deep sub-seafloor biomass
   turnover).
+- Mediterranean Sea and Continental crust formation now cite primary
+  sources instead of Wikipedia (#104). Mediterranean time is the age of the
+  present sea, 5.33 Myr (Zanclean reflooding); continental crust time is the
+  oldest dated crust, 4.03 Ga, and its volume is 4.7 to 7.8e9 km3.
 
 ## [0.3.3] — 2026-10-14
 
