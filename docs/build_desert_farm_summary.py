@@ -12,6 +12,7 @@ from pathlib import Path
 from bokeh.resources import CDN
 from bokeh.embed import components
 
+from timeSpace.constants import DIFFUSION_COEFFICIENTS
 from timeSpace.etl import transform_process_response_sheet
 from timeSpace.plotting import (
     create_space_time_figure,
@@ -30,6 +31,16 @@ DEFAULT_CSV = DATA_DIR / "desert_farm_leverage_points.csv"
 X_RANGE = (1e-16, 1e18)
 Y_RANGE = (1e-31, 1e15)
 
+DIFFUSION_LINES = {"CO₂": DIFFUSION_COEFFICIENTS["CO2"]}
+
+# Per-row label overrides: ShortName -> (label text, x px, y px).
+# Offsets are Bokeh screen pixels (positive y is down); "\n" splits lines.
+LABEL_OVERRIDES = {
+    "Biogeochemical Circulation Models": ("Biogeochemical\nCirculation Models", 0, -14),
+    "Nutrient transport": (None, 0, 8),
+    "Photoautotroph cell growth": (None, 0, 10),
+}
+
 
 def load_and_transform(csv_path):
     """Load CSV and run the standard ETL pipeline.
@@ -42,8 +53,15 @@ def load_and_transform(csv_path):
     """
     df = pd.read_csv(csv_path)
     process_df = transform_process_response_sheet(df, space_on_x=False)
+    process_df["label_text"] = process_df["ShortName"]
     process_df["x_offset"] = 0
     process_df["y_offset"] = 0
+    for short_name, (text, xo, yo) in LABEL_OVERRIDES.items():
+        mask = process_df["ShortName"] == short_name
+        if text is not None:
+            process_df.loc[mask, "label_text"] = text
+        process_df.loc[mask, "x_offset"] = xo
+        process_df.loc[mask, "y_offset"] = yo
     return process_df
 
 
@@ -66,7 +84,7 @@ def build_summary_figure(csv_path=None, output_path=None):
     p.title.text_font_style = "bold"
 
     add_magnitude_labels(p, font_size="10pt", space_on_x=False)
-    add_diffusion_lines(p, space_on_x=False)
+    add_diffusion_lines(p, diffusion_coefficients=DIFFUSION_LINES, space_on_x=False)
     add_processes(
         p,
         process_df,
