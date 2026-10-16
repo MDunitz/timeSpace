@@ -451,8 +451,14 @@ def add_processes(
     category_col=None,
     category_colors=None,
     space_on_x=True,
+    label_halo=None,
 ):
     """Render process ellipses and labels on a Stommel diagram.
+
+    label_halo: None for plain text, or a dict of Bokeh Text background
+      properties (e.g. {"background_fill_color": "white",
+      "background_fill_alpha": 0.75, "padding": 2}) drawn behind each label
+      so it stays legible where it crosses reference lines or outlines.
 
     label_side: global default — "left" or "right".
     Per-row override: set a "label_side" column to "left", "right", "above", or "below".
@@ -560,5 +566,6 @@ def add_processes(
                     text_baseline=baseline,
                     legend_label=row.Name,
                     visible=visible,
+                    **(label_halo or {}),
                 )
     return p
