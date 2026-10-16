@@ -97,7 +97,7 @@ e_coli_diffusion_rate = 4.9e-9 * diffusion_unit  # Stokes-Einstein, r ≈ 0.5 µ
 virus_diffusion_rate = 4.9e-8 * diffusion_unit  # 100 nm virion, Stokes-Einstein
 
 DIFFUSION_COEFFICIENTS = {
-    "CO2": CO2_diffusion_rate,
+    "CO₂": CO2_diffusion_rate,
 }
 
 cubic_angstrom = 1e-30 * base_space

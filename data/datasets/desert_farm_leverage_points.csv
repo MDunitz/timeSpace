@@ -9,5 +9,5 @@ leverage point,Community Ecology,1.00E+06,1.00E+08,1.00E-09,1.00E+00,#FF9900,Moo
 leverage point,Flocculation,1.00E+03,86400,1.00E-15,1.00E-09,#FF9900,Salim et al. (2011) J Appl Phycol; Vandamme et al. (2013) Biotechnol Adv 31:1680
 leverage point,Ponds,86400,3.15E+07,2000,2.00E+04,#FF9900,Design basis: 10x100x3m deep ponds (3000 m3); depth for photoinhibition protection and floc settling
 model,Biogeochemical Circulation Models,1.00E+05,1.00E+10,1.00E+09,1.00E+16,#013333,Levine et al. (2025) Annu Rev Earth Planet Sci 53:595
-leverage point,Sequestration,3.15E+08,1.00E+11,3.12E+09,2.18E+10,#FF9900,40 GtCO2/yr = 10.9 GtC/yr: Space_min = C as diamond (10.9 Gt / 3500 kg/m3); Space_max = 10.9 GtC as buried biomass+salt+sand at ~50% C by dry wt (21.8 Gt / 1000 kg/m3)
+leverage point,Sequestration,3.15E+08,1.00E+11,3.12E+09,2.18E+10,#FF9900,40 GtCO₂/yr = 10.9 GtC/yr: Space_min = C as diamond (10.9 Gt / 3500 kg/m3); Space_max = 10.9 GtC as buried biomass+salt+sand at ~50% C by dry wt (21.8 Gt / 1000 kg/m3)
 process,Fossil-fuel formation,3.16E+13,3.16E+15,2.03E+12,2.05E+14,#006666,Kerogen→petroleum maturation (~1-10 My) + coalification (~10-100 My); Tissot & Welte (1984)
