@@ -49,7 +49,7 @@ LABEL_OVERRIDES = {
         round(-28 * FONT_SCALE),
         None,
     ),
-    "Sequestration": (None, 18, round(4 * FONT_SCALE), "below"),
+    "Sequestration": (None, 34, round(4 * FONT_SCALE), "below"),
     "Nutrient transport": (None, 0, round(8 * FONT_SCALE), None),
     "Photoautotroph cell growth": (None, 0, round(10 * FONT_SCALE), None),
     "Fossil-fuel formation": ("Fossil-fuel\nformation", 45, round(2 * FONT_SCALE), "below"),
