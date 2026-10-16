@@ -27,6 +27,16 @@ All notable changes to timeSpace are recorded here. Format follows
   "Bacterial cell division" becomes "Microbial cell division", spanning
   15 min (Vibrio natriegens) to about 1000 yr (deep sub-seafloor biomass
   turnover).
+- Reference objects that had no source (#104): Glacial valley carving is
+  400-600 kyr of glacial occupancy (Brook et al. 2008); Internal wave runs
+  up to 6 h and 2.7e10 m3 (Bulatov & Vladimirov); Grass blade growth is
+  8-72 days per leaf (DairyNZ); "Coal seam formation" becomes "British Coal
+  Measures accumulation", 2-3.5 Myr (Scott & Stephens 2015).
+
+### Removed
+- Reference object "Fossil formation (mineralization)": no measured duration
+  was found to source it. The explorer header now counts objects from the
+  data instead of a fixed 102.
 
 ## [0.3.3] — 2026-10-14
 
