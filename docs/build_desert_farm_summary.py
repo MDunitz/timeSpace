@@ -28,14 +28,31 @@ DEFAULT_CSV = DATA_DIR / "desert_farm_leverage_points.csv"
 # in the CSV (MD models at 1e-30 m3, fossil-fuel formation at 3e15 s) stays
 # inside the fixed view.
 X_RANGE = (1e-16, 1e18)
-Y_RANGE = (1e-31, 1e15)
+Y_RANGE = (1e-31, 1e17)
 
-# Per-row label overrides: ShortName -> (label text, x px, y px).
-# Offsets are Bokeh screen pixels (positive y is down); "\n" splits lines.
+# Per-row label overrides: ShortName -> (label text, x px, y px, side).
+# Offsets are Bokeh screen pixels (positive y is down); "\n" splits lines;
+# side is "left", "right", "above" or "below" (None keeps the default).
+LABEL_HALO = {"background_fill_color": "white", "background_fill_alpha": 0.75, "padding": 2}
+FONT_SCALE = 1.3  # all text sizes relative to the package defaults used before 2026-10-16
+
+
+def pt(base):
+    """Scale a base point size by FONT_SCALE and format for Bokeh."""
+    return f"{base * FONT_SCALE:g}pt"
+
+
 LABEL_OVERRIDES = {
-    "Biogeochemical Circulation Models": ("Biogeochemical\nCirculation Models", 0, -14),
-    "Nutrient transport": (None, 0, 8),
-    "Photoautotroph cell growth": (None, 0, 10),
+    "Biogeochemical Circulation Models": (
+        "Biogeochemical\nCirculation\nModels",
+        0,
+        round(-28 * FONT_SCALE),
+        None,
+    ),
+    "Sequestration": (None, 18, round(4 * FONT_SCALE), "below"),
+    "Nutrient transport": (None, 0, round(8 * FONT_SCALE), None),
+    "Photoautotroph cell growth": (None, 0, round(10 * FONT_SCALE), None),
+    "Fossil-fuel formation": ("Fossil-fuel\nformation", 45, round(2 * FONT_SCALE), "below"),
 }
 
 
@@ -53,10 +70,13 @@ def load_and_transform(csv_path):
     process_df["label_text"] = process_df["ShortName"]
     process_df["x_offset"] = 0
     process_df["y_offset"] = 0
-    for short_name, (text, xo, yo) in LABEL_OVERRIDES.items():
+    process_df["label_side"] = ""
+    for short_name, (text, xo, yo, side) in LABEL_OVERRIDES.items():
         mask = process_df["ShortName"] == short_name
         if text is not None:
             process_df.loc[mask, "label_text"] = text
+        if side is not None:
+            process_df.loc[mask, "label_side"] = side
         process_df.loc[mask, "x_offset"] = xo
         process_df.loc[mask, "y_offset"] = yo
     return process_df
@@ -69,28 +89,31 @@ def build_summary_figure(csv_path=None, output_path=None):
     process_df = load_and_transform(csv_path)
 
     p = create_space_time_figure(
-        width=1200,
-        height=720,
+        width=1400,
+        height=760,
         title="Desert Algae Carbon Capture — Leverage Points",
         space_on_x=False,
     )
     p.sizing_mode = "stretch_width"
     p.x_range.start, p.x_range.end = X_RANGE
     p.y_range.start, p.y_range.end = Y_RANGE
-    p.title.text_font_size = "16pt"
+    p.title.text_font_size = pt(16)
     p.title.text_font_style = "bold"
+    p.axis.axis_label_text_font_size = pt(24)
+    p.axis.major_label_text_font_size = pt(12)
 
-    add_magnitude_labels(p, font_size="10pt", space_on_x=False)
+    add_magnitude_labels(p, font_size=pt(10), space_on_x=False)
     add_diffusion_lines(p, space_on_x=False)
     add_processes(
         p,
         process_df,
         group="Prefix",
         interactive=False,
-        font_size="8pt",
+        font_size=pt(8),
         space_on_x=False,
+        label_halo=LABEL_HALO,
     )
-    add_legend(p)
+    add_legend(p, font_size=pt(12))
 
     script, div = components(p)
 
@@ -106,10 +129,10 @@ def build_summary_figure(csv_path=None, output_path=None):
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0; padding: 16px; background: #fff;
         }}
-        .header {{ max-width: 1220px; margin: 0 auto 12px auto; }}
+        .header {{ max-width: 1420px; margin: 0 auto 12px auto; }}
         .header h2 {{ margin: 0 0 6px 0; font-size: 20px; color: #333; }}
         .header p {{ margin: 0 0 4px 0; font-size: 13px; color: #666; line-height: 1.5; }}
-        .footer {{ max-width: 1220px; margin: 12px auto 0 auto; font-size: 12px; color: #888; }}
+        .footer {{ max-width: 1420px; margin: 12px auto 0 auto; font-size: 12px; color: #888; }}
         .footer a {{ color: #006666; }}
     </style>
 </head>

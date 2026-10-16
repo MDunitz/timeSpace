@@ -7,6 +7,18 @@ from timeSpace.calculations import calculate_diffusion_length, calculate_sphere_
 from timeSpace.marker_axes import add_marker_axes
 
 DEFAULT_FONT_SIZE = "14pt"
+LINE_HEIGHT = 1.4  # multi-line label spacing as a multiple of the font size
+
+
+def line_spacing_px(font_size):
+    """Vertical gap between stacked label lines, in screen pixels.
+
+    Accepts a Bokeh font-size string in pt or px (e.g. "10.5pt", "14px");
+    1 pt = 4/3 px (CSS reference pixel).
+    """
+    value = float(font_size.rstrip("ptx"))
+    px = value * 4 / 3 if font_size.endswith("pt") else value
+    return round(px * LINE_HEIGHT)
 
 
 # HELPER FUNCTIONS
@@ -439,8 +451,14 @@ def add_processes(
     category_col=None,
     category_colors=None,
     space_on_x=True,
+    label_halo=None,
 ):
     """Render process ellipses and labels on a Stommel diagram.
+
+    label_halo: None for plain text, or a dict of Bokeh Text background
+      properties (e.g. {"background_fill_color": "white",
+      "background_fill_alpha": 0.75, "padding": 2}) drawn behind each label
+      so it stays legible where it crosses reference lines or outlines.
 
     label_side: global default — "left" or "right".
     Per-row override: set a "label_side" column to "left", "right", "above", or "below".
@@ -532,12 +550,12 @@ def add_processes(
             yo_val = str(row.get("y_offset", "")).strip() if has_yo else ""
             xo = int(float(xo_val)) if xo_val else 0
             yo = int(float(yo_val)) if yo_val else 0
-            LINE_PX = 15  # vertical gap between lines in screen pixels
+            line_px = line_spacing_px(font_size)
             for line_i, line_text in enumerate(lines):
                 p.text(
                     x=lx,
                     y=ly,
-                    y_offset=yo + line_i * LINE_PX,
+                    y_offset=yo + line_i * line_px,
                     x_offset=xo,
                     text=[line_text],
                     text_font_size=font_size,
@@ -548,5 +566,6 @@ def add_processes(
                     text_baseline=baseline,
                     legend_label=row.Name,
                     visible=visible,
+                    **(label_halo or {}),
                 )
     return p
