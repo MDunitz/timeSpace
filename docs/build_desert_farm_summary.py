@@ -28,7 +28,7 @@ DEFAULT_CSV = DATA_DIR / "desert_farm_leverage_points.csv"
 # in the CSV (MD models at 1e-30 m3, fossil-fuel formation at 3e15 s) stays
 # inside the fixed view.
 X_RANGE = (1e-16, 1e18)
-Y_RANGE = (1e-31, 1e15)
+Y_RANGE = (1e-31, 1e17)
 
 # Per-row label overrides: ShortName -> (label text, x px, y px, side).
 # Offsets are Bokeh screen pixels (positive y is down); "\n" splits lines;
@@ -43,14 +43,15 @@ def pt(base):
 
 LABEL_OVERRIDES = {
     "Biogeochemical Circulation Models": (
-        "Biogeochemical\nCirculation Models",
+        "Biogeochemical\nCirculation\nModels",
         0,
-        round(-14 * FONT_SCALE),
+        round(-28 * FONT_SCALE),
         None,
     ),
+    "Sequestration": (None, 0, round(10 * FONT_SCALE), "below"),
     "Nutrient transport": (None, 0, round(8 * FONT_SCALE), None),
     "Photoautotroph cell growth": (None, 0, round(10 * FONT_SCALE), None),
-    "Fossil-fuel formation": ("Fossil-fuel\nformation", 45, round(14 * FONT_SCALE), "below"),
+    "Fossil-fuel formation": ("Fossil-fuel\nformation", 45, round(2 * FONT_SCALE), "below"),
 }
 
 
