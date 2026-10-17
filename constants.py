@@ -112,7 +112,7 @@ cubic_Mm = 1e18 * base_space
 # Add time markers on x-axis
 TIME_MARKERS = {
     2.42e-17: "Electron movement",  # atomic unit of time, hbar/E_h = 2.419e-17 s
-    1.8e-15: "Period of wave \nof visible light",  # T = lambda/c, 550 nm
+    1.8e-15: "Period of wave\nof visible light",  # T = lambda/c, 550 nm
     1e-6: "Protein Folding",  # https://en.wikipedia.org/wiki/Microsecond
     1e-3: "Neuron Firing",  # https://en.wikipedia.org/wiki/Millisecond
     1e0: "Second",
