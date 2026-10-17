@@ -21,7 +21,7 @@ def marker_axis(markers, font_size, orientation=0.0):
     ticks = sorted(markers)
     return LogAxis(
         ticker=FixedTicker(ticks=ticks, minor_ticks=[]),
-        major_label_overrides={t: markers[t].replace("\n", " ") for t in ticks},
+        major_label_overrides={t: markers[t] for t in ticks},
         major_label_text_font_size=font_size,
         major_label_text_color=MARKER_COLOR,
         major_label_orientation=orientation,
