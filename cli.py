@@ -42,6 +42,7 @@ from timeSpace.etl import (
     normalize_form_responses,
 )
 from timeSpace.plotting import (
+    apply_theme,
     create_space_time_figure,
     add_predefined_processes,
     add_processes,
@@ -118,6 +119,10 @@ def parse_args(argv):
     parser.add_argument("--output", "-o", default="stommel.html", help="Output HTML path (default stommel.html).")
     parser.add_argument("--title", default=" ", help="Figure title.")
     parser.add_argument(
+        "--transparent", action="store_true", help="No plot/border background, for dropping the figure onto a slide."
+    )
+    parser.add_argument("--text-color", default=None, help="Ink colour for axes, title and legend, e.g. #FFFFFF.")
+    parser.add_argument(
         "--time-on-x",
         action="store_true",
         help="Put time on the x-axis (default: space on x, time reversed on y).",
@@ -144,6 +149,7 @@ def main(argv=None):
         title=args.title,
         interactive=args.interactive,
     )
+    apply_theme(figure, transparent=args.transparent, text_color=args.text_color)
     output = write_html(figure, args.output, title=args.title.strip() or "Stommel diagram")
     print(f"Wrote {output.resolve()}")
     if args.open:

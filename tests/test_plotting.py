@@ -272,3 +272,24 @@ def test_label_side_above_below_center_aligned():
     assert g.text_align == "center"
     # below -> anchored at Space_min (bottom of the ellipse's space range)
     assert abs(float(g.y) - 1e-18) < 1e-24  # anchored at Space_min (bottom of ellipse)
+
+
+class TestApplyTheme:
+    def test_transparent_clears_fills(self):
+        p = create_space_time_figure(transparent=True)
+        assert p.background_fill_color is None
+        assert p.border_fill_color is None
+        assert p.outline_line_color is None
+        assert p.grid[0].grid_line_alpha == 0.2
+
+    def test_text_color_sets_ink(self):
+        p = create_space_time_figure(text_color="#FFFFFF")
+        assert p.xaxis[0].axis_label_text_color == "#FFFFFF"
+        assert p.yaxis[0].major_label_text_color == "#FFFFFF"
+        assert p.title.text_color == "#FFFFFF"
+        assert p.background_fill_color == "#f8f8f8"
+
+    def test_default_unchanged(self):
+        p = create_space_time_figure()
+        assert p.background_fill_color == "#f8f8f8"
+        assert p.grid[0].grid_line_color == "white"

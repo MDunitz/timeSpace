@@ -97,7 +97,48 @@ def add_legend(p, position="right", font_size="12pt"):
     return p
 
 
-def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True, x_axis_location="above"):
+def apply_theme(p, transparent=False, text_color=None):
+    """Restyle a figure for a slide: no backgrounds and/or a single ink colour.
+
+    Parameters
+    ----------
+    p : figure
+    transparent : bool
+        Drop the plot and border fills so a PNG export (or an HTML embed)
+        shows whatever sits behind it. The grid becomes a faint tint of the
+        ink colour instead of the opaque white-on-grey default.
+    text_color : str or None
+        Ink for axis labels, tick labels, title and legend text, e.g.
+        "#FFFFFF" on a dark deck. None leaves Bokeh's default ink.
+
+    Returns
+    -------
+    figure
+    """
+    if transparent:
+        p.background_fill_color = None
+        p.border_fill_color = None
+        p.outline_line_color = None
+        p.grid.grid_line_color = text_color or "#888888"
+        p.grid.grid_line_alpha = 0.2
+        p.grid.grid_line_width = 1
+    if text_color:
+        p.axis.axis_label_text_color = text_color
+        p.axis.major_label_text_color = text_color
+        p.axis.axis_line_color = text_color
+        p.axis.major_tick_line_color = text_color
+        p.axis.minor_tick_line_color = text_color
+        p.title.text_color = text_color
+        for leg in p.legend:
+            leg.label_text_color = text_color
+            leg.background_fill_alpha = 0
+            leg.border_line_color = None
+    return p
+
+
+def create_space_time_figure(
+    width=1600, height=900, title=" ", space_on_x=True, x_axis_location="above", transparent=False, text_color=None
+):
     """Create a Stommel-style time-space figure.
 
     Parameters
@@ -110,6 +151,10 @@ def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True,
     x_axis_location : str
         Where the x axis is drawn: "above" (default) or "below". This only
         moves the x axis; it does not change which quantity is on x.
+    transparent, text_color
+        Passed to apply_theme after the figure is built; see there. Legends
+        and marker axes added later are not restyled, so call apply_theme
+        again at the end when those are used.
     """
     if space_on_x:
         xl, yl = "Space (m\u00b3)", "Time (s)"
@@ -137,7 +182,7 @@ def create_space_time_figure(width=1600, height=900, title=" ", space_on_x=True,
     p.grid.grid_line_color = "white"
     p.grid.grid_line_width = 2
 
-    return p
+    return apply_theme(p, transparent=transparent, text_color=text_color)
 
 
 # PREDEFINED DATA

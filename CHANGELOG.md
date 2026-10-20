@@ -7,6 +7,12 @@ All notable changes to timeSpace are recorded here. Format follows
 ## [Unreleased]
 
 ### Added
+- `plotting.apply_theme(p, transparent, text_color)` and matching
+  `transparent` / `text_color` keywords on `create_space_time_figure`: no
+  plot or border fill and a single ink colour, for exporting a figure onto a
+  coloured slide. `cli.py` gains `--transparent` and `--text-color`;
+  `docs/build_desert_farm_summary.py` gains the same plus `--slide-color`
+  for previewing, and drops the label halos when transparent.
 - Source-link checker (`.github/workflows/links.yml`): weekly, on demand, and
   on PRs that change the sources, it checks every link the explorer shows for
   the reference objects and reports dead ones in a "Broken source links"

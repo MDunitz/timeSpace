@@ -14,6 +14,7 @@ from bokeh.embed import components
 
 from timeSpace.etl import transform_process_response_sheet
 from timeSpace.plotting import (
+    apply_theme,
     create_space_time_figure,
     add_magnitude_labels,
     add_diffusion_lines,
@@ -82,7 +83,15 @@ def load_and_transform(csv_path):
     return process_df
 
 
-def build_summary_figure(csv_path=None, output_path=None):
+def build_summary_figure(csv_path=None, output_path=None, transparent=False, text_color=None, slide_color="#fff"):
+    """Build the summary page.
+
+    transparent / text_color : see timeSpace.plotting.apply_theme. With
+      transparent=True the page body takes slide_color so the browser preview
+      shows the figure as it will sit on the slide, and the label halo is
+      dropped (a white box behind every label defeats the point). Export the
+      PNG with the toolbar save icon: Bokeh keeps the canvas alpha.
+    """
     csv_path = csv_path or DEFAULT_CSV
     output_path = output_path or Path(__file__).resolve().parent / "desert_farm_summary.html"
 
@@ -111,9 +120,11 @@ def build_summary_figure(csv_path=None, output_path=None):
         interactive=False,
         font_size=pt(8),
         space_on_x=False,
-        label_halo=LABEL_HALO,
+        label_halo=None if transparent else LABEL_HALO,
     )
     add_legend(p, font_size=pt(12))
+    apply_theme(p, transparent=transparent, text_color=text_color)
+    body_bg = slide_color if transparent else "#fff"
 
     script, div = components(p)
 
@@ -127,7 +138,7 @@ def build_summary_figure(csv_path=None, output_path=None):
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 16px; background: #fff;
+            margin: 0; padding: 16px; background: {body_bg};
         }}
         .header {{ max-width: 1420px; margin: 0 auto 12px auto; }}
         .header h2 {{ margin: 0 0 6px 0; font-size: 20px; color: #333; }}
@@ -160,8 +171,13 @@ def build_summary_figure(csv_path=None, output_path=None):
 
 
 if __name__ == "__main__":
-    import sys
+    import argparse
 
-    csv_path = sys.argv[1] if len(sys.argv) > 1 else None
-    output_path = sys.argv[2] if len(sys.argv) > 2 else None
-    build_summary_figure(csv_path, output_path)
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("csv_path", nargs="?", default=None)
+    ap.add_argument("output_path", nargs="?", default=None)
+    ap.add_argument("--transparent", action="store_true", help="no figure background; drop label halos")
+    ap.add_argument("--text-color", default=None, help="ink for axes/title/legend, e.g. #FFFFFF")
+    ap.add_argument("--slide-color", default="#fff", help="page background for previewing, e.g. #7DBEB8")
+    a = ap.parse_args()
+    build_summary_figure(a.csv_path, a.output_path, a.transparent, a.text_color, a.slide_color)
