@@ -293,3 +293,11 @@ class TestApplyTheme:
         p = create_space_time_figure()
         assert p.background_fill_color == "#f8f8f8"
         assert p.grid[0].grid_line_color == "white"
+
+    def test_plot_fill_keeps_plot_area(self):
+        from timeSpace.plotting import apply_theme
+
+        p = apply_theme(create_space_time_figure(), transparent=True, text_color="#FFFFFF", plot_fill="#FFFFFF")
+        assert p.background_fill_color == "#FFFFFF"
+        assert p.border_fill_color is None
+        assert p.grid[0].grid_line_color == "#dddddd"

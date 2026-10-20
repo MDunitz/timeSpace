@@ -97,7 +97,7 @@ def add_legend(p, position="right", font_size="12pt"):
     return p
 
 
-def apply_theme(p, transparent=False, text_color=None):
+def apply_theme(p, transparent=False, text_color=None, plot_fill=None):
     """Restyle a figure for a slide: no backgrounds and/or a single ink colour.
 
     Parameters
@@ -110,17 +110,26 @@ def apply_theme(p, transparent=False, text_color=None):
     text_color : str or None
         Ink for axis labels, tick labels, title and legend text, e.g.
         "#FFFFFF" on a dark deck. None leaves Bokeh's default ink.
+    plot_fill : str or None
+        With transparent=True, keep the plot area (inside the axes) filled
+        with this colour while the border stays transparent, e.g. "#FFFFFF"
+        so the data keep their white-page contrast and only the frame takes
+        the slide colour. The grid reverts to the default light grey.
 
     Returns
     -------
     figure
     """
     if transparent:
-        p.background_fill_color = None
+        p.background_fill_color = plot_fill
         p.border_fill_color = None
         p.outline_line_color = None
-        p.grid.grid_line_color = text_color or "#888888"
-        p.grid.grid_line_alpha = 0.2
+        if plot_fill:
+            p.grid.grid_line_color = "#dddddd"
+            p.grid.grid_line_alpha = 1.0
+        else:
+            p.grid.grid_line_color = text_color or "#888888"
+            p.grid.grid_line_alpha = 0.2
         p.grid.grid_line_width = 1
     if text_color:
         p.axis.axis_label_text_color = text_color
