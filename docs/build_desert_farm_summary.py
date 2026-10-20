@@ -84,7 +84,13 @@ def load_and_transform(csv_path):
 
 
 def build_summary_figure(
-    csv_path=None, output_path=None, transparent=False, text_color=None, slide_color="#fff", figure_only=False
+    csv_path=None,
+    output_path=None,
+    transparent=False,
+    text_color=None,
+    slide_color="#fff",
+    figure_only=False,
+    plot_fill=None,
 ):
     """Build the summary page.
 
@@ -124,10 +130,10 @@ def build_summary_figure(
         interactive=False,
         font_size=pt(8),
         space_on_x=False,
-        label_halo=None if transparent else LABEL_HALO,
+        label_halo=LABEL_HALO if (not transparent or plot_fill) else None,
     )
     add_legend(p, font_size=pt(12))
-    apply_theme(p, transparent=transparent, text_color=text_color)
+    apply_theme(p, transparent=transparent, text_color=text_color, plot_fill=plot_fill)
     body_bg = slide_color if transparent else "#fff"
 
     if figure_only:
@@ -196,5 +202,10 @@ if __name__ == "__main__":
     ap.add_argument("--text-color", default=None, help="ink for axes/title/legend, e.g. #FFFFFF")
     ap.add_argument("--slide-color", default="#fff", help="page background for previewing, e.g. #7DBEB8")
     ap.add_argument("--figure-only", action="store_true", help="just the figure, no page header/footer or title")
+    ap.add_argument(
+        "--plot-fill", default=None, help="with --transparent: keep the plot area this colour, e.g. #FFFFFF"
+    )
     a = ap.parse_args()
-    build_summary_figure(a.csv_path, a.output_path, a.transparent, a.text_color, a.slide_color, a.figure_only)
+    build_summary_figure(
+        a.csv_path, a.output_path, a.transparent, a.text_color, a.slide_color, a.figure_only, a.plot_fill
+    )
