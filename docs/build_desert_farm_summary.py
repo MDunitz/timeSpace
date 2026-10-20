@@ -83,7 +83,9 @@ def load_and_transform(csv_path):
     return process_df
 
 
-def build_summary_figure(csv_path=None, output_path=None, transparent=False, text_color=None, slide_color="#fff"):
+def build_summary_figure(
+    csv_path=None, output_path=None, transparent=False, text_color=None, slide_color="#fff", figure_only=False
+):
     """Build the summary page.
 
     transparent / text_color : see timeSpace.plotting.apply_theme. With
@@ -91,6 +93,8 @@ def build_summary_figure(csv_path=None, output_path=None, transparent=False, tex
       shows the figure as it will sit on the slide, and the label halo is
       dropped (a white box behind every label defeats the point). Export the
       PNG with the toolbar save icon: Bokeh keeps the canvas alpha.
+    figure_only : write just the figure (no page header, caption or footer),
+      for slides; the figure title is dropped too since the slide carries it.
     """
     csv_path = csv_path or DEFAULT_CSV
     output_path = output_path or Path(__file__).resolve().parent / "desert_farm_summary.html"
@@ -125,6 +129,18 @@ def build_summary_figure(csv_path=None, output_path=None, transparent=False, tex
     add_legend(p, font_size=pt(12))
     apply_theme(p, transparent=transparent, text_color=text_color)
     body_bg = slide_color if transparent else "#fff"
+
+    if figure_only:
+        p.title.text = " "
+        p.sizing_mode = "fixed"
+        from bokeh.embed import file_html
+        from bokeh.resources import CDN as _CDN
+
+        html = file_html(p, _CDN, "Leverage points")
+        html = html.replace("<body>", f'<body style="margin:0;background:{body_bg}">', 1)
+        Path(output_path).write_text(html)
+        print(f"Built {output_path} (figure only, {len(html):,} bytes)")
+        return
 
     script, div = components(p)
 
@@ -179,5 +195,6 @@ if __name__ == "__main__":
     ap.add_argument("--transparent", action="store_true", help="no figure background; drop label halos")
     ap.add_argument("--text-color", default=None, help="ink for axes/title/legend, e.g. #FFFFFF")
     ap.add_argument("--slide-color", default="#fff", help="page background for previewing, e.g. #7DBEB8")
+    ap.add_argument("--figure-only", action="store_true", help="just the figure, no page header/footer or title")
     a = ap.parse_args()
-    build_summary_figure(a.csv_path, a.output_path, a.transparent, a.text_color, a.slide_color)
+    build_summary_figure(a.csv_path, a.output_path, a.transparent, a.text_color, a.slide_color, a.figure_only)
