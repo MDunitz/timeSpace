@@ -4,6 +4,7 @@ from bokeh.models import SaveTool
 from bokeh.plotting import figure
 
 from timeSpace.constants import TIME_MARKERS, SPACE_MARKERS
+from timeSpace.log_ticks import apply_decade_ticks
 from timeSpace.marker_axes import add_marker_axes
 
 from .config import FIGURE_HEIGHT, X_RANGE, Y_RANGE, FONT_SIZE, LABEL_FONT_SIZE, SAVE_FILENAME
@@ -30,6 +31,7 @@ def create_figure(x_range=X_RANGE, y_range=Y_RANGE):
     p.axis.major_label_text_font_size = "10pt"
     p.title.text_font_size = "14pt"
     p.background_fill_color = "#fafafa"
+    apply_decade_ticks(p)
 
     # Time on x, space on y: time names on the top axis, volume names on the right.
     add_marker_axes(p, TIME_MARKERS, SPACE_MARKERS, LABEL_FONT_SIZE, space_on_x=False)
