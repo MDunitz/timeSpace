@@ -4,6 +4,7 @@ import pandas as pd
 from bokeh.plotting import figure
 from timeSpace.constants import DIFFUSION_COEFFICIENTS, TIME_MARKERS, SPACE_MARKERS, base_time, COORD_ORIENTATION_COL
 from timeSpace.calculations import calculate_diffusion_length, calculate_sphere_volume
+from timeSpace.log_ticks import apply_decade_ticks
 from timeSpace.marker_axes import add_marker_axes
 
 DEFAULT_FONT_SIZE = "14pt"
@@ -190,6 +191,7 @@ def create_space_time_figure(
     p.background_fill_color = "#f8f8f8"
     p.grid.grid_line_color = "white"
     p.grid.grid_line_width = 2
+    apply_decade_ticks(p)
 
     return apply_theme(p, transparent=transparent, text_color=text_color)
 
