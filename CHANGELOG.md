@@ -7,6 +7,11 @@ All notable changes to timeSpace are recorded here. Format follows
 ## [Unreleased]
 
 ### Added
+- `log_ticks.apply_decade_ticks`: log axes from `create_space_time_figure`
+  and the explorer label every k-th decade with a minor tick on every decade
+  in between (2x-9x subdivisions once each decade is labelled), recomputed on
+  pan and zoom. Replaces Bokeh's default, which drew minor ticks only in the
+  decade below each label. Requires bokeh >= 3.6 (`CustomJSTicker`).
 - `plotting.apply_theme(p, transparent, text_color)` and matching
   `transparent` / `text_color` keywords on `create_space_time_figure`: no
   plot or border fill and a single ink colour, for exporting a figure onto a
